@@ -19,8 +19,8 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px;font-size:15px}
 
-/* SETUP SCREEN */
-#setupScreen{position:fixed;inset:0;background:var(--green);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;color:#fff}
+/* SETUP */
+#setupScreen{position:fixed;inset:0;background:var(--green);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;color:#fff;overflow-y:auto}
 #setupScreen h1{font-size:24px;font-weight:600;margin-bottom:8px;text-align:center}
 #setupScreen p{font-size:14px;opacity:.85;text-align:center;line-height:1.6;margin-bottom:24px}
 .setup-card{background:#fff;border-radius:14px;padding:20px;width:100%;max-width:420px;color:var(--text)}
@@ -36,7 +36,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .setup-btn:disabled{opacity:.5}
 .setup-error{color:var(--red);font-size:12px;margin-top:8px;display:none}
 
-/* SYNC INDICATOR */
+/* SYNC BAR */
 .sync-bar{background:var(--green);color:#fff;text-align:center;font-size:11px;font-family:var(--mono);padding:3px 0;position:sticky;top:0;z-index:201;letter-spacing:.3px}
 .sync-bar.syncing{background:#c07010}
 .sync-bar.error{background:var(--red)}
@@ -75,20 +75,27 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .vinput{font-family:var(--mono);font-size:19px;font-weight:600;border:2px solid var(--border);border-radius:9px;padding:9px 11px;color:var(--text);background:var(--bg);width:100%;transition:border-color .18s}
 .vinput:focus{outline:none;border-color:var(--green);background:var(--green2)}
 
-/* PAIN */
+/* PAIN – 0..10 */
 .pain-wrap{display:flex;gap:5px;flex-wrap:wrap}
 .pbtn{width:38px;height:38px;border-radius:8px;border:2px solid var(--border);background:var(--bg);font-family:var(--mono);font-size:13px;font-weight:600;cursor:pointer;color:var(--text);transition:all .12s}
+.pbtn.sel-0{background:#6c8faf;border-color:#6c8faf;color:#fff}
 .pbtn.sel-1,.pbtn.sel-2,.pbtn.sel-3{background:#27ae60;border-color:#27ae60;color:#fff}
 .pbtn.sel-4,.pbtn.sel-5,.pbtn.sel-6{background:#e67e22;border-color:#e67e22;color:#fff}
 .pbtn.sel-7,.pbtn.sel-8{background:#e74c3c;border-color:#e74c3c;color:#fff}
 .pbtn.sel-9,.pbtn.sel-10{background:#922b21;border-color:#922b21;color:#fff}
+.pain-time-row{display:flex;align-items:center;gap:8px;margin-top:10px}
+.pain-time-lbl{font-size:12px;color:var(--text3)}
 
 /* CHECKS */
 .crow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer;-webkit-user-select:none;user-select:none}
 .crow:last-child{border-bottom:none}
 .cbox{width:26px;height:26px;flex:none;border-radius:7px;border:2px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .15s}
 .cbox.on{background:var(--green);border-color:var(--green);color:#fff}
-.clabel{font-size:14px;flex:1}.ctime{font-family:var(--mono);font-size:10.5px;color:var(--text3);margin-left:auto;flex:none}
+.clabel{font-size:14px;flex:1}
+.ctime{font-family:var(--mono);font-size:10.5px;color:var(--text3);margin-left:auto;flex:none}
+/* duration input inline */
+.cdur{font-family:var(--mono);font-size:12px;width:54px;border:1px solid var(--border);border-radius:6px;padding:3px 5px;background:var(--bg);color:var(--text);text-align:center}
+.cdur:focus{outline:none;border-color:var(--green)}
 
 /* RADIO PILLS */
 .rbgroup{display:flex;gap:6px;flex-wrap:wrap}
@@ -110,7 +117,19 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .micbtn.rec{background:var(--red);border-color:var(--red);color:#fff;animation:pulse 1s infinite}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
 
-/* MED */
+/* MEDIKAMENT STAMMDATEN */
+.med-preset{display:inline-flex;align-items:center;gap:6px;background:var(--green2);border:2px solid var(--green3);border-radius:20px;padding:7px 13px;font-size:13px;font-weight:500;cursor:pointer;margin:3px;transition:all .15s;-webkit-user-select:none;user-select:none}
+.med-preset:active{background:var(--green3)}
+.med-preset .mp-name{color:var(--green);font-weight:600}
+.med-preset .mp-dose{color:var(--text3);font-family:var(--mono);font-size:11px}
+.med-preset.given{background:var(--green);border-color:var(--green)}
+.med-preset.given .mp-name,.med-preset.given .mp-dose{color:#fff}
+.med-preset-wrap{display:flex;flex-wrap:wrap;gap:2px;margin-bottom:10px}
+/* med definition row */
+.meddef-row{display:flex;gap:7px;margin-bottom:7px;align-items:center}
+.mdinput{flex:1;border:2px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px;background:var(--bg);color:var(--text);font-family:var(--sans)}
+.mdinput:focus{outline:none;border-color:var(--green);background:var(--green2)}
+/* med given log */
 .medrow{display:flex;gap:7px;margin-bottom:7px;align-items:center}
 .mtime{font-family:var(--mono);font-size:13px;width:65px;flex:none;border:2px solid var(--border);border-radius:8px;padding:8px 6px;background:var(--bg);color:var(--text)}
 .mname{flex:1;border:2px solid var(--border);border-radius:8px;padding:8px 10px;font-size:13px;background:var(--bg);color:var(--text);font-family:var(--sans)}
@@ -180,7 +199,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .team-name{flex:1;border:2px solid var(--border);border-radius:8px;padding:7px 10px;font-size:14px;background:var(--bg);color:var(--text);font-family:var(--sans)}
 .team-kuerzel:focus,.team-name:focus{outline:none;border-color:var(--green);background:var(--green2)}
 
-/* DIENST */
+/* DIENST SELECTOR */
 .dienst-sel{display:flex;gap:6px;margin-bottom:12px}
 .dbtn{flex:1;padding:10px 6px;border-radius:10px;border:2px solid var(--border);background:var(--bg);font-size:12px;cursor:pointer;color:var(--text);font-family:var(--sans);font-weight:500;text-align:center;transition:all .15s;line-height:1.4}
 .dbtn.on{color:#fff;border-color:transparent}
@@ -197,8 +216,15 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .total-bar-val{font-family:var(--mono);font-size:20px;font-weight:600;color:var(--green)}
 .dtt-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--green3);font-size:13px}
 .dtt-row:last-child{border-bottom:none}
+.info-box{background:var(--surface2);border-radius:9px;padding:12px 14px;font-size:12.5px;color:var(--text2);margin-bottom:12px;border:1px solid var(--border)}
 .settings-link{text-align:center;margin-top:12px}
 .settings-link button{background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;text-decoration:underline;font-family:var(--sans)}
+/* duration row */
+.dur-row{display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap}
+.dur-lbl{font-size:12px;color:var(--text3)}
+.dur-seg{display:flex;gap:4px;flex-wrap:wrap}
+.dur-btn{padding:5px 10px;border-radius:7px;border:1.5px solid var(--border);background:var(--bg);font-family:var(--mono);font-size:12px;cursor:pointer;color:var(--text);transition:all .12s}
+.dur-btn.on{background:var(--green);border-color:var(--green);color:#fff}
 </style>
 </head>
 <body>
@@ -206,34 +232,21 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 <!-- SETUP SCREEN -->
 <div id="setupScreen">
   <h1>🩺 Pflege-Doku</h1>
-  <p>Sarah Salin · Einmalige Einrichtung der Cloud-Synchronisation</p>
+  <p>Sarah Salin · Einmalige Einrichtung</p>
   <div class="setup-card">
-
     <div class="setup-step">
       <div class="step-title"><span class="step-num">1</span>Kostenlosen Account erstellen</div>
-      <div class="step-desc">
-        Gehe auf <a href="https://jsonbin.io" target="_blank">jsonbin.io</a> und erstelle einen <strong>kostenlosen Account</strong>.
-        (E-Mail + Passwort, kein Abo nötig)
-      </div>
+      <div class="step-desc">Gehe auf <a href="https://jsonbin.io" target="_blank">jsonbin.io</a> und erstelle einen kostenlosen Account.</div>
     </div>
-
     <div class="setup-step">
       <div class="step-title"><span class="step-num">2</span>API-Key kopieren</div>
-      <div class="step-desc">
-        Nach dem Login: oben rechts auf deinen <strong>Namen → API Keys</strong> klicken.
-        Den angezeigten Key kopieren und hier einfügen:
-      </div>
+      <div class="step-desc">Nach dem Login: oben rechts auf deinen Namen → <strong>API Keys</strong> → Key kopieren:</div>
       <input class="setup-input" id="setup-key" type="text" placeholder="$2a$10$..." autocomplete="off" autocorrect="off" spellcheck="false">
     </div>
-
     <div class="setup-step">
-      <div class="step-title"><span class="step-num">3</span>Verbindung testen</div>
-      <div class="step-desc">
-        Mit dem Button unten wird automatisch ein sicherer Speicherbereich (»Bin«) erstellt.
-        Das dauert nur einen Moment.
-      </div>
+      <div class="step-title"><span class="step-num">3</span>Verbinden</div>
+      <div class="step-desc">Ein Speicherbereich wird automatisch angelegt.</div>
     </div>
-
     <button class="setup-btn" id="setupBtn" onclick="doSetup()">🔗 Verbinden &amp; starten</button>
     <div class="setup-error" id="setupError"></div>
   </div>
@@ -277,7 +290,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 
 <div class="content">
 
-<!-- VITAL -->
+<!-- ══ VITAL ══ -->
 <div class="page on" id="pg-vitals">
   <div class="card">
     <div class="card-head">Vitalzeichen</div>
@@ -291,44 +304,150 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
       </div>
     </div>
   </div>
+
+  <!-- SCHMERZSKALA 0–10 + Uhrzeit -->
   <div class="card">
-    <div class="card-head">Schmerzskala <span style="font-weight:400;text-transform:none;font-size:11px;letter-spacing:0">1=wenig · 10=sehr stark</span></div>
-    <div class="card-body"><div class="pain-wrap" id="painWrap"></div></div>
+    <div class="card-head">Schmerzskala <span style="font-weight:400;text-transform:none;font-size:11px;letter-spacing:0">0=kein · 10=sehr stark</span></div>
+    <div class="card-body">
+      <div class="pain-wrap" id="painWrap"></div>
+      <div class="pain-time-row">
+        <span class="pain-time-lbl">Schmerz geäußert um:</span>
+        <input type="time" id="pain-time" class="vinput" style="font-size:14px;width:120px;padding:6px 9px" oninput="dirty()">
+        <button onclick="$id('pain-time').value=nowHHMM();dirty()" style="padding:6px 10px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface2);font-size:12px;cursor:pointer">Jetzt</button>
+      </div>
+    </div>
   </div>
+
+  <!-- ATEMWEG -->
   <div class="card">
-    <div class="card-head">Atemweg / Sekret</div>
+    <div class="card-head">Atemweg / Trachea</div>
     <div class="card-body">
       <div class="crow" onclick="tick('ck-sek-tr')"><div class="cbox" id="ck-sek-tr">✓</div><div class="clabel">Sekret TRACHEAL abgesaugt</div><div class="ctime" id="ct-sek-tr"></div></div>
       <div class="crow" onclick="tick('ck-sek-or')"><div class="cbox" id="ck-sek-or">✓</div><div class="clabel">Sekret ORAL abgesaugt</div><div class="ctime" id="ct-sek-or"></div></div>
       <div class="crow" onclick="tick('ck-inhal')"><div class="cbox" id="ck-inhal">✓</div><div class="clabel">Inhalation</div><div class="ctime" id="ct-inhal"></div></div>
       <div class="crow" onclick="tick('ck-cough')"><div class="cbox" id="ck-cough">✓</div><div class="clabel">Cough Assist</div><div class="ctime" id="ct-cough"></div></div>
-      <div class="crow" onclick="tick('ck-kappe')"><div class="cbox" id="ck-kappe">✓</div><div class="clabel">Verschlusskappe</div><div class="ctime" id="ct-kappe"></div></div>
+
+      <!-- Verschlusskappe mit Dauer -->
+      <div class="crow" onclick="tick('ck-kappe')">
+        <div class="cbox" id="ck-kappe">✓</div>
+        <div class="clabel">Verschlusskappe toleriert</div>
+        <div class="ctime" id="ct-kappe"></div>
+      </div>
+      <div style="padding:4px 0 8px 36px">
+        <div class="dur-row">
+          <span class="dur-lbl">Dauer:</span>
+          <div class="dur-seg" id="durseg-kappe">
+            <button class="dur-btn" data-v="15 min" onclick="durSel('durseg-kappe',this)">15'</button>
+            <button class="dur-btn" data-v="30 min" onclick="durSel('durseg-kappe',this)">30'</button>
+            <button class="dur-btn" data-v="45 min" onclick="durSel('durseg-kappe',this)">45'</button>
+            <button class="dur-btn" data-v="1 Std" onclick="durSel('durseg-kappe',this)">1h</button>
+            <button class="dur-btn" data-v="2 Std" onclick="durSel('durseg-kappe',this)">2h</button>
+            <button class="dur-btn" data-v="3 Std" onclick="durSel('durseg-kappe',this)">3h</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trachealkanüle / Stomapflaster -->
+      <div class="sec-lbl" style="padding-top:6px">Trachealkanüle / Stomapflaster</div>
+      <div class="rbgroup" id="rg-trachea" style="margin-bottom:8px">
+        <button class="rbtn" data-v="Trachealkanüle" onclick="setRb('rg-trachea',this)">🫁 Trachealkanüle</button>
+        <button class="rbtn" data-v="Stomapflaster" onclick="setRb('rg-trachea',this)">🩹 Stomapflaster</button>
+      </div>
+      <div class="dur-row" style="margin-bottom:4px">
+        <span class="dur-lbl">Getragen seit / für:</span>
+        <div class="dur-seg" id="durseg-trachea">
+          <button class="dur-btn" data-v="30 min" onclick="durSel('durseg-trachea',this)">30'</button>
+          <button class="dur-btn" data-v="1 Std" onclick="durSel('durseg-trachea',this)">1h</button>
+          <button class="dur-btn" data-v="2 Std" onclick="durSel('durseg-trachea',this)">2h</button>
+          <button class="dur-btn" data-v="4 Std" onclick="durSel('durseg-trachea',this)">4h</button>
+          <button class="dur-btn" data-v="6 Std" onclick="durSel('durseg-trachea',this)">6h</button>
+          <button class="dur-btn" data-v="ganzer Dienst" onclick="durSel('durseg-trachea',this)">Dienst</button>
+        </div>
+      </div>
     </div>
   </div>
-  <button class="savebtn" onclick="saveDay()">💾 Speichern & Sync</button>
+
+  <!-- BEINORTHESEN + BEWEGUNGSTRAINER -->
+  <div class="card">
+    <div class="card-head">Orthesen &amp; Bewegungstrainer</div>
+    <div class="card-body">
+      <div class="crow" onclick="tick('ck-orthese')">
+        <div class="cbox" id="ck-orthese">✓</div>
+        <div class="clabel">Beinorthesen getragen</div>
+        <div class="ctime" id="ct-orthese"></div>
+      </div>
+      <div style="padding:4px 0 8px 36px">
+        <div class="dur-row">
+          <span class="dur-lbl">Dauer:</span>
+          <div class="dur-seg" id="durseg-orthese">
+            <button class="dur-btn" data-v="15 min" onclick="durSel('durseg-orthese',this)">15'</button>
+            <button class="dur-btn" data-v="30 min" onclick="durSel('durseg-orthese',this)">30'</button>
+            <button class="dur-btn" data-v="45 min" onclick="durSel('durseg-orthese',this)">45'</button>
+            <button class="dur-btn" data-v="1 Std" onclick="durSel('durseg-orthese',this)">1h</button>
+            <button class="dur-btn" data-v="2 Std" onclick="durSel('durseg-orthese',this)">2h</button>
+            <button class="dur-btn" data-v="3 Std" onclick="durSel('durseg-orthese',this)">3h</button>
+          </div>
+        </div>
+      </div>
+      <div class="crow" onclick="tick('ck-bewegung')">
+        <div class="cbox" id="ck-bewegung">✓</div>
+        <div class="clabel">Bewegungstrainer angewandt</div>
+        <div class="ctime" id="ct-bewegung"></div>
+      </div>
+      <div style="padding:4px 0 4px 36px">
+        <div class="dur-row">
+          <span class="dur-lbl">Dauer:</span>
+          <div class="dur-seg" id="durseg-bewegung">
+            <button class="dur-btn" data-v="15 min" onclick="durSel('durseg-bewegung',this)">15'</button>
+            <button class="dur-btn" data-v="20 min" onclick="durSel('durseg-bewegung',this)">20'</button>
+            <button class="dur-btn" data-v="30 min" onclick="durSel('durseg-bewegung',this)">30'</button>
+            <button class="dur-btn" data-v="45 min" onclick="durSel('durseg-bewegung',this)">45'</button>
+            <button class="dur-btn" data-v="1 Std" onclick="durSel('durseg-bewegung',this)">1h</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="savebtn" onclick="saveDay()">💾 Speichern &amp; Sync</button>
 </div>
 
-<!-- PFLEGE -->
+<!-- ══ PFLEGE ══ -->
 <div class="page" id="pg-pflege">
+
+  <!-- MEDIKAMENTE SCHNELLAUSWAHL -->
   <div class="card">
-    <div class="card-head">Medikation <button class="addbtn" onclick="addMed()">+ Hinzufügen</button></div>
-    <div class="card-body" id="medList"><div style="color:var(--text3);font-size:13px">Noch keine Einträge.</div></div>
+    <div class="card-head">Medikamente – Schnellauswahl
+      <button class="addbtn" onclick="showTab('team',document.querySelector('.tab:last-child'));setTimeout(()=>document.getElementById('med-def-section').scrollIntoView({behavior:'smooth'}),100)">⚙️ Verwalten</button>
+    </div>
+    <div class="card-body">
+      <div id="medPresetWrap" class="med-preset-wrap">
+        <div style="color:var(--text3);font-size:13px">Noch keine Medikamente definiert. Bitte im Team-Tab unter „Medikamente definieren" anlegen.</div>
+      </div>
+      <div class="sec-lbl" style="margin-top:6px">Verabreichte Medikamente heute</div>
+      <div id="medGivenList"><div style="color:var(--text3);font-size:13px">Noch keine Einträge.</div></div>
+      <button class="addbtn" style="margin-top:8px" onclick="addMedManual()">+ Manuell hinzufügen</button>
+    </div>
   </div>
+
+  <!-- GASTROTUBE (statt PEG) -->
   <div class="card">
-    <div class="card-head">PEG-Verband</div>
+    <div class="card-head">Gastrotube-Verband</div>
     <div class="card-body">
       <div class="sec-lbl">Hautumgebung</div>
-      <div class="vrow"><textarea class="ta" id="peg-haut" placeholder="Befund…" oninput="dirty()"></textarea><button class="micbtn" onclick="mic(this,'peg-haut')">🎤</button></div>
+      <div class="vrow"><textarea class="ta" id="peg-haut" placeholder="Befund Hautumgebung Gastrotube…" oninput="dirty()"></textarea><button class="micbtn" onclick="mic(this,'peg-haut')">🎤</button></div>
       <div class="sec-lbl">Wundbeschreibung</div>
       <div class="vrow"><textarea class="ta" id="peg-wunde" placeholder="Ggf. Wundbeschreibung…" oninput="dirty()"></textarea><button class="micbtn" onclick="mic(this,'peg-wunde')">🎤</button></div>
     </div>
   </div>
+
   <div class="card">
     <div class="card-head">STOMA-Verband</div>
     <div class="card-body">
       <div class="vrow"><textarea class="ta" id="stoma" placeholder="Befund Stomaumgebung…" oninput="dirty()"></textarea><button class="micbtn" onclick="mic(this,'stoma')">🎤</button></div>
     </div>
   </div>
+
   <div class="card">
     <div class="card-head">Krankenbeobachtung</div>
     <div class="card-body">
@@ -351,19 +470,19 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
       <div class="crow" onclick="tick('ck-pulso')"><div class="cbox" id="ck-pulso">✓</div><div class="clabel">Pulsoxymetrie</div><div class="ctime" id="ct-pulso"></div></div>
     </div>
   </div>
-  <button class="savebtn" onclick="saveDay()">💾 Speichern & Sync</button>
+  <button class="savebtn" onclick="saveDay()">💾 Speichern &amp; Sync</button>
 </div>
 
-<!-- LAGERUNG -->
+<!-- ══ LAGERUNG ══ -->
 <div class="page" id="pg-lager">
   <div class="card">
     <div class="card-head">Positionierung / Lagerung <button class="addbtn" onclick="addLager()">+ Hinzufügen</button></div>
     <div class="card-body" id="lagerList"><div style="color:var(--text3);font-size:13px">Noch keine Einträge.</div></div>
   </div>
-  <button class="savebtn" onclick="saveDay()">💾 Speichern & Sync</button>
+  <button class="savebtn" onclick="saveDay()">💾 Speichern &amp; Sync</button>
 </div>
 
-<!-- TRINKEN -->
+<!-- ══ TRINKEN ══ -->
 <div class="page" id="pg-trinken">
   <div class="card">
     <div class="card-head">Getränk erfassen</div>
@@ -402,35 +521,25 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   </div>
 </div>
 
-<!-- FLÜSSIGKEIT -->
+<!-- ══ FLÜSSIGKEIT ══ -->
 <div class="page" id="pg-fluid">
   <div class="card">
-    <div class="card-head">Einfuhr</div>
+    <div class="card-head">Flüssigkeitszufuhr</div>
     <div class="card-body">
       <div class="frow" style="background:var(--green2);border-radius:8px;padding:8px 10px;margin-bottom:10px">
         <div class="flabel" style="font-weight:600;color:var(--green)">☕ Trinkmenge (aus Trinken-Tab)</div>
         <div style="font-family:var(--mono);font-size:16px;font-weight:600;color:var(--green)" id="f-drink-display">0 ml</div>
       </div>
-      <div class="frow"><div class="flabel">Sondenkost</div><input class="finput" id="f-sonde" type="number" inputmode="numeric" placeholder="0" oninput="calcFluid()"><div class="funit">ml</div></div>
+      <div class="frow"><div class="flabel">Sondenkost (Gastrotube)</div><input class="finput" id="f-sonde" type="number" inputmode="numeric" placeholder="0" oninput="calcFluid()"><div class="funit">ml</div></div>
       <div class="frow"><div class="flabel">Infusion</div><input class="finput" id="f-infus" type="number" inputmode="numeric" placeholder="0" oninput="calcFluid()"><div class="funit">ml</div></div>
       <div class="frow"><div class="flabel">Sonstiges</div><input class="finput" id="f-sonst-ein" type="number" inputmode="numeric" placeholder="0" oninput="calcFluid()"><div class="funit">ml</div></div>
-      <div class="ftotal" id="ft-ein">Gesamt Einfuhr: – ml</div>
+      <div class="ftotal" id="ft-ein">Gesamt Zufuhr: – ml</div>
     </div>
   </div>
-  <div class="card">
-    <div class="card-head">Ausfuhr</div>
-    <div class="card-body">
-      <div class="frow"><div class="flabel">Urin (ml)</div><input class="finput" id="f-urin" type="number" inputmode="numeric" placeholder="0" oninput="calcFluid()"><div class="funit">ml</div></div>
-      <div class="frow"><div class="flabel">Stuhl (ml/g)</div><input class="finput" id="f-stuhl-ml" type="number" inputmode="numeric" placeholder="0" oninput="calcFluid()"><div class="funit">ml</div></div>
-      <div class="frow"><div class="flabel">Sonstiges</div><input class="finput" id="f-sonst-aus" type="number" inputmode="numeric" placeholder="0" oninput="calcFluid()"><div class="funit">ml</div></div>
-      <div class="ftotal" id="ft-aus">Gesamt Ausfuhr: – ml</div>
-      <div class="ftotal" id="ft-bil" style="margin-top:4px">Bilanz: – ml</div>
-    </div>
-  </div>
-  <button class="savebtn" onclick="saveDay()">💾 Speichern & Sync</button>
+  <button class="savebtn" onclick="saveDay()">💾 Speichern &amp; Sync</button>
 </div>
 
-<!-- AUSSCHEIDUNG -->
+<!-- ══ AUSSCHEIDUNG ══ -->
 <div class="page" id="pg-ausscheid">
   <div class="card">
     <div class="card-head">Stuhlgang erfassen</div>
@@ -465,6 +574,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     <div class="card-head">Stuhlgang heute</div>
     <div class="card-body" id="stuhlLog"><div class="nodata"><span class="ico">🚽</span>Noch keine Einträge.</div></div>
   </div>
+
   <div class="card" style="margin-top:4px">
     <div class="card-head">Urin erfassen</div>
     <div class="card-body">
@@ -496,15 +606,15 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     <div class="card-head">Urin heute</div>
     <div class="card-body" id="urinLog"><div class="nodata"><span class="ico">💧</span>Noch keine Einträge.</div></div>
   </div>
-  <button class="savebtn" onclick="saveDay()" style="margin-top:4px">💾 Speichern & Sync</button>
+  <button class="savebtn" onclick="saveDay()" style="margin-top:4px">💾 Speichern &amp; Sync</button>
 </div>
 
-<!-- BERICHT -->
+<!-- ══ BERICHT ══ -->
 <div class="page" id="pg-bericht">
   <div class="card">
-    <div class="card-head">Dienst & Pflegerin</div>
+    <div class="card-head">Dienst &amp; Pflegerin</div>
     <div class="card-body">
-      <div class="sec-lbl">Dienst</div>
+      <div class="sec-lbl">Dienst wählen</div>
       <div class="dienst-sel">
         <button class="dbtn td" data-v="Tagdienst (08–15)"   onclick="setDienst(this)">🌤 Tagdienst<br><small>08:00–15:00</small></button>
         <button class="dbtn sd" data-v="Spätdienst (15–22)"  onclick="setDienst(this)">🌆 Spätdienst<br><small>15:00–22:00</small></button>
@@ -530,10 +640,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
         <button class="micbtn" onclick="mic(this,'besond')">🎤</button></div>
     </div>
   </div>
-  <button class="savebtn" onclick="saveDay()">💾 Speichern & Sync</button>
+  <button class="savebtn" onclick="saveDay()">💾 Speichern &amp; Sync</button>
 </div>
 
-<!-- AUSWERTUNG -->
+<!-- ══ AUSWERTUNG ══ -->
 <div class="page" id="pg-stats">
   <select class="pselect" id="periodSel" onchange="renderStats()">
     <option value="7">Letzte 7 Tage</option>
@@ -542,54 +652,68 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     <option value="90">Letzte 90 Tage</option>
     <option value="360">Letzte 360 Tage</option>
   </select>
-  <div id="statsContent"><div class="nodata"><span class="ico">📊</span>Noch keine Daten vorhanden.</div></div>
+  <div id="statsContent"><div class="nodata"><span class="ico">📊</span>Noch keine Daten.</div></div>
 </div>
 
-<!-- VERLAUF -->
+<!-- ══ VERLAUF ══ -->
 <div class="page" id="pg-verlauf">
   <div id="verlaufContent"><div class="nodata"><span class="ico">📋</span>Noch keine Einträge.</div></div>
 </div>
 
-<!-- TEAM -->
+<!-- ══ TEAM ══ -->
 <div class="page" id="pg-team">
   <div class="card">
     <div class="card-head">Pflegerinnen-Register <button class="addbtn" onclick="addTeamRow()">+ Hinzufügen</button></div>
     <div class="card-body" id="teamList"><div style="color:var(--text3);font-size:13px">Noch keine Einträge.</div></div>
   </div>
-  <div style="background:var(--surface2);border-radius:9px;padding:12px 14px;font-size:12.5px;color:var(--text2);margin-bottom:12px;border:1px solid var(--border)">
+
+  <!-- MEDIKAMENTE DEFINIEREN -->
+  <div class="card" id="med-def-section">
+    <div class="card-head">Medikamente definieren <button class="addbtn" onclick="addMedDef()">+ Hinzufügen</button></div>
+    <div class="card-body">
+      <div style="color:var(--text3);font-size:12px;margin-bottom:10px">Diese Medikamente erscheinen als Schnellauswahl im Pflege-Tab.</div>
+      <div id="medDefList"><div style="color:var(--text3);font-size:13px">Noch keine Medikamente definiert.</div></div>
+    </div>
+  </div>
+
+  <div class="info-box">
     💡 <strong>Tagdienst</strong> 08–15 Uhr · <strong>Spätdienst</strong> 15–22 Uhr · <strong>Nachtdienst</strong> 22–08 Uhr
   </div>
-  <button class="savebtn" onclick="saveTeam()">💾 Team speichern & Sync</button>
+  <button class="savebtn" onclick="saveTeam()">💾 Team &amp; Medikamente speichern</button>
   <div class="settings-link"><button onclick="resetSetup()">⚙️ Cloud-Einstellungen zurücksetzen</button></div>
 </div>
 
-</div>
+</div><!-- /content -->
 <div class="toast" id="toast"></div>
 
 <script>
 'use strict';
-/* ── constants ── */
-const LS_KEY='pflege_key', LS_BIN='pflege_bin', LS_CACHE='pflege_cache_v1';
+const STORE='pflege_v5', TSTORE='pflege_team_v2';
 const API='https://api.jsonbin.io/v3';
+const LS_KEY='pflege_key', LS_BIN='pflege_bin', LS_CACHE='pflege_cache_v2';
+
+let db={}, team=[], medDefs=[];  // medDefs = [{name,dose}]
+let curDate=todayISO(), isDirty=false;
+let painSel=-1, checks={}, radios={}, durations={}, lagers=[];
+let medGiven=[];  // [{time,name,dose}] – per day
+let drinkLog=[], stuhlLog=[], urinLog=[];
+let activeDienst='', micNode=null;
+let apiKey='', binId='';
+
 const LAGER_POS=['Rücken (Rü)','Linke Seite (li)','Rechte Seite (re)',
   'Oberkörperhochlagerung (OK)','Rollstuhl (RS)','Sitzbett (sb)',
   'Mikrolagerung (M)','Bettkante (BK)','nicht toleriert (n.t.)'];
-const ALL_TXT=['v-puls','v-spo2','v-rr-s','v-rr-d','v-temp',
-  'peg-haut','peg-wunde','stoma','atem-fd','atem-nd','haut-besch',
-  'urin-fd','urin-nd','f-sonde','f-infus','f-sonst-ein',
-  'f-urin','f-stuhl-ml','f-sonst-aus','pflegebericht','besond'];
-const ALL_CK=['ck-sek-tr','ck-sek-or','ck-inhal','ck-cough','ck-kappe',
-  'ck-absaug','ck-lifter','ck-cough2','ck-notfall','ck-pulso'];
-const DRINK_ICO={Kaffee:'☕',Tee:'🍵',Wasser:'💧',Saft:'🍹',Milch:'🥛',Sonstiges:'🥤'};
 
-/* ── state ── */
-let apiKey='', binId='';
-let db={}, team=[];
-let curDate=todayISO(), isDirty=false;
-let painSel=0, checks={}, radios={}, meds=[], lagers=[];
-let drinkLog=[], stuhlLog=[], urinLog=[];
-let activeDienst='', micNode=null;
-let syncPending=false;
+const ALL_TXT=['v-puls','v-spo2','v-rr-s','v-rr-d','v-temp',
+  'pain-time','peg-haut','peg-wunde','stoma','atem-fd','atem-nd','haut-besch',
+  'urin-fd','urin-nd','f-sonde','f-infus','f-sonst-ein',
+  'pflegebericht','besond'];
+
+const ALL_CK=['ck-sek-tr','ck-sek-or','ck-inhal','ck-cough','ck-kappe',
+  'ck-absaug','ck-lifter','ck-cough2','ck-notfall','ck-pulso',
+  'ck-orthese','ck-bewegung'];
+
+const DRINK_ICO={Kaffee:'☕',Tee:'🍵',Wasser:'💧',Saft:'🍹',Milch:'🥛',Sonstiges:'🥤'};
 
 /* ── helpers ── */
 function todayISO(){const d=new Date();return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())}
@@ -607,73 +731,58 @@ async function doSetup(){
   $id('setupBtn').disabled=true;$id('setupBtn').textContent='⏳ Verbinde…';
   hideSetupErr();
   try{
-    // Create a new bin
-    const res=await fetch(API+'/b',{
-      method:'POST',
+    const res=await fetch(API+'/b',{method:'POST',
       headers:{'Content-Type':'application/json','X-Master-Key':key,'X-Bin-Name':'pflege-salin','X-Bin-Private':'true'},
-      body:JSON.stringify({days:{},team:[],version:1})
-    });
+      body:JSON.stringify({days:{},team:[],medDefs:[],version:2})});
     if(!res.ok){const e=await res.json();throw new Error(e.message||'HTTP '+res.status)}
     const data=await res.json();
     binId=data.metadata.id;
-    localStorage.setItem(LS_KEY,key);
-    localStorage.setItem(LS_BIN,binId);
+    localStorage.setItem(LS_KEY,key);localStorage.setItem(LS_BIN,binId);
     apiKey=key;
     $id('setupScreen').style.display='none';
-    showToast('✓ Verbunden! Daten werden geladen…');
-    await loadFromCloud();
-    init();
+    showToast('✓ Verbunden!');
+    await loadFromCloud();init();
   }catch(e){
     $id('setupBtn').disabled=false;$id('setupBtn').textContent='🔗 Verbinden & starten';
-    showSetupErr('Fehler: '+e.message+'\nBitte API-Key prüfen.');
+    showSetupErr('Fehler: '+e.message);
   }
 }
 function showSetupErr(msg){const el=$id('setupError');el.textContent=msg;el.style.display='block'}
 function hideSetupErr(){$id('setupError').style.display='none'}
 function resetSetup(){
-  if(!confirm('Cloud-Verbindung zurücksetzen? Die gespeicherten Daten in der Cloud bleiben erhalten.'))return;
-  localStorage.removeItem(LS_KEY);localStorage.removeItem(LS_BIN);
-  location.reload();
+  if(!confirm('Cloud-Verbindung zurücksetzen?'))return;
+  localStorage.removeItem(LS_KEY);localStorage.removeItem(LS_BIN);location.reload();
 }
 
-/* ── CLOUD SYNC ── */
+/* ── CLOUD ── */
 function setSyncBar(state,msg){
-  const bar=$id('syncBar');
-  bar.className='sync-bar'+(state==='syncing'?' syncing':state==='error'?' error':'');
-  bar.textContent=msg;
+  const b=$id('syncBar');
+  b.className='sync-bar'+(state==='syncing'?' syncing':state==='error'?' error':'');
+  b.textContent=msg;
 }
-
 async function loadFromCloud(){
-  setSyncBar('syncing','⏳ Lade Daten aus der Cloud…');
+  setSyncBar('syncing','⏳ Lade Daten…');
   try{
     const res=await fetch(API+'/b/'+binId+'/latest',{headers:{'X-Master-Key':apiKey}});
     if(!res.ok)throw new Error('HTTP '+res.status);
-    const data=await res.json();
-    const rec=data.record;
-    db=rec.days||{};
-    team=rec.team||[];
-    // cache locally
-    localStorage.setItem(LS_CACHE,JSON.stringify({days:db,team}));
-    setSyncBar('ok','☁️ Cloud-Sync aktiv · Zuletzt geladen: '+nowHHMM());
+    const rec=(await res.json()).record;
+    db=rec.days||{};team=rec.team||[];medDefs=rec.medDefs||[];
+    localStorage.setItem(LS_CACHE,JSON.stringify({days:db,team,medDefs}));
+    setSyncBar('ok','☁️ Synchronisiert · '+nowHHMM());
   }catch(e){
-    // try local cache
-    try{const c=JSON.parse(localStorage.getItem(LS_CACHE)||'{}');db=c.days||{};team=c.team||[]}catch{}
+    try{const c=JSON.parse(localStorage.getItem(LS_CACHE)||'{}');db=c.days||{};team=c.team||[];medDefs=c.medDefs||[]}catch{}
     setSyncBar('error','⚠️ Offline – lokaler Cache · '+e.message);
   }
 }
-
 async function saveToCloud(){
-  setSyncBar('syncing','⏳ Speichert in Cloud…');
-  // update local cache
-  localStorage.setItem(LS_CACHE,JSON.stringify({days:db,team}));
+  setSyncBar('syncing','⏳ Speichert…');
+  localStorage.setItem(LS_CACHE,JSON.stringify({days:db,team,medDefs}));
   try{
-    const res=await fetch(API+'/b/'+binId,{
-      method:'PUT',
+    const res=await fetch(API+'/b/'+binId,{method:'PUT',
       headers:{'Content-Type':'application/json','X-Master-Key':apiKey},
-      body:JSON.stringify({days:db,team,version:1,lastSaved:new Date().toISOString()})
-    });
+      body:JSON.stringify({days:db,team,medDefs,version:2,lastSaved:new Date().toISOString()})});
     if(!res.ok)throw new Error('HTTP '+res.status);
-    setSyncBar('ok','☁️ Gespeichert & synchronisiert · '+nowHHMM());
+    setSyncBar('ok','☁️ Gespeichert · '+nowHHMM());
   }catch(e){
     setSyncBar('error','⚠️ Cloud-Fehler (lokal gesichert) · '+e.message);
   }
@@ -681,27 +790,16 @@ async function saveToCloud(){
 
 /* ── INIT ── */
 function init(){
-  buildPain();detectDienst();
-  updateDateDisplay();loadDay();
-  renderVerlauf();renderStats();renderTeamList();
-  // auto-refresh from cloud every 60s
-  setInterval(async()=>{
-    if(!isDirty){await loadFromCloud();loadDay();renderVerlauf();renderStats()}
-  },60000);
+  buildPain();detectDienst();updateDateDisplay();loadDay();
+  renderVerlauf();renderStats();renderTeamList();renderMedDefList();renderMedPresets();
+  setInterval(async()=>{if(!isDirty){await loadFromCloud();loadDay();renderVerlauf();renderStats()}},60000);
 }
-
-/* ── boot ── */
 (function boot(){
-  apiKey=localStorage.getItem(LS_KEY)||'';
-  binId=localStorage.getItem(LS_BIN)||'';
-  if(apiKey&&binId){
-    $id('setupScreen').style.display='none';
-    loadFromCloud().then(()=>{init()});
-  }
-  // else setup screen stays visible
+  apiKey=localStorage.getItem(LS_KEY)||'';binId=localStorage.getItem(LS_BIN)||'';
+  if(apiKey&&binId){$id('setupScreen').style.display='none';loadFromCloud().then(()=>init())}
 })();
 
-/* ── date ── */
+/* ── DATE ── */
 function updateDateDisplay(){$id('dateStr').textContent=fmtDate(curDate)}
 function shiftDay(d){
   if(isDirty&&!confirm('Ungespeicherte Änderungen gehen verloren. Trotzdem wechseln?'))return;
@@ -713,7 +811,7 @@ function gotoToday(){
   curDate=todayISO();updateDateDisplay();loadDay();
 }
 
-/* ── dienst ── */
+/* ── DIENST ── */
 function detectDienst(){
   const h=new Date().getHours();
   let v,badge;
@@ -724,9 +822,16 @@ function detectDienst(){
   if(!activeDienst){activeDienst=v;applyDienstUI()}
 }
 function applyDienstUI(){document.querySelectorAll('.dbtn').forEach(b=>{b.classList.remove('on');if(b.dataset.v===activeDienst)b.classList.add('on')})}
-function setDienst(btn){document.querySelectorAll('.dbtn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');activeDienst=btn.dataset.v;dirty()}
+function setDienst(btn){
+  document.querySelectorAll('.dbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');activeDienst=btn.dataset.v;
+  // update header badge
+  const labels={'Tagdienst (08–15)':'🌤 Tagdienst 08–15','Spätdienst (15–22)':'🌆 Spätdienst 15–22','Nachtdienst (22–08)':'🌙 Nachtdienst 22–08'};
+  $id('dbadge').textContent=labels[activeDienst]||activeDienst;
+  dirty();
+}
 
-/* ── tabs ── */
+/* ── TABS ── */
 function showTab(name,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
@@ -735,17 +840,30 @@ function showTab(name,btn){
   if(name==='verlauf')renderVerlauf();
 }
 
-/* ── pain ── */
+/* ── PAIN 0–10 ── */
 function buildPain(){
   const w=$id('painWrap');w.innerHTML='';
-  for(let i=1;i<=10;i++){const b=document.createElement('button');b.className='pbtn';b.textContent=i;b.id='pb'+i;b.onclick=()=>selectPain(i);w.appendChild(b)}
+  for(let i=0;i<=10;i++){
+    const b=document.createElement('button');
+    b.className='pbtn';
+    b.textContent=i===0?'0\u200Bkein':String(i);
+    if(i===0){b.style.fontSize='11px';b.style.width='52px'}
+    b.id='pb'+i;b.onclick=()=>selectPain(i);
+    w.appendChild(b);
+  }
 }
-function selectPain(v){painSel=painSel===v?0:v;applyPainUI();dirty()}
-function applyPainUI(){for(let i=1;i<=10;i++){const b=$id('pb'+i);b.className='pbtn';if(i<=painSel)b.classList.add('sel-'+i)}}
+function selectPain(v){painSel=painSel===v?-1:v;applyPainUI();dirty()}
+function applyPainUI(){
+  for(let i=0;i<=10;i++){
+    const b=$id('pb'+i);b.className='pbtn';
+    if(i===0&&b.style){b.style.fontSize='11px';b.style.width='52px'}
+    if(painSel>=0&&i<=painSel)b.classList.add('sel-'+i);
+  }
+}
 
-/* ── checks ── */
+/* ── CHECKS ── */
 function tick(id){
-  const box=$id(id),tid='ct-'+id.slice(3),tel=$id(tid);
+  const box=$id(id),tel=$id('ct-'+id.slice(3));
   if(checks[id]!==undefined){delete checks[id];box.classList.remove('on');if(tel)tel.textContent=''}
   else{const t=nowHHMM();checks[id]=t;box.classList.add('on');if(tel)tel.textContent=t}
   dirty();
@@ -759,31 +877,92 @@ function applyChecksUI(){
   });
 }
 
-/* ── radios ── */
-function setRb(gid,btn){$id(gid).querySelectorAll('.rbtn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');radios[gid]=btn.dataset.v;dirty()}
-function applyRadiosUI(){Object.entries(radios).forEach(([gid,val])=>{const g=$id(gid);if(!g)return;g.querySelectorAll('.rbtn').forEach(b=>b.classList.toggle('on',b.dataset.v===val))})}
+/* ── DURATIONS ── */
+function durSel(gid,btn){
+  $id(gid).querySelectorAll('.dur-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');durations[gid]=btn.dataset.v;dirty();
+}
+function applyDurationsUI(){
+  Object.entries(durations).forEach(([gid,val])=>{
+    const g=$id(gid);if(!g)return;
+    g.querySelectorAll('.dur-btn').forEach(b=>{b.classList.remove('on');if(b.dataset.v===val)b.classList.add('on')});
+  });
+}
 
-/* ── segments ── */
+/* ── RADIOS ── */
+function setRb(gid,btn){
+  $id(gid).querySelectorAll('.rbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');radios[gid]=btn.dataset.v;dirty();
+}
+function applyRadiosUI(){
+  Object.entries(radios).forEach(([gid,val])=>{
+    const g=$id(gid);if(!g)return;
+    g.querySelectorAll('.rbtn').forEach(b=>b.classList.toggle('on',b.dataset.v===val));
+  });
+}
+
+/* ── SEGMENTS ── */
 function segSel(gid,btn){$id(gid).querySelectorAll('.segbtn').forEach(b=>b.classList.remove('on'));btn.classList.add('on');dirty()}
 function segGet(gid){const b=$id(gid)?.querySelector('.segbtn.on');return b?b.dataset.v:''}
 function segClear(gid){$id(gid)?.querySelectorAll('.segbtn').forEach(b=>b.classList.remove('on'))}
 
-/* ── meds ── */
-function addMed(time='',name=''){meds.push({time,name});renderMedList();dirty()}
-function renderMedList(){
-  const w=$id('medList');
-  if(!meds.length){w.innerHTML='<div style="color:var(--text3);font-size:13px">Noch keine Einträge.</div>';return}
+/* ── MED DEFS (Stammdaten) ── */
+function addMedDef(name='',dose=''){medDefs.push({name,dose});renderMedDefList()}
+function renderMedDefList(){
+  const w=$id('medDefList');
+  if(!medDefs.length){w.innerHTML='<div style="color:var(--text3);font-size:13px">Noch keine Medikamente definiert.</div>';renderMedPresets();return}
   w.innerHTML='';
-  meds.forEach((m,i)=>{
+  medDefs.forEach((m,i)=>{
+    const d=document.createElement('div');d.className='meddef-row';
+    d.innerHTML=`<input class="mdinput" value="${escH(m.name)}" placeholder="Medikament" style="flex:2" oninput="medDefs[${i}].name=this.value;renderMedPresets()">
+      <input class="mdinput" value="${escH(m.dose)}" placeholder="Dosis (z.B. 10mg)" oninput="medDefs[${i}].dose=this.value;renderMedPresets()">
+      <button class="del-btn" onclick="medDefs.splice(${i},1);renderMedDefList()">✕</button>`;
+    w.appendChild(d);
+  });
+  renderMedPresets();
+}
+
+/* ── MED PRESETS (Schnellauswahl) ── */
+function renderMedPresets(){
+  const w=$id('medPresetWrap');
+  if(!medDefs.length){w.innerHTML='<div style="color:var(--text3);font-size:13px">Noch keine Medikamente definiert (→ Team-Tab).</div>';return}
+  w.innerHTML='';
+  medDefs.forEach((m,i)=>{
+    // check if already given this time slot (within last 30min)
+    const btn=document.createElement('button');
+    btn.className='med-preset';
+    btn.innerHTML=`<span class="mp-name">${escH(m.name)}</span><span class="mp-dose">${escH(m.dose)}</span>`;
+    btn.onclick=()=>giveMed(m.name,m.dose,btn);
+    w.appendChild(btn);
+  });
+}
+function giveMed(name,dose,btn){
+  const t=nowHHMM();
+  medGiven.push({time:t,name,dose});
+  btn.classList.add('given');
+  setTimeout(()=>btn.classList.remove('given'),2000);
+  renderMedGivenList();dirty();
+  showToast('✓ '+name+(dose?' ('+dose+')':'')+' um '+t);
+}
+function addMedManual(){
+  medGiven.push({time:nowHHMM(),name:'',dose:''});
+  renderMedGivenList();dirty();
+}
+function renderMedGivenList(){
+  const w=$id('medGivenList');
+  if(!medGiven.length){w.innerHTML='<div style="color:var(--text3);font-size:13px">Noch keine Einträge.</div>';return}
+  w.innerHTML='';
+  medGiven.forEach((m,i)=>{
     const d=document.createElement('div');d.className='medrow';
-    d.innerHTML=`<input class="mtime" type="time" value="${m.time}" onchange="meds[${i}].time=this.value;dirty()">
-      <input class="mname" type="text" value="${escH(m.name)}" placeholder="Medikament / Grund" oninput="meds[${i}].name=this.value;dirty()">
-      <button class="del-btn" onclick="meds.splice(${i},1);renderMedList();dirty()">✕</button>`;
+    d.innerHTML=`<input class="mtime" type="time" value="${m.time}" onchange="medGiven[${i}].time=this.value;dirty()">
+      <input class="mname" value="${escH(m.name)}" placeholder="Medikament" style="flex:2" oninput="medGiven[${i}].name=this.value;dirty()">
+      <input class="mname" value="${escH(m.dose)}" placeholder="Dosis" style="flex:1" oninput="medGiven[${i}].dose=this.value;dirty()">
+      <button class="del-btn" onclick="medGiven.splice(${i},1);renderMedGivenList();dirty()">✕</button>`;
     w.appendChild(d);
   });
 }
 
-/* ── lager ── */
+/* ── LAGER ── */
 function addLager(time='',pos=''){lagers.push({time,pos});renderLagerList();dirty()}
 function renderLagerList(){
   const w=$id('lagerList');
@@ -799,7 +978,7 @@ function renderLagerList(){
   });
 }
 
-/* ── drinks ── */
+/* ── DRINKS ── */
 function addDrinkEntry(){
   const type=radios['rg-drink-type'],ml=segGet('seg-drink-ml');
   if(!type){showToast('⚠️ Bitte Getränk wählen');return}
@@ -807,7 +986,7 @@ function addDrinkEntry(){
   drinkLog.push({type,ml:parseInt(ml),time:nowHHMM()});
   $id('rg-drink-type').querySelectorAll('.rbtn').forEach(b=>b.classList.remove('on'));
   delete radios['rg-drink-type'];segClear('seg-drink-ml');
-  renderDrinkLog();dirty();showToast('✓ '+type+' ('+ml+' ml) eingetragen');
+  renderDrinkLog();dirty();showToast('✓ '+type+' ('+ml+' ml)');
 }
 function renderDrinkLog(){
   const total=drinkLog.reduce((a,e)=>a+e.ml,0);
@@ -830,7 +1009,7 @@ function renderDrinkLog(){
   calcFluid();
 }
 
-/* ── stuhl ── */
+/* ── STUHL ── */
 function addStuhlEntry(){
   const time=$id('stuhl-time').value||nowHHMM();
   const menge=segGet('seg-stuhl-menge'),konst=segGet('seg-stuhl-konst');
@@ -839,7 +1018,7 @@ function addStuhlEntry(){
   stuhlLog.push({time,menge,konst,bem});
   $id('stuhl-time').value='';segClear('seg-stuhl-menge');segClear('seg-stuhl-konst');
   $id('stuhl-bem').value='';
-  renderStuhlLog();dirty();showToast('✓ Stuhlgang eingetragen ('+time+')');
+  renderStuhlLog();dirty();showToast('✓ Stuhlgang ('+time+')');
 }
 function renderStuhlLog(){
   const w=$id('stuhlLog');
@@ -858,14 +1037,14 @@ function renderStuhlLog(){
     </div>`).join('');
 }
 
-/* ── urin ── */
+/* ── URIN ── */
 function addUrinEntry(){
   const time=$id('urin-time').value||nowHHMM();
   const menge=segGet('seg-urin-menge'),konst=segGet('seg-urin-konst');
   if(!menge){showToast('⚠️ Bitte Menge wählen');return}
   urinLog.push({time,menge,konst});
   $id('urin-time').value='';segClear('seg-urin-menge');segClear('seg-urin-konst');
-  renderUrinLog();dirty();showToast('✓ Urin eingetragen ('+time+')');
+  renderUrinLog();dirty();showToast('✓ Urin ('+time+')');
 }
 function renderUrinLog(){
   const w=$id('urinLog');
@@ -881,26 +1060,21 @@ function renderUrinLog(){
     </div>`).join('');
 }
 
-/* ── fluid ── */
+/* ── FLUID ── */
 function calcFluid(){
   dirty();
   const v=id=>parseFloat($id(id)?.value)||0;
   const dml=drinkLog.reduce((a,e)=>a+e.ml,0);
   const ein=dml+v('f-sonde')+v('f-infus')+v('f-sonst-ein');
-  const aus=v('f-urin')+v('f-stuhl-ml')+v('f-sonst-aus');
-  const bil=ein-aus;
-  $id('ft-ein').textContent='Gesamt Einfuhr: '+(ein||'–')+' ml';
-  $id('ft-aus').textContent='Gesamt Ausfuhr: '+(aus||'–')+' ml';
-  $id('ft-bil').textContent='Bilanz: '+(ein||aus?(bil>=0?'+':'')+bil+' ml':'–');
-  $id('ft-bil').style.color=bil<0?'var(--red)':'var(--blue)';
+  $id('ft-ein').textContent='Gesamt Zufuhr: '+(ein||'–')+' ml';
   const fd=$id('f-drink-display');if(fd)fd.textContent=dml+' ml';
 }
 
-/* ── team ── */
+/* ── TEAM ── */
 function addTeamRow(k='',n=''){team.push({kuerzel:k,name:n});renderTeamList()}
 function renderTeamList(){
   const w=$id('teamList');
-  if(!team.length){w.innerHTML='<div style="color:var(--text3);font-size:13px">Noch keine Pflegepersonen angelegt.</div>';updatePflegerinSel();return}
+  if(!team.length){w.innerHTML='<div style="color:var(--text3);font-size:13px">Noch keine Pflegepersonen.</div>';updatePflegerinSel();return}
   w.innerHTML='';
   team.forEach((t,i)=>{
     const d=document.createElement('div');d.className='team-row';
@@ -917,7 +1091,15 @@ async function saveTeam(){
     team[i].kuerzel=row.querySelector('.team-kuerzel').value.toUpperCase().trim();
     team[i].name=row.querySelector('.team-name').value.trim();
   });
-  await saveToCloud();updatePflegerinSel();showToast('✓ Team gespeichert & synchronisiert');
+  // collect medDefs from inputs too
+  $id('medDefList').querySelectorAll('.meddef-row').forEach((row,i)=>{
+    if(!medDefs[i])return;
+    medDefs[i].name=row.querySelectorAll('.mdinput')[0].value.trim();
+    medDefs[i].dose=row.querySelectorAll('.mdinput')[1].value.trim();
+  });
+  await saveToCloud();
+  updatePflegerinSel();renderMedPresets();
+  showToast('✓ Team & Medikamente gespeichert');
 }
 function updatePflegerinSel(){
   const sel=$id('bericht-pflegerin');if(!sel)return;
@@ -930,12 +1112,13 @@ function updatePflegerinSel(){
   });
 }
 
-/* ── save/load day ── */
+/* ── SAVE / LOAD ── */
 function collectDay(){
   const r={savedAt:new Date().toISOString()};
   ALL_TXT.forEach(id=>{const el=$id(id);if(el)r[id]=el.value});
-  r.pain=painSel;r.checks={...checks};r.radios={...radios};
-  r.meds=meds.map(m=>({...m}));r.lagers=lagers.map(l=>({...l}));
+  r.pain=painSel;r.checks={...checks};r.radios={...radios};r.durations={...durations};
+  r.lagers=lagers.map(l=>({...l}));
+  r.medGiven=medGiven.map(m=>({...m}));
   r.drinkLog=drinkLog.map(e=>({...e}));
   r.stuhlLog=stuhlLog.map(e=>({...e}));
   r.urinLog=urinLog.map(e=>({...e}));
@@ -945,28 +1128,28 @@ function collectDay(){
 }
 async function saveDay(){
   db[curDate]=collectDay();
-  await saveToCloud();
-  isDirty=false;
-  showToast('✓ Gespeichert & synchronisiert – '+fmtDate(curDate));
+  await saveToCloud();isDirty=false;
+  showToast('✓ Gespeichert – '+fmtDate(curDate));
   renderVerlauf();renderStats();
 }
 function loadDay(){
   const r=db[curDate]||{};
   ALL_TXT.forEach(id=>{const el=$id(id);if(el)el.value=r[id]||''});
-  painSel=r.pain||0;applyPainUI();
+  painSel=r.pain!=null?r.pain:-1;applyPainUI();
   checks=r.checks?{...r.checks}:{};applyChecksUI();
   radios=r.radios?{...r.radios}:{};applyRadiosUI();
-  meds=r.meds?r.meds.map(m=>({...m})):[];renderMedList();
+  durations=r.durations?{...r.durations}:{};applyDurationsUI();
   lagers=r.lagers?r.lagers.map(l=>({...l})):[];renderLagerList();
+  medGiven=r.medGiven?r.medGiven.map(m=>({...m})):[];renderMedGivenList();
   drinkLog=r.drinkLog?r.drinkLog.map(e=>({...e})):[];renderDrinkLog();
   stuhlLog=r.stuhlLog?r.stuhlLog.map(e=>({...e})):[];renderStuhlLog();
   urinLog=r.urinLog?r.urinLog.map(e=>({...e})):[];renderUrinLog();
-  if(r.dienst){activeDienst=r.dienst;applyDienstUI()}else detectDienst();
+  if(r.dienst){activeDienst=r.dienst;applyDienstUI()}else{activeDienst='';detectDienst()}
   const sel=$id('bericht-pflegerin');if(sel&&r.pflegerin)sel.value=r.pflegerin;
   calcFluid();isDirty=false;
 }
 
-/* ── voice ── */
+/* ── VOICE ── */
 function mic(btn,targetId){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){alert('Spracheingabe: Safari auf iOS 17+ erforderlich.');return}
@@ -979,38 +1162,41 @@ function mic(btn,targetId){
   r.start();
 }
 
-/* ── toast ── */
+/* ── TOAST ── */
 let tTimer=null;
-function showToast(msg){const t=$id('toast');t.textContent=msg;t.classList.add('show');clearTimeout(tTimer);tTimer=setTimeout(()=>t.classList.remove('show'),2800)}
+function showToast(msg){const t=$id('toast');t.textContent=msg;t.classList.add('show');clearTimeout(tTimer);tTimer=setTimeout(()=>t.classList.remove('show'),2600)}
 
-/* ── stats ── */
+/* ── STATS ── */
 function renderStats(){
   const days=parseInt($id('periodSel')?.value||14);
   const wrap=$id('statsContent');
   const cut=new Date();cut.setDate(cut.getDate()-days);
   const rel=Object.keys(db).sort().filter(k=>new Date(k+'T12:00:00')>=cut);
-  if(!rel.length){wrap.innerHTML='<div class="nodata"><span class="ico">📊</span>Keine Daten für diesen Zeitraum.</div>';return}
+  if(!rel.length){wrap.innerHTML='<div class="nodata"><span class="ico">📊</span>Keine Daten.</div>';return}
+
   let puls=[],spo2=[],rrs=[],temp=[],pain=[];
-  let stuhlTotal=0,stuhlMengen=[],trinkmL=0,einSum=0,ausSum=0;
+  let stuhlTotal=0,stuhlMengen=[],trinkmL=0,einSum=0;
   const drinkByType={};
+
   rel.forEach(k=>{
     const d=db[k];if(!d)return;
     const n=(a,v)=>{const x=parseFloat(v);if(!isNaN(x)&&x>0)a.push(x)};
     n(puls,d['v-puls']);n(spo2,d['v-spo2']);n(rrs,d['v-rr-s']);n(temp,d['v-temp']);
-    const pn=parseInt(d.pain);if(!isNaN(pn)&&pn>0)pain.push(pn);
+    const pn=parseInt(d.pain);if(!isNaN(pn)&&pn>=0)pain.push(pn);
     if(d.stuhlLog?.length){stuhlTotal+=d.stuhlLog.length;d.stuhlLog.forEach(e=>{if(e.menge)stuhlMengen.push(parseInt(e.menge))})}
     if(d.drinkLog)d.drinkLog.forEach(e=>{trinkmL+=e.ml;drinkByType[e.type]=(drinkByType[e.type]||0)+e.ml});
     const dml=d.drinkLog?d.drinkLog.reduce((a,e)=>a+e.ml,0):0;
     const ein=dml+(parseFloat(d['f-sonde'])||0)+(parseFloat(d['f-infus'])||0)+(parseFloat(d['f-sonst-ein'])||0);
-    const aus=(parseFloat(d['f-urin'])||0)+(parseFloat(d['f-stuhl-ml'])||0)+(parseFloat(d['f-sonst-aus'])||0);
-    if(ein>0)einSum+=ein;if(aus>0)ausSum+=aus;
+    if(ein>0)einSum+=ein;
   });
+
   const avg=a=>a.length?(a.reduce((x,y)=>x+y,0)/a.length).toFixed(1):'–';
   const mn=a=>a.length?Math.min(...a).toFixed(1):'–';
   const mx=a=>a.length?Math.max(...a).toFixed(1):'–';
   const maxD=Math.max(...Object.values(drinkByType),1);
   const painCount={};pain.forEach(p=>{painCount[p]=(painCount[p]||0)+1});
   const maxP=Math.max(...Object.values(painCount),1);
+
   wrap.innerHTML=`
   <div class="sgrid">
     <div class="scard"><div class="stitle">Dok. Tage</div><div class="sval">${rel.length}</div><div class="ssub">von ${days} Tagen</div></div>
@@ -1022,30 +1208,28 @@ function renderStats(){
   </div>
   <div class="card"><div class="card-head">☕ Trinkmenge</div><div class="card-body">
     <div style="display:flex;justify-content:space-between;margin-bottom:8px">
-      <span style="font-size:13px">Gesamt</span>
-      <span style="font-family:var(--mono);font-weight:600;font-size:18px;color:var(--green)">${trinkmL} ml</span>
-    </div>
+      <span>Gesamt</span><span style="font-family:var(--mono);font-weight:600;font-size:18px;color:var(--green)">${trinkmL} ml</span></div>
     <div style="font-size:11px;color:var(--text3);margin-bottom:10px">⌀ ${rel.length?Math.round(trinkmL/rel.length):0} ml / Tag</div>
     ${Object.entries(drinkByType).sort((a,b)=>b[1]-a[1]).map(([t,ml])=>`
     <div class="crow2"><div class="clbl2">${DRINK_ICO[t]||'🥤'} ${escH(t)}</div>
       <div class="cbarw"><div class="cbar" style="width:${Math.round(ml/maxD*100)}%"></div></div>
       <div class="cval2">${ml}</div></div>`).join('')}
   </div></div>
-  <div class="card"><div class="card-head">💧 Flüssigkeitsbilanz</div><div class="card-body">
-    <div class="frow"><div class="flabel">Gesamteinfuhr</div><div style="font-family:var(--mono);font-weight:600;color:var(--green)">${einSum>0?einSum+' ml':'–'}</div></div>
-    <div class="frow"><div class="flabel">Gesamtausfuhr</div><div style="font-family:var(--mono);font-weight:600;color:var(--blue)">${ausSum>0?ausSum+' ml':'–'}</div></div>
-    <div class="frow"><div class="flabel">Bilanz</div><div style="font-family:var(--mono);font-weight:600;color:${einSum-ausSum<0?'var(--red)':'var(--green)'}">
-      ${einSum||ausSum?(einSum-ausSum>=0?'+':'')+(einSum-ausSum)+' ml':'–'}</div></div>
+  <div class="card"><div class="card-head">💧 Gesamtzufuhr</div><div class="card-body">
+    <div class="frow"><div class="flabel">Gesamt (${days} Tage)</div>
+      <div style="font-family:var(--mono);font-weight:600;color:var(--green)">${einSum>0?einSum+' ml':'–'}</div></div>
+    <div class="frow"><div class="flabel">⌀ pro Tag</div>
+      <div style="font-family:var(--mono);font-weight:600;color:var(--green)">${rel.length&&einSum?Math.round(einSum/rel.length)+' ml':'–'}</div></div>
   </div></div>
-  ${pain.length?`<div class="card"><div class="card-head">😣 Schmerz · Ø ${avg(pain)}/10</div><div class="card-body">
+  ${pain.length?`<div class="card"><div class="card-head">😣 Schmerzskala · Ø ${avg(pain)}/10</div><div class="card-body">
     ${Object.entries(painCount).sort((a,b)=>+a[0]-+b[0]).map(([lvl,cnt])=>`
     <div class="crow2"><div class="clbl2">Stufe ${lvl}</div>
-      <div class="cbarw"><div class="cbar" style="width:${Math.round(cnt/maxP*100)}%;background:${+lvl<=3?'#27ae60':+lvl<=6?'#e67e22':+lvl<=8?'#e74c3c':'#922b21'}"></div></div>
+      <div class="cbarw"><div class="cbar" style="width:${Math.round(cnt/maxP*100)}%;background:${+lvl===0?'#6c8faf':+lvl<=3?'#27ae60':+lvl<=6?'#e67e22':+lvl<=8?'#e74c3c':'#922b21'}"></div></div>
       <div class="cval2">${cnt}×</div></div>`).join('')}
   </div></div>`:''}`;
 }
 
-/* ── verlauf ── */
+/* ── VERLAUF ── */
 function renderVerlauf(){
   const wrap=$id('verlaufContent');
   const keys=Object.keys(db).sort().reverse();
@@ -1056,18 +1240,21 @@ function renderVerlauf(){
     if(d['v-spo2'])items.push(['SpO₂',d['v-spo2']+'%']);
     if(d['v-rr-s']&&d['v-rr-d'])items.push(['RR',d['v-rr-s']+'/'+d['v-rr-d']]);
     if(d['v-temp'])items.push(['Temp.',d['v-temp']+'°C']);
-    if(d.pain)items.push(['Schmerz',d.pain+'/10']);
+    if(d.pain>=0)items.push(['Schmerz',d.pain+'/10'+(d['pain-time']?' um '+d['pain-time']:'')]);
+    if(d.radios?.['rg-trachea'])items.push(['Trachea',d.radios['rg-trachea']+(d.durations?.['durseg-trachea']?' · '+d.durations['durseg-trachea']:'')]);
+    if(d.checks?.['ck-kappe'])items.push(['Verschlusskappe',d.checks['ck-kappe']+(d.durations?.['durseg-kappe']?' · '+d.durations['durseg-kappe']:'')]);
+    if(d.checks?.['ck-orthese'])items.push(['Beinorthesen',d.checks['ck-orthese']+(d.durations?.['durseg-orthese']?' · '+d.durations['durseg-orthese']:'')]);
+    if(d.checks?.['ck-bewegung'])items.push(['Bewegungstrainer',d.checks['ck-bewegung']+(d.durations?.['durseg-bewegung']?' · '+d.durations['durseg-bewegung']:'')]);
     if(d.stuhlLog?.length)items.push(['Stuhlgang',d.stuhlLog.length+'× · ⌀ '+(d.stuhlLog.reduce((a,e)=>a+(+e.menge||0),0)/d.stuhlLog.length).toFixed(1)+'/5']);
     if(d.urinLog?.length)items.push(['Urin',d.urinLog.length+'× eingetragen']);
     const dml=d.drinkLog?d.drinkLog.reduce((a,e)=>a+e.ml,0):0;
     if(dml>0)items.push(['Trinkmenge',dml+' ml']);
-    if(d.meds?.length)items.push(['Medikamente',d.meds.map(m=>(m.time?m.time+' ':'')+m.name).join(', ')]);
+    if(d.medGiven?.length)items.push(['Medikamente',d.medGiven.map(m=>(m.time?m.time+' ':'')+m.name+(m.dose?' '+m.dose:'')).join(', ')]);
     if(d.lagers?.length)items.push(['Lagerung',d.lagers.map(l=>(l.time?l.time+' ':'')+l.pos).join(', ')]);
     if(d.dienst)items.push(['Dienst',d.dienst]);
     if(d.pflegerin)items.push(['Pflegerin',d.pflegerin]);
     if(d.pflegebericht)items.push(['Pflegebericht',d.pflegebericht.slice(0,90)+(d.pflegebericht.length>90?'…':'')]);
     if(d.besond)items.push(['Besonderheiten',d.besond.slice(0,90)+(d.besond.length>90?'…':'')]);
-    const ck=Object.keys(d.checks||{}).length;if(ck)items.push(['Checks',ck+'× erledigt']);
     return `<div class="hday">
       <div class="hday-hd" onclick="this.nextElementSibling.classList.toggle('open')">
         <span>${fmtDate(k)}</span>
