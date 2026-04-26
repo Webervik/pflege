@@ -42,30 +42,31 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .sync-bar.syncing{background:var(--orange)}.sync-bar.error{background:var(--red)}
 
 /* HEADER */
-.hdr{color:#fff;padding:10px 14px 8px;position:sticky;top:22px;z-index:200;box-shadow:0 2px 8px rgba(0,0,0,.25);transition:background .3s}
+.hdr{color:#fff;padding:10px 14px 8px;position:sticky;top:22px;z-index:200;box-shadow:0 2px 8px rgba(0,0,0,.25);transition:background .3s;width:100%;overflow:hidden}
 .hdr.td{background:var(--td)}.hdr.sd{background:var(--sd)}.hdr.nd{background:var(--nd)}
-.hdr-row1{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+/* row 1: name + save + date */
+.hdr-row1{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;gap:8px}
+.pat-info{flex:none}
 .pat-info .pat-name{font-size:17px;font-weight:600;letter-spacing:-.2px}
 .pat-info .pat-dob{font-size:10px;opacity:.7;font-family:var(--mono)}
-.hdr-right{display:flex;align-items:center;gap:7px}
-.save-global{background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.4);color:#fff;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--sans);white-space:nowrap}
+.hdr-right{display:flex;align-items:center;gap:6px;flex:none}
+.save-global{background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.4);color:#fff;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans);white-space:nowrap}
 .save-global:active{background:rgba(255,255,255,.35)}
-.date-nav{display:flex;align-items:center;gap:5px}
+.date-nav{display:flex;align-items:center;gap:4px}
 .dnav-btn{background:rgba(255,255,255,.18);border:none;color:#fff;width:28px;height:28px;border-radius:7px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.today-btn{background:rgba(255,255,255,.18);border:none;color:#fff;padding:4px 9px;border-radius:7px;font-size:11px;font-family:var(--mono);cursor:pointer}
-/* row 2 */
-.hdr-row2{display:flex;gap:6px;align-items:center}
-.dienst-btns{display:flex;gap:4px;flex:none}
-.dbtn{padding:6px 10px;border-radius:7px;border:1.5px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;font-size:12px;cursor:pointer;font-family:var(--sans);font-weight:500;transition:all .15s;white-space:nowrap}
+.today-btn{background:rgba(255,255,255,.18);border:none;color:#fff;padding:4px 8px;border-radius:7px;font-size:11px;font-family:var(--mono);cursor:pointer}
+.date-str{font-family:var(--mono);font-size:10px;opacity:.8;text-align:right;margin-top:2px}
+/* row 2: dienst buttons – full width */
+.hdr-row2{display:flex;gap:4px;margin-bottom:6px;width:100%}
+.dbtn{flex:1;padding:7px 4px;border-radius:8px;border:1.5px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;font-size:12px;cursor:pointer;font-family:var(--sans);font-weight:500;transition:all .15s;text-align:center;white-space:nowrap}
 .dbtn.on{border-color:rgba(255,255,255,.9);background:rgba(255,255,255,.28);font-weight:700}
-.pflegerin-sel{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);color:#fff;border-radius:7px;padding:6px 8px;font-size:12px;font-family:var(--sans);-webkit-appearance:none;appearance:none;cursor:pointer;flex:1;min-width:0}
+/* row 3: pflegerin dropdown – full width */
+.hdr-row3{width:100%}
+.pflegerin-sel{width:100%;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.35);color:#fff;border-radius:8px;padding:7px 10px;font-size:13px;font-weight:500;font-family:var(--sans);-webkit-appearance:none;appearance:none;cursor:pointer}
 .pflegerin-sel option{color:var(--text);background:#fff}
-/* date display */
-.date-str-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
-.date-str{font-family:var(--mono);font-size:11px;opacity:.85}
 
 /* TABS */
-.tabs{display:flex;background:var(--surface);border-bottom:2px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;position:sticky;top:130px;z-index:190}
+.tabs{display:flex;background:var(--surface);border-bottom:2px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;position:sticky;top:152px;z-index:190}
 .tabs::-webkit-scrollbar{display:none}
 .tab{flex:none;padding:10px 12px;font-size:12px;font-weight:500;color:var(--text3);border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap}
 .tab.on{color:var(--green);border-bottom-color:var(--green)}
@@ -266,6 +267,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 
 <!-- HEADER -->
 <div class="hdr td" id="hdr">
+  <!-- Row 1: Patient + Speichern + Datum -->
   <div class="hdr-row1">
     <div class="pat-info">
       <div class="pat-name">Sarah Salin</div>
@@ -273,7 +275,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     </div>
     <div class="hdr-right">
       <button class="save-global" onclick="saveEntry()">💾 Speichern</button>
-      <div class="date-str-wrap">
+      <div>
         <div class="date-nav">
           <button class="dnav-btn" onclick="shiftDay(-1)">‹</button>
           <button class="today-btn" onclick="gotoToday()">Heute</button>
@@ -283,14 +285,16 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
       </div>
     </div>
   </div>
+  <!-- Row 2: Dienst-Buttons – volle Breite -->
   <div class="hdr-row2">
-    <div class="dienst-btns">
-      <button class="dbtn" data-d="Tagdienst"   onclick="setDienst('Tagdienst')">🌤 Tagdienst</button>
-      <button class="dbtn" data-d="Spätdienst"  onclick="setDienst('Spätdienst')">🌆 Spätdienst</button>
-      <button class="dbtn" data-d="Nachtdienst" onclick="setDienst('Nachtdienst')">🌙 Nachtdienst</button>
-    </div>
+    <button class="dbtn" data-d="Tagdienst"   onclick="setDienst('Tagdienst')">🌤 Tagdienst</button>
+    <button class="dbtn" data-d="Spätdienst"  onclick="setDienst('Spätdienst')">🌆 Spätdienst</button>
+    <button class="dbtn" data-d="Nachtdienst" onclick="setDienst('Nachtdienst')">🌙 Nachtdienst</button>
+  </div>
+  <!-- Row 3: Pflegerin-Dropdown – volle Breite -->
+  <div class="hdr-row3">
     <select class="pflegerin-sel" id="hdr-pflegerin" onchange="dirty()">
-      <option value="">– Pflegerin –</option>
+      <option value="">👤 Pflegerin wählen…</option>
     </select>
   </div>
 </div>
