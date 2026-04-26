@@ -12,6 +12,7 @@
   --bg:#f4f2ee;--surface:#fff;--surface2:#eeebe4;--border:#d5cfc4;
   --green:#1a6b4a;--green2:#e6f2ec;--green3:#b8dfc9;
   --red:#b83232;--orange:#c07010;--blue:#2060a0;
+  --td:#1a6b4a;--sd:#c07010;--nd:#2060a0;
   --text:#181818;--text2:#505050;--text3:#909090;
   --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
   --r:12px;--sh:0 2px 10px rgba(0,0,0,.07);
@@ -19,7 +20,7 @@
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px;font-size:15px}
 
-/* ── SETUP ── */
+/* SETUP */
 #setupScreen{position:fixed;inset:0;background:var(--green);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;color:#fff;overflow-y:auto}
 #setupScreen h1{font-size:24px;font-weight:600;margin-bottom:8px;text-align:center}
 #setupScreen p{font-size:14px;opacity:.85;text-align:center;line-height:1.6;margin-bottom:20px}
@@ -36,55 +37,56 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .setup-btn:disabled{opacity:.5}
 .setup-error{color:var(--red);font-size:12px;margin-top:6px;display:none;white-space:pre-wrap}
 
-/* ── SYNC BAR ── */
+/* SYNC BAR */
 .sync-bar{background:var(--green);color:#fff;text-align:center;font-size:11px;font-family:var(--mono);padding:3px 8px;position:sticky;top:0;z-index:201;letter-spacing:.3px}
-.sync-bar.syncing{background:var(--orange)}
-.sync-bar.error{background:var(--red)}
+.sync-bar.syncing{background:var(--orange)}.sync-bar.error{background:var(--red)}
 
-/* ── HEADER ── */
-.hdr{background:var(--green);color:#fff;padding:10px 14px 8px;position:sticky;top:22px;z-index:200;box-shadow:0 2px 8px rgba(0,0,0,.25)}
-.hdr-row1{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
-.pat-info{display:flex;flex-direction:column}
-.pat-name{font-size:17px;font-weight:600;letter-spacing:-.2px}
-.pat-dob{font-size:10px;opacity:.7;font-family:var(--mono)}
-.hdr-actions{display:flex;align-items:center;gap:6px}
-.save-global{background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.4);color:#fff;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--sans);display:flex;align-items:center;gap:5px;white-space:nowrap}
+/* HEADER */
+.hdr{color:#fff;padding:10px 14px 8px;position:sticky;top:22px;z-index:200;box-shadow:0 2px 8px rgba(0,0,0,.25);transition:background .3s}
+.hdr.td{background:var(--td)}.hdr.sd{background:var(--sd)}.hdr.nd{background:var(--nd)}
+.hdr-row1{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.pat-info .pat-name{font-size:17px;font-weight:600;letter-spacing:-.2px}
+.pat-info .pat-dob{font-size:10px;opacity:.7;font-family:var(--mono)}
+.hdr-right{display:flex;align-items:center;gap:7px}
+.save-global{background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.4);color:#fff;border-radius:8px;padding:7px 12px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--sans);white-space:nowrap}
 .save-global:active{background:rgba(255,255,255,.35)}
 .date-nav{display:flex;align-items:center;gap:5px}
 .dnav-btn{background:rgba(255,255,255,.18);border:none;color:#fff;width:28px;height:28px;border-radius:7px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .today-btn{background:rgba(255,255,255,.18);border:none;color:#fff;padding:4px 9px;border-radius:7px;font-size:11px;font-family:var(--mono);cursor:pointer}
-.date-str{font-family:var(--mono);font-size:11px;opacity:.85;text-align:center}
-/* header row 2: dienst + pflegerin */
+/* row 2 */
 .hdr-row2{display:flex;gap:6px;align-items:center}
-.hdr-select{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);color:#fff;border-radius:7px;padding:5px 8px;font-size:12px;font-family:var(--sans);-webkit-appearance:none;appearance:none;cursor:pointer;flex:1;min-width:0}
-.hdr-select option{color:var(--text);background:#fff}
-.dienst-btns{display:flex;gap:4px}
-.dbtn-sm{padding:5px 9px;border-radius:7px;border:1.5px solid rgba(255,255,255,.3);background:rgba(255,255,255,.12);color:#fff;font-size:11px;cursor:pointer;font-family:var(--sans);font-weight:500;white-space:nowrap;transition:all .15s}
-.dbtn-sm.on{border-color:rgba(255,255,255,.8);background:rgba(255,255,255,.28);font-weight:600}
+.dienst-btns{display:flex;gap:4px;flex:none}
+.dbtn{padding:6px 10px;border-radius:7px;border:1.5px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;font-size:12px;cursor:pointer;font-family:var(--sans);font-weight:500;transition:all .15s;white-space:nowrap}
+.dbtn.on{border-color:rgba(255,255,255,.9);background:rgba(255,255,255,.28);font-weight:700}
+.pflegerin-sel{background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);color:#fff;border-radius:7px;padding:6px 8px;font-size:12px;font-family:var(--sans);-webkit-appearance:none;appearance:none;cursor:pointer;flex:1;min-width:0}
+.pflegerin-sel option{color:var(--text);background:#fff}
+/* date display */
+.date-str-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.date-str{font-family:var(--mono);font-size:11px;opacity:.85}
 
-/* ── TABS ── */
-.tabs{display:flex;background:var(--surface);border-bottom:2px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;position:sticky;top:132px;z-index:190}
+/* TABS */
+.tabs{display:flex;background:var(--surface);border-bottom:2px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;position:sticky;top:130px;z-index:190}
 .tabs::-webkit-scrollbar{display:none}
 .tab{flex:none;padding:10px 12px;font-size:12px;font-weight:500;color:var(--text3);border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap}
 .tab.on{color:var(--green);border-bottom-color:var(--green)}
 
-/* ── CONTENT ── */
+/* CONTENT */
 .content{padding:14px;max-width:600px;margin:0 auto}
 .page{display:none}.page.on{display:block}
 
-/* ── CARD ── */
+/* CARD */
 .card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);margin-bottom:12px;overflow:hidden;box-shadow:var(--sh)}
 .card-head{padding:10px 14px;background:var(--surface2);border-bottom:1px solid var(--border);font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.6px;display:flex;justify-content:space-between;align-items:center}
 .card-body{padding:14px}
 
-/* ── VITALS ── */
+/* VITALS */
 .vgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .vi{display:flex;flex-direction:column;gap:4px}
 .vlabel{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.5px}
 .vinput{font-family:var(--mono);font-size:18px;font-weight:600;border:2px solid var(--border);border-radius:9px;padding:8px 10px;color:var(--text);background:var(--bg);width:100%;transition:border-color .18s}
 .vinput:focus{outline:none;border-color:var(--green);background:var(--green2)}
 
-/* ── PAIN ── */
+/* PAIN */
 .pain-wrap{display:flex;gap:4px;flex-wrap:wrap}
 .pbtn{width:36px;height:36px;border-radius:8px;border:2px solid var(--border);background:var(--bg);font-family:var(--mono);font-size:13px;font-weight:600;cursor:pointer;color:var(--text);transition:all .12s;display:flex;align-items:center;justify-content:center;flex-direction:column}
 .pbtn small{font-size:8px;font-weight:400;font-family:var(--sans);color:var(--text3);line-height:1}
@@ -95,7 +97,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .pbtn.sel-7,.pbtn.sel-8{background:#e74c3c;border-color:#e74c3c;color:#fff}
 .pbtn.sel-9,.pbtn.sel-10{background:#922b21;border-color:#922b21;color:#fff}
 
-/* ── CHECKS ── */
+/* CHECKS */
 .crow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);-webkit-user-select:none;user-select:none}
 .crow:last-child{border-bottom:none}
 .cbox{width:26px;height:26px;flex:none;border-radius:7px;border:2px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:14px;transition:all .15s;cursor:pointer}
@@ -103,43 +105,39 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .clabel{font-size:14px;flex:1;cursor:pointer}
 .ctime{font-family:var(--mono);font-size:10px;color:var(--text3);flex:none}
 
-/* ── RADIO PILLS ── */
+/* RADIOS */
 .rbgroup{display:flex;gap:6px;flex-wrap:wrap}
 .rbtn{padding:7px 12px;border-radius:20px;border:2px solid var(--border);background:var(--bg);font-size:13px;cursor:pointer;color:var(--text);font-family:var(--sans);font-weight:500;transition:all .15s}
 .rbtn.on{background:var(--green);border-color:var(--green);color:#fff}
 
-/* ── DURATION PILLS ── */
-.dur-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:4px 0 6px 0}
+/* DURATION */
+.dur-row{display:flex;align-items:center;gap:5px;flex-wrap:wrap;padding:3px 0 6px}
 .dur-lbl{font-size:11px;color:var(--text3);flex:none}
-.dur-btn{padding:5px 9px;border-radius:7px;border:1.5px solid var(--border);background:var(--bg);font-family:var(--mono);font-size:11px;cursor:pointer;color:var(--text);transition:all .12s}
+.dur-btn{padding:4px 8px;border-radius:7px;border:1.5px solid var(--border);background:var(--bg);font-family:var(--mono);font-size:11px;cursor:pointer;color:var(--text);transition:all .12s}
 .dur-btn.on{background:var(--green);border-color:var(--green);color:#fff}
 
-/* ── SEGMENT BUTTONS ── */
+/* SEGMENTS */
 .seg{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px}
 .segbtn{min-width:42px;height:46px;border-radius:9px;border:2px solid var(--border);background:var(--bg);font-family:var(--mono);font-size:13px;font-weight:600;cursor:pointer;color:var(--text);transition:all .12s;padding:0 8px;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.2}
 .segbtn small{font-size:9px;font-family:var(--sans);font-weight:400;color:var(--text3)}
 .segbtn.on{background:var(--green);border-color:var(--green);color:#fff}
 .segbtn.on small{color:rgba(255,255,255,.8)}
 
-/* ── TRACHEA / STOMA LOG ── */
+/* TRACHEA LOG */
 .tlog-entry{background:var(--surface2);border-radius:9px;padding:10px 12px;margin-bottom:7px;border:1px solid var(--border)}
-.tlog-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
-.tlog-row:last-child{margin-bottom:0}
-.tlog-lbl{font-size:11px;color:var(--text3);width:50px;flex:none}
-.tlog-type{font-size:13px;font-weight:600;color:var(--green);margin-bottom:4px}
+.tlog-type{font-size:13px;font-weight:600;color:var(--green);margin-bottom:5px;display:flex;justify-content:space-between;align-items:center}
 
-/* ── TEXTAREA + VOICE ── */
+/* TEXTAREA + MIC */
 .vrow{display:flex;gap:8px;align-items:flex-start}
 .ta{flex:1;width:100%;border:2px solid var(--border);border-radius:9px;padding:10px 12px;font-family:var(--sans);font-size:14px;resize:none;background:var(--bg);color:var(--text);line-height:1.5;min-height:68px;transition:border-color .18s}
 .ta:focus{outline:none;border-color:var(--green);background:var(--green2)}
 .micbtn{flex:none;width:44px;height:44px;border-radius:50%;border:2px solid var(--green);background:var(--green2);color:var(--green);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
 .micbtn.rec{background:var(--red);border-color:var(--red);color:#fff;animation:pulse 1s infinite}
 @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
-/* mic status hint */
-.mic-hint{font-size:11px;color:var(--text3);margin-top:4px;display:none}
+.mic-hint{font-size:11px;color:var(--red);margin-top:3px;display:none}
 .mic-hint.show{display:block}
 
-/* ── MEDIKAMENTE ── */
+/* MEDS */
 .med-preset-wrap{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
 .med-preset{display:inline-flex;align-items:center;gap:5px;background:var(--green2);border:2px solid var(--green3);border-radius:20px;padding:6px 12px;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;-webkit-user-select:none;user-select:none}
 .med-preset .mp-name{color:var(--green);font-weight:600}
@@ -155,13 +153,13 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .mtime:focus,.mname:focus{outline:none;border-color:var(--green);background:var(--green2)}
 .del-btn{width:28px;height:28px;border-radius:50%;background:#fde8e8;border:none;color:var(--red);font-size:14px;cursor:pointer;flex:none;display:flex;align-items:center;justify-content:center}
 
-/* ── LAGER ── */
+/* LAGER */
 .lrow{display:flex;gap:6px;margin-bottom:6px;align-items:center}
 .ltime{font-family:var(--mono);font-size:13px;width:62px;flex:none;border:2px solid var(--border);border-radius:8px;padding:7px 5px;background:var(--bg);color:var(--text);text-align:center}
 .lpos{flex:1;border:2px solid var(--border);border-radius:8px;padding:7px 9px;font-size:13px;background:var(--bg);color:var(--text);font-family:var(--sans);-webkit-appearance:none;appearance:none}
 .ltime:focus,.lpos:focus{outline:none;border-color:var(--green);background:var(--green2)}
 
-/* ── FLUID ── */
+/* FLUID */
 .frow{display:flex;align-items:center;gap:10px;margin-bottom:9px}
 .flabel{flex:1;font-size:14px}
 .finput{width:88px;font-family:var(--mono);font-size:16px;border:2px solid var(--border);border-radius:8px;padding:8px;text-align:right;background:var(--bg);color:var(--text)}
@@ -169,7 +167,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .funit{font-size:12px;color:var(--text3);width:22px}
 .ftotal{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--green);padding:6px 0 0;border-top:1px solid var(--border);margin-top:4px}
 
-/* ── DRINK / AUSSCHEIDUNG LOG ── */
+/* DRINK / AUS */
 .drink-entry,.aus-entry{background:var(--surface2);border-radius:9px;padding:9px 12px;margin-bottom:6px;display:flex;align-items:flex-start;gap:8px}
 .drink-ico,.aus-ico{font-size:20px;flex:none;margin-top:1px}
 .drink-info,.aus-info{flex:1}
@@ -178,18 +176,23 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .dtt-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--green3);font-size:13px}
 .dtt-row:last-child{border-bottom:none}
 
-/* ── SAVE ── */
+/* TOTAL BAR */
+.total-bar{background:var(--green2);border:1px solid var(--green3);border-radius:9px;padding:9px 13px;margin-top:4px;display:flex;justify-content:space-between;align-items:center}
+.total-bar-lbl{font-size:12px;color:var(--green);font-weight:600}
+.total-bar-val{font-family:var(--mono);font-size:19px;font-weight:600;color:var(--green)}
+
+/* BUTTONS */
 .savebtn{width:100%;padding:14px;background:var(--green);color:#fff;border:none;border-radius:var(--r);font-size:16px;font-weight:600;cursor:pointer;font-family:var(--sans);margin-top:4px}
 .savebtn:active{background:#145a3d}
 .addbtn{padding:7px 12px;background:var(--green2);border:2px solid var(--green3);border-radius:8px;color:var(--green);font-weight:600;font-size:12px;cursor:pointer;font-family:var(--sans)}
 .delbtn-day{width:100%;padding:13px;background:#fde8e8;color:var(--red);border:2px solid #f5c6c6;border-radius:var(--r);font-size:14px;font-weight:600;cursor:pointer;font-family:var(--sans);margin-top:6px}
 
-/* ── TOAST ── */
+/* TOAST */
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--green);color:#fff;padding:10px 20px;border-radius:22px;font-size:14px;font-weight:500;opacity:0;transition:all .28s;z-index:500;white-space:nowrap;pointer-events:none;max-width:90vw;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.err{background:var(--red)}
 
-/* ── STATS ── */
+/* STATS */
 .pselect{width:100%;padding:11px;border-radius:9px;border:2px solid var(--border);background:var(--bg);font-size:15px;color:var(--text);font-family:var(--sans);margin-bottom:12px;-webkit-appearance:none;appearance:none}
 .sgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
 .scard{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:13px;box-shadow:var(--sh)}
@@ -202,9 +205,12 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .cbar{height:100%;background:var(--green);border-radius:4px;transition:width .5s}
 .cval2{font-size:10px;color:var(--text2);width:30px;font-family:var(--mono);text-align:right}
 
-/* ── VERLAUF ── */
+/* VERLAUF */
 .hday{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);margin-bottom:8px;overflow:hidden;box-shadow:var(--sh)}
-.hday-hd{padding:10px 14px;background:var(--surface2);border-bottom:1px solid var(--border);font-family:var(--mono);font-size:12px;font-weight:600;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.hday-hd{padding:10px 14px;border-bottom:1px solid var(--border);font-size:12px;font-weight:600;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.hday-hd.td{background:#e8f4ee;color:var(--td)}
+.hday-hd.sd{background:#fdf3e3;color:var(--sd)}
+.hday-hd.nd{background:#e8eef8;color:var(--nd)}
 .hday-bd{padding:11px 14px;display:none}
 .hday-bd.open{display:block}
 .hitem{font-size:12px;padding:4px 0;border-bottom:1px solid var(--border);display:flex;gap:8px}
@@ -212,24 +218,21 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .hkey{color:var(--text3);flex:none;width:120px;font-size:11px}
 .hval{color:var(--text);font-size:11px;word-break:break-word}
 
-/* ── TEAM ── */
+/* TEAM */
 .team-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--border)}
 .team-row:last-child{border-bottom:none}
 .team-name{flex:1;border:2px solid var(--border);border-radius:8px;padding:7px 10px;font-size:14px;background:var(--bg);color:var(--text);font-family:var(--sans)}
 .team-name:focus{outline:none;border-color:var(--green);background:var(--green2)}
 
-/* ── MISC ── */
+/* MISC */
 .sec-lbl{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;padding:9px 0 5px}
-.nodata{text-align:center;padding:24px 16px;color:var(--text3);font-size:14px}
-.nodata .ico{font-size:28px;display:block;margin-bottom:6px}
-.total-bar{background:var(--green2);border:1px solid var(--green3);border-radius:9px;padding:9px 13px;margin-top:4px;display:flex;justify-content:space-between;align-items:center}
-.total-bar-lbl{font-size:12px;color:var(--green);font-weight:600}
-.total-bar-val{font-family:var(--mono);font-size:19px;font-weight:600;color:var(--green)}
+.nodata{text-align:center;padding:20px 16px;color:var(--text3);font-size:14px}
+.nodata .ico{font-size:26px;display:block;margin-bottom:6px}
 .info-box{background:var(--surface2);border-radius:9px;padding:11px 13px;font-size:12px;color:var(--text2);margin-bottom:10px;border:1px solid var(--border)}
 .settings-link{text-align:center;margin-top:10px}
 .settings-link button{background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;text-decoration:underline;font-family:var(--sans)}
-.time-pair{display:flex;gap:8px;align-items:center;margin-bottom:6px}
-.time-pair .tp-lbl{font-size:11px;color:var(--text3);width:44px;flex:none}
+/* dienst-key badge in verlauf header */
+.dienst-badge{font-family:var(--mono);font-size:10px;opacity:.8}
 </style>
 </head>
 <body>
@@ -244,13 +247,13 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
       <div class="step-desc">Gehe auf <a href="https://jsonbin.io" target="_blank">jsonbin.io</a> → kostenlosen Account anlegen.</div>
     </div>
     <div class="setup-step">
-      <div class="step-title"><span class="step-num">2</span>API-Key eingeben</div>
-      <div class="step-desc">Login → oben rechts Name → <strong>API Keys</strong> → kopieren:</div>
+      <div class="step-title"><span class="step-num">2</span>X-Master-Key eingeben</div>
+      <div class="step-desc">Login → oben rechts Name → <strong>API Keys</strong> → Key kopieren:</div>
       <input class="setup-input" id="setup-key" type="text" placeholder="$2a$10$..." autocomplete="off" autocorrect="off" spellcheck="false">
     </div>
     <div class="setup-step">
       <div class="step-title"><span class="step-num">3</span>Bestehende Bin-ID (optional)</div>
-      <div class="step-desc">Falls du schon Daten hast: Bin-ID aus jsonbin.io eingeben. Sonst leer lassen → neue Datenbank wird angelegt.</div>
+      <div class="step-desc">Falls du schon Daten hast: Bin-ID aus jsonbin.io → Bins eingeben. Sonst leer lassen.</div>
       <input class="setup-input" id="setup-bin" type="text" placeholder="64abc123... (optional)" autocomplete="off" autocorrect="off" spellcheck="false">
     </div>
     <button class="setup-btn" id="setupBtn" onclick="doSetup()">🔗 Verbinden &amp; starten</button>
@@ -262,15 +265,15 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 <div class="sync-bar" id="syncBar">☁️ Verbinde…</div>
 
 <!-- HEADER -->
-<div class="hdr">
+<div class="hdr td" id="hdr">
   <div class="hdr-row1">
     <div class="pat-info">
       <div class="pat-name">Sarah Salin</div>
       <div class="pat-dob">* 29.04.1986</div>
     </div>
-    <div class="hdr-actions">
-      <button class="save-global" onclick="saveDay()">💾 Speichern</button>
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
+    <div class="hdr-right">
+      <button class="save-global" onclick="saveEntry()">💾 Speichern</button>
+      <div class="date-str-wrap">
         <div class="date-nav">
           <button class="dnav-btn" onclick="shiftDay(-1)">‹</button>
           <button class="today-btn" onclick="gotoToday()">Heute</button>
@@ -280,14 +283,13 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
       </div>
     </div>
   </div>
-  <!-- Row 2: Dienst + Pflegerin -->
   <div class="hdr-row2">
     <div class="dienst-btns">
-      <button class="dbtn-sm" data-v="Tagdienst"   onclick="setDienst(this)">🌤 Tag</button>
-      <button class="dbtn-sm" data-v="Spätdienst"  onclick="setDienst(this)">🌆 Spät</button>
-      <button class="dbtn-sm" data-v="Nachtdienst" onclick="setDienst(this)">🌙 Nacht</button>
+      <button class="dbtn" data-d="Tagdienst"   onclick="setDienst('Tagdienst')">🌤 Tagdienst</button>
+      <button class="dbtn" data-d="Spätdienst"  onclick="setDienst('Spätdienst')">🌆 Spätdienst</button>
+      <button class="dbtn" data-d="Nachtdienst" onclick="setDienst('Nachtdienst')">🌙 Nachtdienst</button>
     </div>
-    <select class="hdr-select" id="hdr-pflegerin" onchange="activePflegerin=this.value;dirty()">
+    <select class="pflegerin-sel" id="hdr-pflegerin" onchange="dirty()">
       <option value="">– Pflegerin –</option>
     </select>
   </div>
@@ -324,7 +326,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     </div>
   </div>
 
-  <!-- SCHMERZ -->
   <div class="card">
     <div class="card-head">Schmerzskala <span style="font-weight:400;text-transform:none;font-size:11px;letter-spacing:0">0=kein · 10=sehr stark</span></div>
     <div class="card-body">
@@ -337,7 +338,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     </div>
   </div>
 
-  <!-- ATEMWEG -->
   <div class="card">
     <div class="card-head">Atemweg / Sekret</div>
     <div class="card-body">
@@ -348,28 +348,25 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     </div>
   </div>
 
-  <!-- VERSCHLUSSKAPPE -->
   <div class="card">
     <div class="card-head">Verschlusskappe</div>
     <div class="card-body">
       <div class="crow"><div class="cbox" id="ck-kappe" onclick="tick('ck-kappe')">✓</div><div class="clabel" onclick="tick('ck-kappe')">Toleriert</div><div class="ctime" id="ct-kappe"></div></div>
       <div class="dur-row">
         <span class="dur-lbl">Dauer:</span>
-        <button class="dur-btn" data-v="15 min" onclick="durSel('dur-kappe',this)">15'</button>
-        <button class="dur-btn" data-v="30 min" onclick="durSel('dur-kappe',this)">30'</button>
-        <button class="dur-btn" data-v="45 min" onclick="durSel('dur-kappe',this)">45'</button>
-        <button class="dur-btn" data-v="1 Std" onclick="durSel('dur-kappe',this)">1h</button>
-        <button class="dur-btn" data-v="2 Std" onclick="durSel('dur-kappe',this)">2h</button>
-        <button class="dur-btn" data-v="3 Std" onclick="durSel('dur-kappe',this)">3h</button>
+        <button class="dur-btn" data-g="dur-kappe" data-v="15 min" onclick="durSel(this)">15'</button>
+        <button class="dur-btn" data-g="dur-kappe" data-v="30 min" onclick="durSel(this)">30'</button>
+        <button class="dur-btn" data-g="dur-kappe" data-v="45 min" onclick="durSel(this)">45'</button>
+        <button class="dur-btn" data-g="dur-kappe" data-v="1 Std" onclick="durSel(this)">1h</button>
+        <button class="dur-btn" data-g="dur-kappe" data-v="2 Std" onclick="durSel(this)">2h</button>
+        <button class="dur-btn" data-g="dur-kappe" data-v="3 Std" onclick="durSel(this)">3h</button>
       </div>
     </div>
   </div>
 
-  <!-- TRACHEALKANÜLE / STOMAPFLASTER – mit Von/Bis -->
   <div class="card">
     <div class="card-head">Trachealkanüle / Stomapflaster <button class="addbtn" onclick="addTracheaEntry()">+ Eintrag</button></div>
     <div class="card-body">
-      <!-- Eingabe -->
       <div class="sec-lbl">Art</div>
       <div class="rbgroup" id="rg-trachea-typ" style="margin-bottom:10px">
         <button class="rbtn" data-v="Trachealkanüle" onclick="setRb('rg-trachea-typ',this)">🫁 Trachealkanüle</button>
@@ -386,35 +383,31 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
         <textarea class="ta" id="trachea-bem" placeholder="Zustand, Besonderheiten…" rows="2" oninput="dirty()"></textarea>
         <button class="micbtn" onclick="mic(this,'trachea-bem')">🎤</button>
       </div>
-      <button class="savebtn" onclick="addTracheaEntry()" style="margin-top:0">+ Eintrag hinzufügen</button>
-      <!-- Log -->
-      <div class="sec-lbl" style="margin-top:12px">Einträge heute</div>
-      <div id="tracheaLog"><div class="nodata" style="padding:12px 0"><span class="ico" style="font-size:20px;margin-bottom:4px">🫁</span>Noch keine Einträge.</div></div>
+      <div id="tracheaLog"><div class="nodata" style="padding:10px 0"><span class="ico" style="font-size:18px;margin-bottom:3px">🫁</span>Noch keine Einträge.</div></div>
     </div>
   </div>
 
-  <!-- ORTHESEN + BEWEGUNGSTRAINER -->
   <div class="card">
     <div class="card-head">Orthesen &amp; Bewegungstrainer</div>
     <div class="card-body">
       <div class="crow"><div class="cbox" id="ck-orthese" onclick="tick('ck-orthese')">✓</div><div class="clabel" onclick="tick('ck-orthese')">Beinorthesen getragen</div><div class="ctime" id="ct-orthese"></div></div>
       <div class="dur-row">
         <span class="dur-lbl">Dauer:</span>
-        <button class="dur-btn" data-v="15 min" onclick="durSel('dur-orthese',this)">15'</button>
-        <button class="dur-btn" data-v="30 min" onclick="durSel('dur-orthese',this)">30'</button>
-        <button class="dur-btn" data-v="45 min" onclick="durSel('dur-orthese',this)">45'</button>
-        <button class="dur-btn" data-v="1 Std" onclick="durSel('dur-orthese',this)">1h</button>
-        <button class="dur-btn" data-v="2 Std" onclick="durSel('dur-orthese',this)">2h</button>
-        <button class="dur-btn" data-v="3 Std" onclick="durSel('dur-orthese',this)">3h</button>
+        <button class="dur-btn" data-g="dur-orthese" data-v="15 min" onclick="durSel(this)">15'</button>
+        <button class="dur-btn" data-g="dur-orthese" data-v="30 min" onclick="durSel(this)">30'</button>
+        <button class="dur-btn" data-g="dur-orthese" data-v="45 min" onclick="durSel(this)">45'</button>
+        <button class="dur-btn" data-g="dur-orthese" data-v="1 Std" onclick="durSel(this)">1h</button>
+        <button class="dur-btn" data-g="dur-orthese" data-v="2 Std" onclick="durSel(this)">2h</button>
+        <button class="dur-btn" data-g="dur-orthese" data-v="3 Std" onclick="durSel(this)">3h</button>
       </div>
       <div class="crow" style="margin-top:4px"><div class="cbox" id="ck-bewegung" onclick="tick('ck-bewegung')">✓</div><div class="clabel" onclick="tick('ck-bewegung')">Bewegungstrainer</div><div class="ctime" id="ct-bewegung"></div></div>
       <div class="dur-row">
         <span class="dur-lbl">Dauer:</span>
-        <button class="dur-btn" data-v="15 min" onclick="durSel('dur-bewegung',this)">15'</button>
-        <button class="dur-btn" data-v="20 min" onclick="durSel('dur-bewegung',this)">20'</button>
-        <button class="dur-btn" data-v="30 min" onclick="durSel('dur-bewegung',this)">30'</button>
-        <button class="dur-btn" data-v="45 min" onclick="durSel('dur-bewegung',this)">45'</button>
-        <button class="dur-btn" data-v="1 Std" onclick="durSel('dur-bewegung',this)">1h</button>
+        <button class="dur-btn" data-g="dur-bewegung" data-v="15 min" onclick="durSel(this)">15'</button>
+        <button class="dur-btn" data-g="dur-bewegung" data-v="20 min" onclick="durSel(this)">20'</button>
+        <button class="dur-btn" data-g="dur-bewegung" data-v="30 min" onclick="durSel(this)">30'</button>
+        <button class="dur-btn" data-g="dur-bewegung" data-v="45 min" onclick="durSel(this)">45'</button>
+        <button class="dur-btn" data-g="dur-bewegung" data-v="1 Std" onclick="durSel(this)">1h</button>
       </div>
     </div>
   </div>
@@ -426,16 +419,16 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     <div class="card-head">Medikamente – Schnellauswahl</div>
     <div class="card-body">
       <div id="medPresetWrap" class="med-preset-wrap"><div style="color:var(--text3);font-size:13px">Noch keine Medikamente definiert (→ Team-Tab).</div></div>
-      <div class="sec-lbl">Verabreicht heute</div>
+      <div class="sec-lbl">Verabreicht in diesem Dienst</div>
       <div id="medGivenList"><div style="color:var(--text3);font-size:13px">Noch keine Einträge.</div></div>
-      <button class="addbtn" style="margin-top:8px" onclick="addMedManual()">+ Manuell hinzufügen</button>
+      <button class="addbtn" style="margin-top:8px" onclick="addMedManual()">+ Manuell</button>
     </div>
   </div>
   <div class="card">
     <div class="card-head">Gastrotube-Verband</div>
     <div class="card-body">
       <div class="sec-lbl">Hautumgebung</div>
-      <div class="vrow"><textarea class="ta" id="peg-haut" placeholder="Befund Hautumgebung…" oninput="dirty()"></textarea><button class="micbtn" onclick="mic(this,'peg-haut')">🎤</button></div>
+      <div class="vrow"><textarea class="ta" id="peg-haut" placeholder="Befund…" oninput="dirty()"></textarea><button class="micbtn" onclick="mic(this,'peg-haut')">🎤</button></div>
       <div class="sec-lbl">Wundbeschreibung</div>
       <div class="vrow"><textarea class="ta" id="peg-wunde" placeholder="Ggf. Wundbeschreibung…" oninput="dirty()"></textarea><button class="micbtn" onclick="mic(this,'peg-wunde')">🎤</button></div>
     </div>
@@ -449,10 +442,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   <div class="card">
     <div class="card-head">Krankenbeobachtung</div>
     <div class="card-body">
-      <div class="sec-lbl">Atmung / Schweiß FD</div>
+      <div class="sec-lbl">Atmung / Schweiß</div>
       <div class="vrow"><textarea class="ta" id="atem-fd" placeholder="Befund…" oninput="dirty()"></textarea><button class="micbtn" onclick="mic(this,'atem-fd')">🎤</button></div>
-      <div class="sec-lbl">Atmung / Schweiß ND</div>
-      <div class="vrow"><textarea class="ta" id="atem-nd" placeholder="Befund…" oninput="dirty()"></textarea><button class="micbtn" onclick="mic(this,'atem-nd')">🎤</button></div>
       <div class="sec-lbl">Hautbeschaffenheit</div>
       <div class="vrow"><textarea class="ta" id="haut-besch" placeholder="Befund…" oninput="dirty()"></textarea><button class="micbtn" onclick="mic(this,'haut-besch')">🎤</button></div>
       <div class="sec-lbl">Fingertest</div>
@@ -504,7 +495,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     </div>
   </div>
   <div class="total-bar">
-    <div class="total-bar-lbl">☕ Trinkmenge heute gesamt</div>
+    <div class="total-bar-lbl">☕ Trinkmenge dieser Schicht</div>
     <div class="total-bar-val" id="drinkTotalVal">0 ml</div>
   </div>
   <div class="card" style="margin-top:10px">
@@ -512,7 +503,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     <div class="card-body" id="drinkTypeTotals"><div style="color:var(--text3);font-size:13px">Noch keine Einträge.</div></div>
   </div>
   <div class="card">
-    <div class="card-head">Einträge heute</div>
+    <div class="card-head">Einträge</div>
     <div class="card-body" id="drinkLog"><div class="nodata"><span class="ico">☕</span>Noch keine Einträge.</div></div>
   </div>
 </div>
@@ -539,7 +530,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   <div class="card">
     <div class="card-head">Stuhlgang erfassen</div>
     <div class="card-body">
-      <div class="sec-lbl">Uhrzeit</div>
       <input type="time" class="vinput" id="stuhl-time" style="font-size:15px;margin-bottom:8px">
       <div class="sec-lbl">Menge (1=wenig · 5=sehr viel)</div>
       <div class="seg" id="seg-stuhl-menge" style="margin-bottom:8px">
@@ -557,7 +547,6 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
         <button class="segbtn" data-v="Breiig"  onclick="segSel('seg-stuhl-konst',this)">Breiig</button>
         <button class="segbtn" data-v="Flüssig" onclick="segSel('seg-stuhl-konst',this)">Flüssig</button>
       </div>
-      <div class="sec-lbl">Bemerkung</div>
       <div class="vrow" style="margin-bottom:8px">
         <textarea class="ta" id="stuhl-bem" placeholder="Farbe, Auffälligkeiten…" rows="2" oninput="dirty()"></textarea>
         <button class="micbtn" onclick="mic(this,'stuhl-bem')">🎤</button>
@@ -565,14 +554,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
       <button class="savebtn" onclick="addStuhlEntry()">+ Stuhlgang eintragen</button>
     </div>
   </div>
-  <div class="card">
-    <div class="card-head">Stuhlgang heute</div>
-    <div class="card-body" id="stuhlLog"><div class="nodata"><span class="ico">🚽</span>Noch keine Einträge.</div></div>
-  </div>
+  <div class="card"><div class="card-head">Stuhlgang</div><div class="card-body" id="stuhlLog"><div class="nodata"><span class="ico">🚽</span>Noch keine Einträge.</div></div></div>
   <div class="card" style="margin-top:4px">
     <div class="card-head">Urin erfassen</div>
     <div class="card-body">
-      <div class="sec-lbl">Uhrzeit</div>
       <input type="time" class="vinput" id="urin-time" style="font-size:15px;margin-bottom:8px">
       <div class="sec-lbl">Menge (1=wenig · 3=viel)</div>
       <div class="seg" id="seg-urin-menge" style="margin-bottom:8px">
@@ -595,10 +580,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
       <button class="savebtn" onclick="addUrinEntry()">+ Urin eintragen</button>
     </div>
   </div>
-  <div class="card">
-    <div class="card-head">Urin heute</div>
-    <div class="card-body" id="urinLog"><div class="nodata"><span class="ico">💧</span>Noch keine Einträge.</div></div>
-  </div>
+  <div class="card"><div class="card-head">Urin</div><div class="card-body" id="urinLog"><div class="nodata"><span class="ico">💧</span>Noch keine Einträge.</div></div></div>
 </div>
 
 <!-- ══ BERICHT ══ -->
@@ -606,9 +588,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   <div class="card">
     <div class="card-head">Pflegebericht</div>
     <div class="card-body">
-      <div class="vrow"><textarea class="ta" id="pflegebericht" rows="6" placeholder="Pflegebericht…" oninput="dirty()"></textarea>
+      <div class="vrow"><textarea class="ta" id="pflegebericht" rows="6" placeholder="Pflegebericht für diesen Dienst…" oninput="dirty()"></textarea>
         <button class="micbtn" onclick="mic(this,'pflegebericht')">🎤</button></div>
-      <div class="mic-hint" id="mic-hint-pflegebericht">🎤 Sprechen…</div>
+      <div class="mic-hint" id="mic-hint-pflegebericht">🎤 Sprechen Sie jetzt…</div>
     </div>
   </div>
   <div class="card">
@@ -616,11 +598,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     <div class="card-body">
       <div class="vrow"><textarea class="ta" id="besond" rows="4" placeholder="Besondere Vorkommnisse, Arztbesuche…" oninput="dirty()"></textarea>
         <button class="micbtn" onclick="mic(this,'besond')">🎤</button></div>
-      <div class="mic-hint" id="mic-hint-besond">🎤 Sprechen…</div>
+      <div class="mic-hint" id="mic-hint-besond">🎤 Sprechen Sie jetzt…</div>
     </div>
   </div>
-  <!-- Tag löschen -->
-  <button class="delbtn-day" onclick="deleteDay()">🗑 Daten dieses Tages löschen</button>
+  <button class="delbtn-day" onclick="deleteEntry()">🗑 Diesen Diensteintrag löschen</button>
 </div>
 
 <!-- ══ AUSWERTUNG ══ -->
@@ -646,7 +627,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     <div class="card-head">Pflegerinnen <button class="addbtn" onclick="addTeamRow()">+ Hinzufügen</button></div>
     <div class="card-body" id="teamList"><div style="color:var(--text3);font-size:13px">Noch keine Einträge.</div></div>
   </div>
-  <div class="card" id="med-def-section">
+  <div class="card">
     <div class="card-head">Medikamente definieren <button class="addbtn" onclick="addMedDef()">+ Hinzufügen</button></div>
     <div class="card-body">
       <div style="color:var(--text3);font-size:12px;margin-bottom:10px">Erscheinen als Schnellauswahl im Pflege-Tab.</div>
@@ -665,35 +646,47 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 'use strict';
 /* ── CONSTANTS ── */
 const API='https://api.jsonbin.io/v3';
-const LS_KEY='pflege_key',LS_BIN='pflege_bin',LS_CACHE='pflege_cache_v3';
+const LS_KEY='pflege_key', LS_BIN='pflege_bin', LS_CACHE='pflege_cache_v4';
+const DIENSTE=['Tagdienst','Spätdienst','Nachtdienst'];
+const DIENST_CLS={Tagdienst:'td',Spätdienst:'sd',Nachtdienst:'nd'};
+const DIENST_LABEL={Tagdienst:'🌤 Tagdienst 08–15',Spätdienst:'🌆 Spätdienst 15–22',Nachtdienst:'🌙 Nachtdienst 22–08'};
 const LAGER_POS=['Rücken (Rü)','Linke Seite (li)','Rechte Seite (re)',
   'Oberkörperhochlagerung (OK)','Rollstuhl (RS)','Sitzbett (sb)',
   'Mikrolagerung (M)','Bettkante (BK)','nicht toleriert (n.t.)'];
 const ALL_TXT=['v-puls','v-spo2','v-rr-s','v-rr-d','v-temp','pain-time',
-  'peg-haut','peg-wunde','stoma','atem-fd','atem-nd','haut-besch',
+  'peg-haut','peg-wunde','stoma','atem-fd','haut-besch',
   'urin-fd','urin-nd','f-sonde','f-infus','f-sonst-ein','pflegebericht','besond'];
 const ALL_CK=['ck-sek-tr','ck-sek-or','ck-inhal','ck-cough','ck-kappe',
   'ck-absaug','ck-lifter','ck-cough2','ck-notfall','ck-pulso','ck-orthese','ck-bewegung'];
 const DRINK_ICO={Kaffee:'☕',Tee:'🍵',Wasser:'💧',Saft:'🍹',Milch:'🥛',Sonstiges:'🥤'};
-const DUR_GROUPS=['dur-kappe','dur-orthese','dur-bewegung'];
 
-/* ── STATE ── */
-let apiKey='',binId='';
-let db={},team=[],medDefs=[];
-let curDate=todayISO(),isDirty=false;
-let painSel=-1,checks={},radios={},durations={};
-let lagers=[],medGiven=[],drinkLog=[],stuhlLog=[],urinLog=[],tracheaLog=[];
-let activeDienst='',activePflegerin='';
-let micNode=null,micTarget=null,micHintEl=null;
+/* ── STATE ──
+   Key format: "2025-04-26_Tagdienst"
+*/
+let apiKey='', binId='';
+let db={}, team=[], medDefs=[];   // db[key] = entry
+let curDate=todayISO(), curDienst='Tagdienst';
+let isDirty=false;
+let painSel=-1, checks={}, radios={}, durations={};
+let lagers=[], medGiven=[], drinkLog=[], stuhlLog=[], urinLog=[], tracheaLog=[];
+let micNode=null, micHintEl=null;
 
 /* ── HELPERS ── */
 function todayISO(){const d=new Date();return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())}
 function nowHHMM(){const d=new Date();return p2(d.getHours())+':'+p2(d.getMinutes())}
 function p2(n){return String(n).padStart(2,'0')}
 function fmtDate(iso){const d=new Date(iso+'T12:00:00');return d.toLocaleDateString('de-DE',{weekday:'short',day:'2-digit',month:'2-digit',year:'numeric'})}
+function entryKey(date,dienst){return date+'_'+dienst}
 function $id(id){return document.getElementById(id)}
 function dirty(){isDirty=true}
 function escH(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function calcDur(von,bis){
+  try{
+    const[vh,vm]=von.split(':').map(Number),[bh,bm]=bis.split(':').map(Number);
+    let min=(bh*60+bm)-(vh*60+vm);if(min<0)min+=1440;
+    return min<60?min+'min':Math.floor(min/60)+'h'+(min%60?' '+min%60+'min':'');
+  }catch{return ''}
+}
 
 /* ── SETUP ── */
 async function doSetup(){
@@ -704,10 +697,9 @@ async function doSetup(){
   try{
     let bid=existingBin;
     if(!bid){
-      // create new bin
       const r=await fetch(API+'/b',{method:'POST',
         headers:{'Content-Type':'application/json','X-Master-Key':key,'X-Bin-Name':'pflege-salin','X-Bin-Private':'true'},
-        body:JSON.stringify({days:{},team:[],medDefs:[],version:3})});
+        body:JSON.stringify({entries:{},team:[],medDefs:[],version:4})});
       if(!r.ok){const e=await r.json();throw new Error(e.message||'HTTP '+r.status)}
       bid=(await r.json()).metadata.id;
     }
@@ -718,13 +710,13 @@ async function doSetup(){
     await loadFromCloud();init();
   }catch(e){
     $id('setupBtn').disabled=false;$id('setupBtn').textContent='🔗 Verbinden & starten';
-    showSetupErr('Fehler: '+e.message+'\nBitte API-Key und Bin-ID prüfen.');
+    showSetupErr('Fehler: '+e.message);
   }
 }
 function showSetupErr(m){const e=$id('setupError');e.textContent=m;e.style.display='block'}
 function hideSetupErr(){$id('setupError').style.display='none'}
 function resetSetup(){
-  if(!confirm('Cloud-Verbindung zurücksetzen?\n\nDie Daten in der Cloud bleiben erhalten.\nBeim nächsten Start musst du die bestehende Bin-ID eingeben.'))return;
+  if(!confirm('Cloud-Verbindung zurücksetzen?\nDaten in der Cloud bleiben erhalten.\nBeim nächsten Start Bin-ID eingeben.'))return;
   localStorage.removeItem(LS_KEY);localStorage.removeItem(LS_BIN);location.reload();
 }
 
@@ -740,21 +732,24 @@ async function loadFromCloud(){
     const r=await fetch(API+'/b/'+binId+'/latest',{headers:{'X-Master-Key':apiKey}});
     if(!r.ok)throw new Error('HTTP '+r.status);
     const rec=(await r.json()).record;
-    db=rec.days||{};team=rec.team||[];medDefs=rec.medDefs||[];
-    localStorage.setItem(LS_CACHE,JSON.stringify({days:db,team,medDefs}));
+    // Support both old format (rec.days) and new (rec.entries)
+    db=rec.entries||rec.days||{};
+    team=rec.team||[];medDefs=rec.medDefs||[];
+    localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs}));
     setSyncBar('ok','☁️ Synchronisiert · '+nowHHMM());
   }catch(e){
-    try{const c=JSON.parse(localStorage.getItem(LS_CACHE)||'{}');db=c.days||{};team=c.team||[];medDefs=c.medDefs||[]}catch{}
+    try{const c=JSON.parse(localStorage.getItem(LS_CACHE)||'{}');
+      db=c.entries||c.days||{};team=c.team||[];medDefs=c.medDefs||[]}catch{}
     setSyncBar('error','⚠️ Offline – lokaler Cache · '+e.message);
   }
 }
 async function saveToCloud(){
   setSyncBar('syncing','⏳ Speichert…');
-  localStorage.setItem(LS_CACHE,JSON.stringify({days:db,team,medDefs}));
+  localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs}));
   try{
     const r=await fetch(API+'/b/'+binId,{method:'PUT',
       headers:{'Content-Type':'application/json','X-Master-Key':apiKey},
-      body:JSON.stringify({days:db,team,medDefs,version:3,lastSaved:new Date().toISOString()})});
+      body:JSON.stringify({entries:db,team,medDefs,version:4,lastSaved:new Date().toISOString()})});
     if(!r.ok)throw new Error('HTTP '+r.status);
     setSyncBar('ok','☁️ Gespeichert · '+nowHHMM());
   }catch(e){
@@ -764,44 +759,48 @@ async function saveToCloud(){
 
 /* ── INIT / BOOT ── */
 function init(){
-  buildPain();detectDienst();updateDateDisplay();loadDay();
-  renderVerlauf();renderStats();renderTeamList();renderMedDefList();renderMedPresets();
-  setInterval(async()=>{if(!isDirty){await loadFromCloud();loadDay();renderVerlauf();renderStats()}},60000);
+  buildPain();autoDetectDienst();updateHeaderUI();updateDateDisplay();
+  loadEntry();renderVerlauf();renderStats();renderTeamList();renderMedDefList();renderMedPresets();
+  setInterval(async()=>{if(!isDirty){await loadFromCloud();loadEntry();renderVerlauf();renderStats()}},60000);
 }
 (function boot(){
-  apiKey=localStorage.getItem(LS_KEY)||'';
-  binId=localStorage.getItem(LS_BIN)||'';
+  apiKey=localStorage.getItem(LS_KEY)||'';binId=localStorage.getItem(LS_BIN)||'';
   if(apiKey&&binId){$id('setupScreen').style.display='none';loadFromCloud().then(()=>init())}
 })();
 
-/* ── DATE ── */
+/* ── DATE + DIENST ── */
 function updateDateDisplay(){$id('dateStr').textContent=fmtDate(curDate)}
-function shiftDay(d){
+
+function autoDetectDienst(){
+  const h=new Date().getHours();
+  if(h>=8&&h<15)curDienst='Tagdienst';
+  else if(h>=15&&h<22)curDienst='Spätdienst';
+  else curDienst='Nachtdienst';
+}
+
+function updateHeaderUI(){
+  // header color
+  const hdr=$id('hdr');
+  hdr.className='hdr '+DIENST_CLS[curDienst];
+  // dienst buttons
+  document.querySelectorAll('.dbtn').forEach(b=>b.classList.toggle('on',b.dataset.d===curDienst));
+  // sync bar label
+  setSyncBar('ok','☁️ Synchronisiert · '+nowHHMM());
+}
+
+function setDienst(d){
+  if(isDirty&&!confirm('Ungespeicherte Änderungen vorhanden. Trotzdem Dienst wechseln?'))return;
+  curDienst=d;updateHeaderUI();loadEntry();
+}
+
+function shiftDay(delta){
   if(isDirty&&!confirm('Ungespeicherte Änderungen vorhanden. Trotzdem wechseln?'))return;
-  const dt=new Date(curDate+'T12:00:00');dt.setDate(dt.getDate()+d);
-  curDate=dt.toISOString().slice(0,10);updateDateDisplay();loadDay();
+  const dt=new Date(curDate+'T12:00:00');dt.setDate(dt.getDate()+delta);
+  curDate=dt.toISOString().slice(0,10);updateDateDisplay();loadEntry();
 }
 function gotoToday(){
   if(isDirty&&!confirm('Ungespeicherte Änderungen vorhanden. Trotzdem wechseln?'))return;
-  curDate=todayISO();updateDateDisplay();loadDay();
-}
-
-/* ── DIENST ── */
-function detectDienst(){
-  const h=new Date().getHours();
-  let v;
-  if(h>=8&&h<15)v='Tagdienst';
-  else if(h>=15&&h<22)v='Spätdienst';
-  else v='Nachtdienst';
-  if(!activeDienst){activeDienst=v;applyDienstUI()}
-}
-function applyDienstUI(){
-  document.querySelectorAll('.dbtn-sm').forEach(b=>{
-    b.classList.toggle('on',b.dataset.v===activeDienst);
-  });
-}
-function setDienst(btn){
-  activeDienst=btn.dataset.v;applyDienstUI();dirty();
+  curDate=todayISO();updateDateDisplay();loadEntry();
 }
 
 /* ── TABS ── */
@@ -827,6 +826,7 @@ function applyPainUI(){
   for(let i=0;i<=10;i++){
     const b=$id('pb'+i);if(!b)continue;
     b.className='pbtn';
+    if(i===0)b.innerHTML='0<small>kein</small>';
     if(painSel>=0&&i<=painSel)b.classList.add('sel-'+i);
   }
 }
@@ -835,11 +835,8 @@ function applyPainUI(){
 function tick(id){
   const box=$id(id);if(!box)return;
   const tel=$id('ct-'+id.slice(3));
-  if(checks[id]!==undefined){
-    delete checks[id];box.classList.remove('on');if(tel)tel.textContent='';
-  }else{
-    const t=nowHHMM();checks[id]=t;box.classList.add('on');if(tel)tel.textContent=t;
-  }
+  if(checks[id]!==undefined){delete checks[id];box.classList.remove('on');if(tel)tel.textContent=''}
+  else{const t=nowHHMM();checks[id]=t;box.classList.add('on');if(tel)tel.textContent=t}
   dirty();
 }
 function applyChecksUI(){
@@ -852,28 +849,25 @@ function applyChecksUI(){
 }
 
 /* ── DURATIONS ── */
-function durSel(group,btn){
-  // find all dur-btns in same group
-  document.querySelectorAll(`[onclick*="${group}"]`).forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');durations[group]=btn.dataset.v;dirty();
+function durSel(btn){
+  const g=btn.dataset.g,v=btn.dataset.v;
+  document.querySelectorAll(`.dur-btn[data-g="${g}"]`).forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');durations[g]=v;dirty();
 }
 function applyDurationsUI(){
-  Object.entries(durations).forEach(([group,val])=>{
-    document.querySelectorAll(`[onclick*="${group}"]`).forEach(b=>{
-      b.classList.toggle('on',b.dataset.v===val);
-    });
+  Object.entries(durations).forEach(([g,val])=>{
+    document.querySelectorAll(`.dur-btn[data-g="${g}"]`).forEach(b=>b.classList.toggle('on',b.dataset.v===val));
   });
 }
 
 /* ── RADIOS ── */
 function setRb(gid,btn){
-  $id(gid).querySelectorAll('.rbtn').forEach(b=>b.classList.remove('on'));
+  $id(gid)?.querySelectorAll('.rbtn').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');radios[gid]=btn.dataset.v;dirty();
 }
 function applyRadiosUI(){
   Object.entries(radios).forEach(([gid,val])=>{
-    const g=$id(gid);if(!g)return;
-    g.querySelectorAll('.rbtn').forEach(b=>b.classList.toggle('on',b.dataset.v===val));
+    $id(gid)?.querySelectorAll('.rbtn').forEach(b=>b.classList.toggle('on',b.dataset.v===val));
   });
 }
 
@@ -882,50 +876,37 @@ function segSel(gid,btn){$id(gid)?.querySelectorAll('.segbtn').forEach(b=>b.clas
 function segGet(gid){return $id(gid)?.querySelector('.segbtn.on')?.dataset.v||''}
 function segClear(gid){$id(gid)?.querySelectorAll('.segbtn').forEach(b=>b.classList.remove('on'))}
 
-/* ── TRACHEA / STOMA LOG ── */
+/* ── TRACHEA ── */
 function addTracheaEntry(){
   const typ=radios['rg-trachea-typ'];
-  const von=$id('trachea-von').value;
-  const bis=$id('trachea-bis').value;
+  if(!typ){showToast('⚠️ Bitte Art wählen','err');return}
+  const von=$id('trachea-von').value,bis=$id('trachea-bis').value;
   const bem=$id('trachea-bem').value.trim();
-  if(!typ){showToast('⚠️ Bitte Art wählen (Trachealkanüle / Stomapflaster)','err');return}
-  tracheaLog.push({typ,von,bis,bem,addedAt:nowHHMM()});
-  // clear inputs
+  tracheaLog.push({typ,von,bis,bem});
   $id('trachea-von').value='';$id('trachea-bis').value='';$id('trachea-bem').value='';
   $id('rg-trachea-typ').querySelectorAll('.rbtn').forEach(b=>b.classList.remove('on'));
   delete radios['rg-trachea-typ'];
-  renderTracheaLog();dirty();
-  showToast('✓ '+typ+' eingetragen');
+  renderTracheaLog();dirty();showToast('✓ '+typ+' eingetragen');
 }
 function renderTracheaLog(){
   const w=$id('tracheaLog');
-  if(!tracheaLog.length){w.innerHTML='<div class="nodata" style="padding:12px 0"><span class="ico" style="font-size:20px;margin-bottom:4px">🫁</span>Noch keine Einträge.</div>';return}
+  if(!tracheaLog.length){w.innerHTML='<div class="nodata" style="padding:8px 0"><span class="ico" style="font-size:18px;margin-bottom:2px">🫁</span>Noch keine Einträge.</div>';return}
   w.innerHTML=tracheaLog.map((e,i)=>`
     <div class="tlog-entry">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div class="tlog-type">${e.typ==='Trachealkanüle'?'🫁':'🩹'} ${escH(e.typ)}</div>
+      <div class="tlog-type">
+        <span>${e.typ==='Trachealkanüle'?'🫁':'🩹'} ${escH(e.typ)}</span>
         <button class="del-btn" onclick="tracheaLog.splice(${i},1);renderTracheaLog();dirty()">✕</button>
       </div>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:4px">
-        ${e.von?`<div style="font-size:12px"><span style="color:var(--text3)">Aufgesetzt: </span><span style="font-family:var(--mono);font-weight:600">${e.von}</span></div>`:''}
-        ${e.bis?`<div style="font-size:12px"><span style="color:var(--text3)">Abgenommen: </span><span style="font-family:var(--mono);font-weight:600">${e.bis}</span></div>`:''}
-        ${e.von&&e.bis?`<div style="font-size:12px"><span style="color:var(--text3)">Dauer: </span><span style="font-family:var(--mono);font-weight:600">${calcDur(e.von,e.bis)}</span></div>`:''}
+      <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px">
+        ${e.von?`<span><span style="color:var(--text3)">auf: </span><strong style="font-family:var(--mono)">${e.von}</strong></span>`:''}
+        ${e.bis?`<span><span style="color:var(--text3)">ab: </span><strong style="font-family:var(--mono)">${e.bis}</strong></span>`:''}
+        ${e.von&&e.bis?`<span style="color:var(--green);font-family:var(--mono)">⏱ ${calcDur(e.von,e.bis)}</span>`:''}
       </div>
       ${e.bem?`<div style="font-size:12px;color:var(--text2);margin-top:4px">${escH(e.bem)}</div>`:''}
     </div>`).join('');
 }
-function calcDur(von,bis){
-  try{
-    const [vh,vm]=von.split(':').map(Number);
-    const [bh,bm]=bis.split(':').map(Number);
-    let min=(bh*60+bm)-(vh*60+vm);
-    if(min<0)min+=1440;
-    if(min<60)return min+'min';
-    return Math.floor(min/60)+'h '+(min%60?min%60+'min':'');
-  }catch{return ''}
-}
 
-/* ── MEDIKAMENTE ── */
+/* ── MEDS ── */
 function addMedDef(n='',d=''){medDefs.push({name:n,dose:d});renderMedDefList()}
 function renderMedDefList(){
   const w=$id('medDefList');
@@ -947,7 +928,7 @@ function renderMedPresets(){
   medDefs.forEach(m=>{
     const btn=document.createElement('button');btn.className='med-preset';
     btn.innerHTML=`<span class="mp-name">${escH(m.name)}</span>${m.dose?`<span class="mp-dose">${escH(m.dose)}</span>`:''}`;
-    btn.onclick=()=>{giveMed(m.name,m.dose,btn)};
+    btn.onclick=()=>giveMed(m.name,m.dose,btn);
     w.appendChild(btn);
   });
 }
@@ -1094,38 +1075,33 @@ function renderTeamList(){
   updatePflegerinSel();
 }
 async function saveTeam(){
-  // collect current values
   $id('teamList').querySelectorAll('.team-row').forEach((row,i)=>{
     if(team[i])team[i].name=row.querySelector('.team-name').value.trim();
   });
   $id('medDefList').querySelectorAll('.meddef-row').forEach((row,i)=>{
     if(medDefs[i]){
-      medDefs[i].name=row.querySelectorAll('.mdinput')[0].value.trim();
-      medDefs[i].dose=row.querySelectorAll('.mdinput')[1].value.trim();
+      const ins=row.querySelectorAll('.mdinput');
+      medDefs[i].name=ins[0].value.trim();medDefs[i].dose=ins[1].value.trim();
     }
   });
-  await saveToCloud();
-  updatePflegerinSel();renderMedPresets();
+  await saveToCloud();updatePflegerinSel();renderMedPresets();
   showToast('✓ Team & Medikamente gespeichert');
 }
 function updatePflegerinSel(){
-  // update both header select and any other references
-  ['hdr-pflegerin'].forEach(selId=>{
-    const sel=$id(selId);if(!sel)return;
-    const cur=sel.value;
-    sel.innerHTML='<option value="">– Pflegerin –</option>';
-    team.forEach(t=>{
-      if(!t.name)return;
-      sel.innerHTML+=`<option value="${escH(t.name)}"${cur===t.name?' selected':''}>${escH(t.name)}</option>`;
-    });
-    if(activePflegerin)sel.value=activePflegerin;
+  const sel=$id('hdr-pflegerin');if(!sel)return;
+  const cur=sel.value;
+  sel.innerHTML='<option value="">– Pflegerin –</option>';
+  team.forEach(t=>{
+    if(!t.name)return;
+    sel.innerHTML+=`<option value="${escH(t.name)}"${cur===t.name?' selected':''}>${escH(t.name)}</option>`;
   });
 }
 
 /* ── SAVE / LOAD / DELETE ── */
-function collectDay(){
-  const r={savedAt:new Date().toISOString()};
+function collectEntry(){
+  const r={savedAt:new Date().toISOString(),dienst:curDienst,date:curDate};
   ALL_TXT.forEach(id=>{const el=$id(id);if(el)r[id]=el.value});
+  r.pflegerin=$id('hdr-pflegerin')?.value||'';
   r.pain=painSel;r.checks={...checks};r.radios={...radios};r.durations={...durations};
   r.lagers=lagers.map(l=>({...l}));
   r.medGiven=medGiven.map(m=>({...m}));
@@ -1133,18 +1109,18 @@ function collectDay(){
   r.drinkLog=drinkLog.map(e=>({...e}));
   r.stuhlLog=stuhlLog.map(e=>({...e}));
   r.urinLog=urinLog.map(e=>({...e}));
-  r.dienst=activeDienst;
-  r.pflegerin=$id('hdr-pflegerin')?.value||activePflegerin||'';
   return r;
 }
-async function saveDay(){
-  db[curDate]=collectDay();
+async function saveEntry(){
+  const k=entryKey(curDate,curDienst);
+  db[k]=collectEntry();
   await saveToCloud();isDirty=false;
-  showToast('✓ Gespeichert – '+fmtDate(curDate));
+  showToast('✓ '+curDienst+' · '+fmtDate(curDate)+' gespeichert');
   renderVerlauf();renderStats();
 }
-function loadDay(){
-  const r=db[curDate]||{};
+function loadEntry(){
+  const k=entryKey(curDate,curDienst);
+  const r=db[k]||{};
   ALL_TXT.forEach(id=>{const el=$id(id);if(el)el.value=r[id]||''});
   painSel=r.pain!=null?r.pain:-1;applyPainUI();
   checks=r.checks?{...r.checks}:{};applyChecksUI();
@@ -1156,75 +1132,55 @@ function loadDay(){
   drinkLog=r.drinkLog?r.drinkLog.map(e=>({...e})):[];renderDrinkLog();
   stuhlLog=r.stuhlLog?r.stuhlLog.map(e=>({...e})):[];renderStuhlLog();
   urinLog=r.urinLog?r.urinLog.map(e=>({...e})):[];renderUrinLog();
-  // dienst – always let user manually set; auto-detect only if no saved value
-  if(r.dienst){activeDienst=r.dienst}else{activeDienst='';detectDienst()}
-  applyDienstUI();
-  activePflegerin=r.pflegerin||'';
-  const hdrSel=$id('hdr-pflegerin');if(hdrSel&&activePflegerin)hdrSel.value=activePflegerin;
+  // pflegerin
+  const sel=$id('hdr-pflegerin');if(sel&&r.pflegerin)sel.value=r.pflegerin;
   calcFluid();isDirty=false;
+  updateHeaderUI();
 }
-async function deleteDay(){
-  if(!confirm('Alle Daten vom '+fmtDate(curDate)+' unwiderruflich löschen?'))return;
-  delete db[curDate];
+async function deleteEntry(){
+  const k=entryKey(curDate,curDienst);
+  if(!confirm('Eintrag für '+curDienst+' am '+fmtDate(curDate)+' löschen?'))return;
+  delete db[k];
   await saveToCloud();isDirty=false;
-  loadDay();renderVerlauf();renderStats();
-  showToast('🗑 Daten gelöscht – '+fmtDate(curDate));
+  loadEntry();renderVerlauf();renderStats();
+  showToast('🗑 Gelöscht: '+curDienst+' · '+fmtDate(curDate));
 }
 
-/* ── VOICE – fixed for iOS Safari ── */
+/* ── VOICE ── */
 function mic(btn,targetId){
-  // Stop if already running
   if(micNode){
     micNode.stop();micNode=null;
-    if(micHintEl)micHintEl.classList.remove('show');
     document.querySelectorAll('.micbtn').forEach(b=>b.classList.remove('rec'));
-    return;
+    if(micHintEl)micHintEl.classList.remove('show');return;
   }
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){
-    alert('Spracheingabe wird auf diesem Gerät/Browser nicht unterstützt.\nBitte Safari auf iOS 17+ verwenden.');return;
-  }
-  // Request mic permission explicitly first (fixes iOS bug)
-  if(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){
-    navigator.mediaDevices.getUserMedia({audio:true}).then(stream=>{
-      stream.getTracks().forEach(t=>t.stop()); // immediately release, SR handles its own
-      startRecognition(btn,targetId);
-    }).catch(err=>{
-      alert('Mikrofonzugriff verweigert: '+err.message+'\nBitte Mikrofon-Erlaubnis in Safari-Einstellungen erteilen.');
-    });
-  } else {
-    startRecognition(btn,targetId);
-  }
+  if(!SR){alert('Spracheingabe nicht unterstützt. Bitte Safari iOS 17+ verwenden.');return}
+  if(navigator.mediaDevices?.getUserMedia){
+    navigator.mediaDevices.getUserMedia({audio:true})
+      .then(s=>{s.getTracks().forEach(t=>t.stop());startSR(btn,targetId)})
+      .catch(e=>alert('Mikrofon verweigert: '+e.message+'\nBitte in Safari-Einstellungen erlauben.'));
+  } else startSR(btn,targetId);
 }
-function startRecognition(btn,targetId){
+function startSR(btn,targetId){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  const r=new SR();
-  r.lang='de-DE';r.continuous=false;r.interimResults=false;r.maxAlternatives=1;
-  btn.classList.add('rec');micNode=r;micTarget=targetId;
-  // show hint
+  const r=new SR();r.lang='de-DE';r.continuous=false;r.interimResults=false;r.maxAlternatives=1;
+  btn.classList.add('rec');micNode=r;
   micHintEl=$id('mic-hint-'+targetId);
   if(micHintEl)micHintEl.classList.add('show');
-  r.onstart=()=>{btn.classList.add('rec')};
   r.onresult=e=>{
     if(e.results.length>0){
       const t=e.results[0][0].transcript;
-      const el=$id(targetId);
-      if(el)el.value=(el.value?(el.value+' '):'')+t;
-      dirty();
+      const el=$id(targetId);if(el){el.value=(el.value?(el.value+' '):'')+t;dirty()}
     }
   };
-  r.onspeechend=()=>{r.stop()};
-  r.onend=()=>{
-    btn.classList.remove('rec');micNode=null;
-    if(micHintEl)micHintEl.classList.remove('show');
-  };
+  r.onspeechend=()=>r.stop();
+  r.onend=()=>{btn.classList.remove('rec');micNode=null;if(micHintEl)micHintEl.classList.remove('show')};
   r.onerror=err=>{
-    btn.classList.remove('rec');micNode=null;
-    if(micHintEl)micHintEl.classList.remove('show');
-    if(err.error==='not-allowed'){alert('Mikrofon nicht erlaubt. Bitte in Safari-Einstellungen → Datenschutz → Mikrofon erlauben.')}
-    else if(err.error!=='aborted'&&err.error!=='no-speech'){alert('Sprachfehler: '+err.error)}
+    btn.classList.remove('rec');micNode=null;if(micHintEl)micHintEl.classList.remove('show');
+    if(err.error==='not-allowed')alert('Mikrofon nicht erlaubt. Bitte in Safari → Einstellungen → Datenschutz → Mikrofon erlauben.');
+    else if(err.error!=='aborted'&&err.error!=='no-speech')alert('Sprachfehler: '+err.error);
   };
-  try{r.start()}catch(e){btn.classList.remove('rec');micNode=null;alert('Spracherkennung konnte nicht gestartet werden: '+e.message)}
+  try{r.start()}catch(e){btn.classList.remove('rec');micNode=null;alert('SR-Fehler: '+e.message)}
 }
 
 /* ── TOAST ── */
@@ -1240,13 +1196,18 @@ function renderStats(){
   const days=parseInt($id('periodSel')?.value||14);
   const wrap=$id('statsContent');
   const cut=new Date();cut.setDate(cut.getDate()-days);
-  const rel=Object.keys(db).sort().filter(k=>new Date(k+'T12:00:00')>=cut);
+  // Collect all entries within period
+  const rel=Object.entries(db).filter(([k])=>{
+    const date=k.split('_')[0];
+    return new Date(date+'T12:00:00')>=cut;
+  });
   if(!rel.length){wrap.innerHTML='<div class="nodata"><span class="ico">📊</span>Keine Daten.</div>';return}
+
   let puls=[],spo2=[],rrs=[],temp=[],pain=[];
   let stuhlTotal=0,stuhlMengen=[],trinkmL=0,einSum=0;
   const drinkByType={};
-  rel.forEach(k=>{
-    const d=db[k];if(!d)return;
+
+  rel.forEach(([,d])=>{
     const n=(a,v)=>{const x=parseFloat(v);if(!isNaN(x)&&x>0)a.push(x)};
     n(puls,d['v-puls']);n(spo2,d['v-spo2']);n(rrs,d['v-rr-s']);n(temp,d['v-temp']);
     const pn=parseInt(d.pain);if(!isNaN(pn)&&pn>=0)pain.push(pn);
@@ -1256,15 +1217,20 @@ function renderStats(){
     const ein=dml+(parseFloat(d['f-sonde'])||0)+(parseFloat(d['f-infus'])||0)+(parseFloat(d['f-sonst-ein'])||0);
     if(ein>0)einSum+=ein;
   });
+
+  // Count unique days
+  const uniqueDays=new Set(rel.map(([k])=>k.split('_')[0])).size;
+
   const avg=a=>a.length?(a.reduce((x,y)=>x+y,0)/a.length).toFixed(1):'–';
   const mn=a=>a.length?Math.min(...a).toFixed(1):'–';
   const mx=a=>a.length?Math.max(...a).toFixed(1):'–';
   const maxD=Math.max(...Object.values(drinkByType),1);
   const painCount={};pain.forEach(p=>{painCount[p]=(painCount[p]||0)+1});
   const maxP=Math.max(...Object.values(painCount),1);
+
   wrap.innerHTML=`
   <div class="sgrid">
-    <div class="scard"><div class="stitle">Dok. Tage</div><div class="sval">${rel.length}</div><div class="ssub">von ${days} Tagen</div></div>
+    <div class="scard"><div class="stitle">Dok. Tage</div><div class="sval">${uniqueDays}</div><div class="ssub">${rel.length} Dienste</div></div>
     <div class="scard"><div class="stitle">Stuhlgang</div><div class="sval">${stuhlTotal}×</div><div class="ssub">⌀ Menge ${stuhlMengen.length?avg(stuhlMengen):'–'}/5</div></div>
     <div class="scard"><div class="stitle">Ø Puls</div><div class="sval">${avg(puls)}</div><div class="ssub">↓${mn(puls)} ↑${mx(puls)}</div></div>
     <div class="scard"><div class="stitle">Ø SpO₂</div><div class="sval">${avg(spo2)}%</div><div class="ssub">↓${mn(spo2)} ↑${mx(spo2)}</div></div>
@@ -1274,7 +1240,7 @@ function renderStats(){
   <div class="card"><div class="card-head">☕ Trinkmenge</div><div class="card-body">
     <div style="display:flex;justify-content:space-between;margin-bottom:6px">
       <span>Gesamt</span><span style="font-family:var(--mono);font-weight:600;font-size:17px;color:var(--green)">${trinkmL} ml</span></div>
-    <div style="font-size:11px;color:var(--text3);margin-bottom:8px">⌀ ${rel.length?Math.round(trinkmL/rel.length):0} ml / Tag</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:8px">⌀ ${uniqueDays?Math.round(trinkmL/uniqueDays):0} ml / Tag</div>
     ${Object.entries(drinkByType).sort((a,b)=>b[1]-a[1]).map(([t,ml])=>`
     <div class="crow2"><div class="clbl2">${DRINK_ICO[t]||'🥤'} ${escH(t)}</div>
       <div class="cbarw"><div class="cbar" style="width:${Math.round(ml/maxD*100)}%"></div></div>
@@ -1284,7 +1250,7 @@ function renderStats(){
     <div class="frow"><div class="flabel">Gesamt (${days}d)</div>
       <span style="font-family:var(--mono);font-weight:600;color:var(--green)">${einSum?einSum+' ml':'–'}</span></div>
     <div class="frow"><div class="flabel">⌀ pro Tag</div>
-      <span style="font-family:var(--mono);font-weight:600;color:var(--green)">${rel.length&&einSum?Math.round(einSum/rel.length)+' ml':'–'}</span></div>
+      <span style="font-family:var(--mono);font-weight:600;color:var(--green)">${uniqueDays&&einSum?Math.round(einSum/uniqueDays)+' ml':'–'}</span></div>
   </div></div>
   ${pain.length?`<div class="card"><div class="card-head">😣 Schmerz · Ø ${avg(pain)}/10</div><div class="card-body">
     ${Object.entries(painCount).sort((a,b)=>+a[0]-+b[0]).map(([lvl,cnt])=>`
@@ -1297,39 +1263,53 @@ function renderStats(){
 /* ── VERLAUF ── */
 function renderVerlauf(){
   const wrap=$id('verlaufContent');
-  const keys=Object.keys(db).sort().reverse();
-  if(!keys.length){wrap.innerHTML='<div class="nodata"><span class="ico">📋</span>Noch keine Einträge.</div>';return}
-  wrap.innerHTML=keys.map(k=>{
-    const d=db[k];const items=[];
-    if(d['v-puls'])items.push(['Puls',d['v-puls']+' bpm']);
-    if(d['v-spo2'])items.push(['SpO₂',d['v-spo2']+'%']);
-    if(d['v-rr-s']&&d['v-rr-d'])items.push(['RR',d['v-rr-s']+'/'+d['v-rr-d']]);
-    if(d['v-temp'])items.push(['Temp.',d['v-temp']+'°C']);
-    if(d.pain>=0)items.push(['Schmerz',d.pain+'/10'+(d['pain-time']?' ('+d['pain-time']+'Uhr)':'')]);
-    if(d.tracheaLog?.length)d.tracheaLog.forEach(e=>{
-      items.push([e.typ,[(e.von?'auf '+e.von:''), (e.bis?'ab '+e.bis:''), (e.von&&e.bis?calcDur(e.von,e.bis):'')].filter(Boolean).join(' · ')]);
-    });
-    if(d.checks?.['ck-kappe'])items.push(['Verschlusskappe',d.checks['ck-kappe']+(d.durations?.['dur-kappe']?' · '+d.durations['dur-kappe']:'')]);
-    if(d.checks?.['ck-orthese'])items.push(['Beinorthesen',d.checks['ck-orthese']+(d.durations?.['dur-orthese']?' · '+d.durations['dur-orthese']:'')]);
-    if(d.checks?.['ck-bewegung'])items.push(['Bewegungstrainer',d.checks['ck-bewegung']+(d.durations?.['dur-bewegung']?' · '+d.durations['dur-bewegung']:'')]);
-    if(d.stuhlLog?.length)items.push(['Stuhlgang',d.stuhlLog.length+'× · ⌀ '+(d.stuhlLog.reduce((a,e)=>a+(+e.menge||0),0)/d.stuhlLog.length).toFixed(1)+'/5']);
-    if(d.urinLog?.length)items.push(['Urin',d.urinLog.length+'× eingetragen']);
-    const dml=d.drinkLog?d.drinkLog.reduce((a,e)=>a+e.ml,0):0;
-    if(dml)items.push(['Trinkmenge',dml+' ml']);
-    if(d.medGiven?.length)items.push(['Medikamente',d.medGiven.map(m=>(m.time?m.time+' ':'')+m.name+(m.dose?' '+m.dose:'')).join(', ')]);
-    if(d.lagers?.length)items.push(['Lagerung',d.lagers.map(l=>(l.time?l.time+' ':'')+l.pos).join(', ')]);
-    if(d.dienst)items.push(['Dienst',d.dienst]);
-    if(d.pflegerin)items.push(['Pflegerin',d.pflegerin]);
-    if(d.pflegebericht)items.push(['Pflegebericht',d.pflegebericht.slice(0,80)+(d.pflegebericht.length>80?'…':'')]);
-    if(d.besond)items.push(['Besonderheiten',d.besond.slice(0,80)+(d.besond.length>80?'…':'')]);
-    return `<div class="hday">
-      <div class="hday-hd" onclick="this.nextElementSibling.classList.toggle('open')">
-        <span>${fmtDate(k)}</span>
-        <span style="color:var(--text3);font-size:11px">${items.length} Einträge ▾</span>
-      </div>
-      <div class="hday-bd">
-        ${items.map(([key,val])=>`<div class="hitem"><div class="hkey">${escH(key)}</div><div class="hval">${escH(String(val))}</div></div>`).join('')}
-      </div>
+  // Group by date, then show dienste sorted
+  const byDate={};
+  Object.entries(db).forEach(([k,v])=>{
+    const[date,dienst]=k.split('_');
+    if(!byDate[date])byDate[date]=[];
+    byDate[date].push({dienst,data:v,key:k});
+  });
+  const dates=Object.keys(byDate).sort().reverse();
+  if(!dates.length){wrap.innerHTML='<div class="nodata"><span class="ico">📋</span>Noch keine Einträge.</div>';return}
+
+  wrap.innerHTML=dates.map(date=>{
+    const dienste=byDate[date].sort((a,b)=>DIENSTE.indexOf(a.dienst)-DIENSTE.indexOf(b.dienst));
+    return `<div style="margin-bottom:12px">
+      <div style="font-size:12px;font-weight:600;color:var(--text3);padding:4px 2px;font-family:var(--mono)">${fmtDate(date)}</div>
+      ${dienste.map(({dienst,data:d,key})=>{
+        const cls=DIENST_CLS[dienst]||'td';
+        const items=[];
+        if(d.pflegerin)items.push(['Pflegerin',d.pflegerin]);
+        if(d['v-puls'])items.push(['Puls',d['v-puls']+' bpm']);
+        if(d['v-spo2'])items.push(['SpO₂',d['v-spo2']+'%']);
+        if(d['v-rr-s']&&d['v-rr-d'])items.push(['RR',d['v-rr-s']+'/'+d['v-rr-d']]);
+        if(d['v-temp'])items.push(['Temp.',d['v-temp']+'°C']);
+        if(d.pain>=0)items.push(['Schmerz',d.pain+'/10'+(d['pain-time']?' ('+d['pain-time']+' Uhr)':'')]);
+        if(d.tracheaLog?.length)d.tracheaLog.forEach(e=>{
+          items.push([e.typ,[(e.von?'auf '+e.von:''),(e.bis?'ab '+e.bis:''),(e.von&&e.bis?calcDur(e.von,e.bis):'')].filter(Boolean).join(' · ')]);
+        });
+        if(d.checks?.['ck-kappe'])items.push(['Verschlusskappe',d.checks['ck-kappe']+(d.durations?.['dur-kappe']?' · '+d.durations['dur-kappe']:'')]);
+        if(d.checks?.['ck-orthese'])items.push(['Beinorthesen',d.durations?.['dur-orthese']||'✓']);
+        if(d.checks?.['ck-bewegung'])items.push(['Bewegungstrainer',d.durations?.['dur-bewegung']||'✓']);
+        if(d.stuhlLog?.length)items.push(['Stuhlgang',d.stuhlLog.length+'× · ⌀ '+(d.stuhlLog.reduce((a,e)=>a+(+e.menge||0),0)/d.stuhlLog.length).toFixed(1)+'/5']);
+        if(d.urinLog?.length)items.push(['Urin',d.urinLog.length+'× eingetragen']);
+        const dml=d.drinkLog?d.drinkLog.reduce((a,e)=>a+e.ml,0):0;
+        if(dml)items.push(['Trinkmenge',dml+' ml']);
+        if(d.medGiven?.length)items.push(['Medikamente',d.medGiven.map(m=>(m.time?m.time+' ':'')+m.name+(m.dose?' '+m.dose:'')).join(', ')]);
+        if(d.lagers?.length)items.push(['Lagerung',d.lagers.map(l=>(l.time?l.time+' ':'')+l.pos).join(', ')]);
+        if(d.pflegebericht)items.push(['Bericht',d.pflegebericht.slice(0,80)+(d.pflegebericht.length>80?'…':'')]);
+        if(d.besond)items.push(['Besonderheiten',d.besond.slice(0,80)+(d.besond.length>80?'…':'')]);
+        return `<div class="hday">
+          <div class="hday-hd ${cls}" onclick="this.nextElementSibling.classList.toggle('open')">
+            <span>${DIENST_LABEL[dienst]||dienst}</span>
+            <span class="dienst-badge">${items.length} Einträge ▾</span>
+          </div>
+          <div class="hday-bd">
+            ${items.map(([key,val])=>`<div class="hitem"><div class="hkey">${escH(key)}</div><div class="hval">${escH(String(val))}</div></div>`).join('')}
+          </div>
+        </div>`;
+      }).join('')}
     </div>`;
   }).join('');
 }
