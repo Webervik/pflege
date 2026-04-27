@@ -794,13 +794,16 @@ function updateHeaderUI(){
 
 function setDienst(d){
   if(isDirty&&!confirm('Ungespeicherte Änderungen vorhanden. Trotzdem Dienst wechseln?'))return;
-  curDienst=d;updateHeaderUI();loadEntry();
+  curDienst=d;loadEntry();
 }
 
 function shiftDay(delta){
   if(isDirty&&!confirm('Ungespeicherte Änderungen vorhanden. Trotzdem wechseln?'))return;
-  const dt=new Date(curDate+'T12:00:00');dt.setDate(dt.getDate()+delta);
-  curDate=dt.toISOString().slice(0,10);updateDateDisplay();loadEntry();
+  const dt=new Date(curDate+'T12:00:00');
+  dt.setDate(dt.getDate()+delta);
+  const newDate=dt.toISOString().slice(0,10);
+  if(newDate>todayISO()){showToast('⚠️ Kein Datum in der Zukunft','err');return}
+  curDate=newDate;updateDateDisplay();loadEntry();
 }
 function gotoToday(){
   if(isDirty&&!confirm('Ungespeicherte Änderungen vorhanden. Trotzdem wechseln?'))return;
@@ -1056,7 +1059,9 @@ function renderUrinLog(){
 
 /* ── FLUID ── */
 function calcFluid(){
-  dirty();
+  dirty();calcFluidSilent();
+}
+function calcFluidSilent(){
   const v=id=>parseFloat($id(id)?.value)||0;
   const dml=drinkLog.reduce((a,e)=>a+e.ml,0);
   const ein=dml+v('f-sonde')+v('f-infus')+v('f-sonst-ein');
@@ -1125,20 +1130,34 @@ async function saveEntry(){
 function loadEntry(){
   const k=entryKey(curDate,curDienst);
   const r=db[k]||{};
+  // Reset ALL text fields – empty if no entry
   ALL_TXT.forEach(id=>{const el=$id(id);if(el)el.value=r[id]||''});
+  // Reset pain
   painSel=r.pain!=null?r.pain:-1;applyPainUI();
+  // Reset checks – clear all boxes first
   checks=r.checks?{...r.checks}:{};applyChecksUI();
-  radios=r.radios?{...r.radios}:{};applyRadiosUI();
-  durations=r.durations?{...r.durations}:{};applyDurationsUI();
+  // Reset radios – clear all pill selections first
+  radios=r.radios?{...r.radios}:{};
+  document.querySelectorAll('.rbtn').forEach(b=>b.classList.remove('on'));
+  applyRadiosUI();
+  // Reset durations – clear all dur-btns first
+  durations=r.durations?{...r.durations}:{};
+  document.querySelectorAll('.dur-btn').forEach(b=>b.classList.remove('on'));
+  applyDurationsUI();
+  // Reset segments – clear all segbtns first
+  document.querySelectorAll('.segbtn').forEach(b=>b.classList.remove('on'));
+  // Reset lists
   lagers=r.lagers?r.lagers.map(l=>({...l})):[];renderLagerList();
   medGiven=r.medGiven?r.medGiven.map(m=>({...m})):[];renderMedGivenList();
   tracheaLog=r.tracheaLog?r.tracheaLog.map(e=>({...e})):[];renderTracheaLog();
   drinkLog=r.drinkLog?r.drinkLog.map(e=>({...e})):[];renderDrinkLog();
   stuhlLog=r.stuhlLog?r.stuhlLog.map(e=>({...e})):[];renderStuhlLog();
   urinLog=r.urinLog?r.urinLog.map(e=>({...e})):[];renderUrinLog();
-  // pflegerin
-  const sel=$id('hdr-pflegerin');if(sel&&r.pflegerin)sel.value=r.pflegerin;
-  calcFluid();isDirty=false;
+  // Reset pflegerin dropdown – empty if no entry
+  const sel=$id('hdr-pflegerin');
+  if(sel) sel.value=r.pflegerin||'';
+  calcFluidSilent();
+  isDirty=false;
   updateHeaderUI();
 }
 async function deleteEntry(){
