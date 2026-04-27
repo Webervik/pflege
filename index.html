@@ -38,11 +38,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .setup-error{color:var(--red);font-size:12px;margin-top:6px;display:none;white-space:pre-wrap}
 
 /* SYNC BAR */
-.sync-bar{background:var(--green);color:#fff;text-align:center;font-size:11px;font-family:var(--mono);padding:3px 8px;position:sticky;top:0;z-index:201;letter-spacing:.3px}
+.sync-bar{background:var(--green);color:#fff;text-align:center;font-size:11px;font-family:var(--mono);padding:3px 8px;position:sticky;top:0;z-index:202;letter-spacing:.3px}
 .sync-bar.syncing{background:var(--orange)}.sync-bar.error{background:var(--red)}
 
 /* HEADER */
-.hdr{color:#fff;padding:10px 14px 8px;position:sticky;top:22px;z-index:200;box-shadow:0 2px 8px rgba(0,0,0,.25);transition:background .3s;width:100%;overflow:hidden}
+.hdr{color:#fff;padding:10px 14px 8px;position:sticky;top:var(--sync-h, 22px);z-index:200;box-shadow:0 2px 8px rgba(0,0,0,.25);transition:background .3s;width:100%;overflow:hidden}
 .hdr.td{background:var(--td)}.hdr.sd{background:var(--sd)}.hdr.nd{background:var(--nd)}
 /* row 1: name + save + date */
 .hdr-row1{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;gap:8px}
@@ -66,7 +66,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .pflegerin-sel option{color:var(--text);background:#fff}
 
 /* TABS */
-.tabs{display:flex;background:var(--surface);border-bottom:2px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;position:sticky;top:152px;z-index:190}
+.tabs{display:flex;background:var(--surface);border-bottom:2px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;position:sticky;top:var(--tabs-top, 120px);z-index:190}
 .tabs::-webkit-scrollbar{display:none}
 .tab{flex:none;padding:10px 12px;font-size:12px;font-weight:500;color:var(--text3);border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap}
 .tab.on{color:var(--green);border-bottom-color:var(--green)}
@@ -234,6 +234,12 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .settings-link button{background:none;border:none;color:var(--text3);font-size:12px;cursor:pointer;text-decoration:underline;font-family:var(--sans)}
 /* dienst-key badge in verlauf header */
 .dienst-badge{font-family:var(--mono);font-size:10px;opacity:.8}
+/* MOTIVATION OVERLAY */
+.mot-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.18);opacity:0;transition:opacity .4s;z-index:599;pointer-events:none}
+.mot-backdrop.show{opacity:1}
+.mot-toast{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.85);background:linear-gradient(135deg,#1a6b4a,#2d9b6b);color:#fff;padding:22px 28px;border-radius:20px;font-size:16px;font-weight:500;opacity:0;transition:all .4s cubic-bezier(.34,1.56,.64,1);z-index:600;text-align:center;pointer-events:none;max-width:82vw;line-height:1.5;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.mot-toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.mot-emoji{font-size:34px;display:block;margin-bottom:8px}
 </style>
 </head>
 <body>
@@ -645,6 +651,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 
 </div><!-- /content -->
 <div class="toast" id="toast"></div>
+<div class="mot-backdrop" id="motBackdrop"></div>
+<div class="mot-toast" id="motToast"><span class="mot-emoji" id="motEmoji"></span><span id="motText"></span></div>
 
 <script>
 'use strict';
@@ -761,10 +769,22 @@ async function saveToCloud(){
   }
 }
 
+/* ── LAYOUT: measure sticky heights dynamically ── */
+function fixLayout(){
+  const syncH=$id('syncBar')?.offsetHeight||0;
+  const hdrH=$id('hdr')?.offsetHeight||0;
+  const root=document.documentElement;
+  root.style.setProperty('--sync-h', syncH+'px');
+  root.style.setProperty('--tabs-top', (syncH+hdrH)+'px');
+}
+
 /* ── INIT / BOOT ── */
 function init(){
   buildPain();autoDetectDienst();updateHeaderUI();updateDateDisplay();
   loadEntry();renderVerlauf();renderStats();renderTeamList();renderMedDefList();renderMedPresets();
+  fixLayout();
+  window.addEventListener('resize', fixLayout);
+  window.addEventListener('orientationchange', ()=>setTimeout(fixLayout, 200));
   setInterval(async()=>{if(!isDirty){await loadFromCloud();loadEntry();renderVerlauf();renderStats()}},60000);
 }
 (function boot(){
@@ -783,13 +803,11 @@ function autoDetectDienst(){
 }
 
 function updateHeaderUI(){
-  // header color
   const hdr=$id('hdr');
   hdr.className='hdr '+DIENST_CLS[curDienst];
-  // dienst buttons
   document.querySelectorAll('.dbtn').forEach(b=>b.classList.toggle('on',b.dataset.d===curDienst));
-  // sync bar label
   setSyncBar('ok','☁️ Synchronisiert · '+nowHHMM());
+  setTimeout(fixLayout, 50);
 }
 
 function setDienst(d){
@@ -1126,6 +1144,7 @@ async function saveEntry(){
   await saveToCloud();isDirty=false;
   showToast('✓ '+curDienst+' · '+fmtDate(curDate)+' gespeichert');
   renderVerlauf();renderStats();
+  maybeShowMotivation();
 }
 function loadEntry(){
   const k=entryKey(curDate,curDienst);
@@ -1204,6 +1223,38 @@ function startSR(btn,targetId){
     else if(err.error!=='aborted'&&err.error!=='no-speech')alert('Sprachfehler: '+err.error);
   };
   try{r.start()}catch(e){btn.classList.remove('rec');micNode=null;alert('SR-Fehler: '+e.message)}
+}
+
+/* ── MOTIVATION ── */
+const MOT_MSGS=[
+  {e:'⭐',t:'Heute machst du das besonders gut!'},
+  {e:'💚',t:'Deine Fürsorge macht einen echten Unterschied.'},
+  {e:'🌟',t:'Großartige Arbeit – Sarah ist in guten Händen!'},
+  {e:'☕',t:'Du schaffst das. Gönne dir zwischendurch eine Pause.'},
+  {e:'🌸',t:'Jeder Eintrag zählt. Danke für deine Sorgfalt!'},
+  {e:'💪',t:'Professionell, einfühlsam, zuverlässig – das bist du!'},
+  {e:'🌈',t:'Du bringst heute Licht in Sarahs Tag.'},
+  {e:'🤍',t:'Pflege mit Herz – man merkt es an jedem Eintrag.'},
+  {e:'✨',t:'Wieder ein Dienst, der zählt. Gut gemacht!'},
+  {e:'🌿',t:'Ruhig und konzentriert – genau richtig so.'},
+  {e:'🏅',t:'Du bist ein wichtiger Teil von Sarahs Wohlbefinden.'},
+  {e:'💫',t:'Kleine Geste, große Wirkung – so wie du arbeitest.'},
+  {e:'🌙',t:'Auch nachts zählt dein Einsatz. Danke!'},
+  {e:'🌤',t:'Ein neuer Dienst, ein neuer Anfang. Du packst das!'},
+  {e:'🫶',t:'Mit so einer Pflege kann Sarah sich glücklich schätzen.'},
+];
+let motCount=0, motTimer=null;
+function maybeShowMotivation(){
+  motCount++;
+  if(motCount<2)return;
+  if(Math.random()>0.28)return;
+  const msg=MOT_MSGS[Math.floor(Math.random()*MOT_MSGS.length)];
+  $id('motEmoji').textContent=msg.e;
+  $id('motText').textContent=msg.t;
+  const bd=$id('motBackdrop'),mt=$id('motToast');
+  bd.classList.add('show');mt.classList.add('show');
+  clearTimeout(motTimer);
+  motTimer=setTimeout(()=>{bd.classList.remove('show');mt.classList.remove('show')},3200);
 }
 
 /* ── TOAST ── */
