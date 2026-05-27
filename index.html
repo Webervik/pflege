@@ -739,6 +739,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   <div class="info-box">💡 <strong>Frühdienst</strong> 08–15 · <strong>Spätdienst</strong> 15–22 · <strong>Nachtdienst</strong> 22–08 Uhr</div>
   <button class="savebtn" onclick="saveTeam()">💾 Team &amp; Medikamente speichern</button>
   <div class="settings-link"><button onclick="resetSetup()">⚙️ Cloud-Einstellungen zurücksetzen</button></div>
+  <div class="settings-link" id="jsonbin-migrate-btn" style="margin-top:6px"><button onclick="migrateFromJsonbin()" style="color:var(--orange);font-weight:600">📦 Alte Daten von JSONbin wiederherstellen</button></div>
 </div>
 
 </div><!-- /content -->
@@ -840,6 +841,49 @@ function hideSetupErr(){$id('setupError').style.display='none'}
 function resetSetup(){
   if(!confirm('Cloud-Verbindung zurücksetzen?\nDaten auf GitHub bleiben erhalten.'))return;
   localStorage.removeItem(LS_GH_TOKEN);location.reload();
+}
+async function migrateFromJsonbin(){
+  const oldKey=localStorage.getItem('pflege_key')||'';
+  const oldBin=localStorage.getItem('pflege_bin')||'';
+  // Fallback: try reading from cache
+  if(!oldKey||!oldBin){
+    const cache=localStorage.getItem(LS_CACHE);
+    if(cache){
+      try{
+        const c=JSON.parse(cache);
+        const entries=c.entries||c.days||{};
+        if(Object.keys(entries).length>0){
+          if(!confirm('JSONbin-Zugangsdaten nicht gefunden, aber lokaler Cache vorhanden mit '+Object.keys(entries).length+' Einträgen.\nCache in GitHub speichern?'))return;
+          db=entries;team=c.team||[];medDefs=c.medDefs||[];
+          await saveToCloud();
+          loadEntry();renderVerlauf();renderStats();
+          showToast('✓ '+Object.keys(entries).length+' Einträge aus Cache wiederhergestellt!');
+          return;
+        }
+      }catch{}
+    }
+    alert('Keine alten JSONbin-Zugangsdaten gefunden.\nBitte wende dich an den App-Entwickler.');
+    return;
+  }
+  setSyncBar('syncing','⏳ Lade Daten von JSONbin…');
+  try{
+    const r=await fetch('https://api.jsonbin.io/v3/b/'+oldBin+'/latest',{
+      headers:{'X-Master-Key':oldKey}
+    });
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const rec=(await r.json()).record;
+    const entries=rec.entries||rec.days||{};
+    const cnt=Object.keys(entries).length;
+    if(!confirm('JSONbin: '+cnt+' Einträge gefunden.\nAlle nach GitHub übertragen?'))return;
+    db=entries;team=rec.team||[];medDefs=rec.medDefs||[];
+    await saveToCloud();
+    loadEntry();renderVerlauf();renderStats();
+    showToast('✓ '+cnt+' Einträge von JSONbin wiederhergestellt!');
+    $id('jsonbin-migrate-btn').style.display='none';
+  }catch(e){
+    setSyncBar('error','⚠️ Fehler: '+e.message);
+    alert('Fehler beim Laden von JSONbin:\n'+e.message);
+  }
 }
 
 /* ── CLOUD ── */
