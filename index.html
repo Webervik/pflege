@@ -1837,8 +1837,8 @@ function renderVerlauf(){
         if(d.besond)items.push(['Besonderheiten',d.besond.slice(0,80)+(d.besond.length>80?'…':'')]);
         return `<div class="hday">
           <div class="hday-hd ${cls}" onclick="this.nextElementSibling.classList.toggle('open')">
-            <span>${DIENST_LABEL[dienst]||dienst}</span>
-            <span class="dienst-badge">${items.length} Einträge ▾</span>
+            <span>${DIENST_LABEL[dienst]||dienst}${d.pflegerin?` · <strong>${escH(d.pflegerin)}</strong>`:''}</span>
+            <span class="dienst-badge">${items.length} ▾</span>
           </div>
           <div class="hday-bd">
             ${items.map(([key,val])=>`<div class="hitem"><div class="hkey">${escH(key)}</div><div class="hval">${escH(String(val))}</div></div>`).join('')}
