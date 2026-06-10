@@ -1039,6 +1039,13 @@ function init(){
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkMidnight();});
 }
 (function boot(){
+  // Setup-Link: ?t=TOKEN – Token aus URL übernehmen und sofort starten
+  const urlToken=new URLSearchParams(location.search).get('t')||'';
+  if(urlToken){
+    localStorage.setItem(LS_GH_TOKEN,urlToken);
+    // URL ohne Token in Adressleiste anzeigen (kein History-Eintrag)
+    history.replaceState(null,'',location.pathname);
+  }
   ghToken=localStorage.getItem(LS_GH_TOKEN)||'';
   if(ghToken){$id('setupScreen').style.display='none';loadFromCloud().then(()=>init())}
 })();
