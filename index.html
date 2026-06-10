@@ -69,8 +69,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 /* TABS */
 .tabs{display:flex;background:var(--surface);border-bottom:2px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;position:sticky;top:var(--tabs-top, 120px);z-index:190}
 .tabs::-webkit-scrollbar{display:none}
-.tab{flex:none;padding:10px 12px;font-size:12px;font-weight:500;color:var(--text3);border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap}
+.tab{flex:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 14px;border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;color:var(--text3)}
+.tab-ico{font-size:20px;line-height:1}
+.tab-lbl{font-size:11px;font-weight:600;white-space:nowrap;letter-spacing:.1px}
 .tab.on{color:var(--green);border-bottom-color:var(--green)}
+.tab.on .tab-lbl{font-weight:700}
 
 /* CONTENT */
 .content{padding:14px;max-width:600px;margin:0 auto}
@@ -317,16 +320,14 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 
 <!-- TABS -->
 <div class="tabs">
-  <button class="tab on" onclick="showTab('vitals',this)">🩺 Vital</button>
-  <button class="tab"    onclick="showTab('pflege',this)">💊 Pflege</button>
-  <button class="tab"    onclick="showTab('lager',this)">🛏 Lagerung</button>
-  <button class="tab"    onclick="showTab('trinken',this)">☕ Trinken</button>
-  <button class="tab"    onclick="showTab('fluid',this)">💧 Flüssigkeit</button>
-  <button class="tab"    onclick="showTab('ausscheid',this)">🚽 Ausscheidung</button>
-  <button class="tab"    onclick="showTab('bericht',this)">📝 Bericht</button>
-  <button class="tab"    onclick="showTab('stats',this)">📊 Auswertung</button>
-  <button class="tab"    onclick="showTab('verlauf',this)">📋 Verlauf</button>
-  <button class="tab"    onclick="showTab('team',this)">👥 Team</button>
+  <button class="tab on" onclick="showTab('vitals',this)"><span class="tab-ico">🩺</span><span class="tab-lbl">Vital</span></button>
+  <button class="tab"    onclick="showTab('pflege',this)"><span class="tab-ico">💊</span><span class="tab-lbl">Pflege</span></button>
+  <button class="tab"    onclick="showTab('lager',this)"><span class="tab-ico">🛏</span><span class="tab-lbl">Lagerung</span></button>
+  <button class="tab"    onclick="showTab('bilanz',this)"><span class="tab-ico">💧</span><span class="tab-lbl">Bilanz</span></button>
+  <button class="tab"    onclick="showTab('bericht',this)"><span class="tab-ico">📝</span><span class="tab-lbl">Bericht</span></button>
+  <button class="tab"    onclick="showTab('stats',this)"><span class="tab-ico">📊</span><span class="tab-lbl">Auswertung</span></button>
+  <button class="tab"    onclick="showTab('verlauf',this)"><span class="tab-ico">📋</span><span class="tab-lbl">Verlauf</span></button>
+  <button class="tab"    onclick="showTab('team',this)"><span class="tab-ico">👥</span><span class="tab-lbl">Team</span></button>
 </div>
 
 <div class="content">
@@ -545,9 +546,14 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 </div>
 
 <!-- ══ TRINKEN ══ -->
-<div class="page" id="pg-trinken">
+<!-- ══ BILANZ (Einfuhr + Ausfuhr) ══ -->
+<div class="page" id="pg-bilanz">
+
+  <!-- ─ EINFUHR ─ -->
+  <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;padding:4px 2px 6px">⬇️ Einfuhr</div>
+
   <div class="card">
-    <div class="card-head">Getränk erfassen</div>
+    <div class="card-head">☕ Getränke erfassen</div>
     <div class="card-body">
       <div class="sec-lbl">Getränk wählen</div>
       <div class="rbgroup" id="rg-drink-type" style="margin-bottom:10px">
@@ -569,27 +575,20 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
       <button class="savebtn" style="margin-top:8px" onclick="addDrinkEntry()">+ Eintrag hinzufügen</button>
     </div>
   </div>
-  <div class="total-bar">
-    <div class="total-bar-lbl">☕ Trinkmenge dieser Schicht</div>
-    <div class="total-bar-val" id="drinkTotalVal">0 ml</div>
-  </div>
-  <div class="card" style="margin-top:10px">
+  <div class="card" style="margin-top:4px">
     <div class="card-head">Nach Getränk</div>
     <div class="card-body" id="drinkTypeTotals"><div style="color:var(--text3);font-size:13px">Noch keine Einträge.</div></div>
   </div>
   <div class="card">
-    <div class="card-head">Einträge</div>
+    <div class="card-head">Getränke-Einträge</div>
     <div class="card-body" id="drinkLog"><div class="nodata"><span class="ico">☕</span>Noch keine Einträge.</div></div>
   </div>
-</div>
 
-<!-- ══ FLÜSSIGKEIT ══ -->
-<div class="page" id="pg-fluid">
   <div class="card">
-    <div class="card-head">Flüssigkeitszufuhr</div>
+    <div class="card-head">🍶 Sonstige Zufuhr</div>
     <div class="card-body">
       <div class="frow" style="background:var(--green2);border-radius:8px;padding:8px 10px;margin-bottom:10px">
-        <div class="flabel" style="font-weight:600;color:var(--green)">☕ Trinkmenge (aus Trinken-Tab)</div>
+        <div class="flabel" style="font-weight:600;color:var(--green)">☕ Trinkmenge</div>
         <div style="font-family:var(--mono);font-size:15px;font-weight:600;color:var(--green)" id="f-drink-display">0 ml</div>
       </div>
       <div class="frow"><div class="flabel">Sondenkost (Gastrotube)</div><input class="finput" id="f-sonde" type="number" inputmode="numeric" placeholder="0" oninput="calcFluid()"><div class="funit">ml</div></div>
@@ -598,12 +597,17 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
       <div class="ftotal" id="ft-ein">Gesamt Zufuhr: – ml</div>
     </div>
   </div>
-</div>
 
-<!-- ══ AUSSCHEIDUNG ══ -->
-<div class="page" id="pg-ausscheid">
+  <div class="total-bar">
+    <div class="total-bar-lbl">⬇️ Gesamtzufuhr dieser Schicht</div>
+    <div class="total-bar-val" id="drinkTotalVal">0 ml</div>
+  </div>
+
+  <!-- ─ AUSFUHR ─ -->
+  <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;padding:16px 2px 6px">⬆️ Ausfuhr</div>
+
   <div class="card">
-    <div class="card-head">Stuhlgang erfassen</div>
+    <div class="card-head">🚽 Stuhlgang erfassen</div>
     <div class="card-body">
       <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
         <input type="time" class="vinput" id="stuhl-time" style="font-size:14px;padding:7px 9px;width:130px;flex:none">
@@ -633,8 +637,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     </div>
   </div>
   <div class="card"><div class="card-head">Stuhlgang</div><div class="card-body" id="stuhlLog"><div class="nodata"><span class="ico">🚽</span>Noch keine Einträge.</div></div></div>
+
   <div class="card" style="margin-top:4px">
-    <div class="card-head">Urin erfassen</div>
+    <div class="card-head">💧 Urin erfassen</div>
     <div class="card-body">
       <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
         <input type="time" class="vinput" id="urin-time" style="font-size:14px;padding:7px 9px;width:130px;flex:none">
@@ -658,6 +663,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     </div>
   </div>
   <div class="card"><div class="card-head">Urin</div><div class="card-body" id="urinLog"><div class="nodata"><span class="ico">💧</span>Noch keine Einträge.</div></div></div>
+
 </div>
 
 <!-- ══ BERICHT ══ -->
@@ -1075,6 +1081,8 @@ function gotoToday(){
 
 /* ── TABS ── */
 function showTab(name,btn){
+  // Alte Tab-IDs auf neuen Bilanz-Tab umleiten
+  if(name==='trinken'||name==='fluid'||name==='ausscheid')name='bilanz';
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
   $id('pg-'+name).classList.add('on');btn.classList.add('on');
