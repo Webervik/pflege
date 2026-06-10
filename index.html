@@ -746,6 +746,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   <button class="savebtn" onclick="saveTeam()">💾 Team &amp; Medikamente speichern</button>
   <div class="settings-link"><button onclick="resetSetup()">⚙️ Cloud-Einstellungen zurücksetzen</button></div>
   <div class="settings-link" id="jsonbin-migrate-btn" style="margin-top:6px"><button onclick="migrateFromJsonbin()" style="color:var(--orange);font-weight:600">📦 Alte Daten von JSONbin wiederherstellen</button></div>
+  <div class="settings-link" style="margin-top:6px"><button onclick="restoreFromBackup()" style="color:var(--blue);font-weight:600">🔄 Backup wiederherstellen</button></div>
 </div>
 
 </div><!-- /content -->
@@ -944,6 +945,17 @@ async function loadFromCloud(){
 }
 async function saveToCloud(){
   setSyncBar('syncing','⏳ Speichert…');
+  const entryCount=Object.keys(db).length;
+
+  // ── Sicherheitsprüfung: nie drastisch weniger Einträge speichern als bekannt ──
+  const backupRaw=localStorage.getItem('pflege_backup');
+  const backupCount=backupRaw?Object.keys(JSON.parse(backupRaw).entries||{}).length:0;
+  if(backupCount>0 && entryCount < backupCount-5){
+    setSyncBar('error',`⚠️ Speichern abgebrochen: nur ${entryCount} Einträge statt ${backupCount}`);
+    showToast(`⛔ Speichern gestoppt – Datenverlust verhindert (${entryCount} vs. ${backupCount} Einträge)`,'err');
+    return;
+  }
+
   const payload=JSON.stringify({entries:db,team,medDefs,version:4,lastSaved:new Date().toISOString()});
   localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,sha:currentSha}));
   try{
@@ -958,9 +970,48 @@ async function saveToCloud(){
     const meta=await r.json();
     currentSha=meta.content.sha;
     localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,sha:currentSha}));
+
+    // ── Backup nach jedem erfolgreichen Speichern aktualisieren ──
+    localStorage.setItem('pflege_backup',JSON.stringify({entries:db,team,medDefs,savedAt:new Date().toISOString()}));
+    // Auch Backup-Datei auf GitHub schreiben (async, Fehler ignorieren)
+    writeBackupToGithub(payload).catch(()=>{});
+
     setSyncBar('ok','☁️ Gespeichert · '+nowHHMM());
   }catch(e){
     setSyncBar('error','⚠️ Cloud-Fehler (lokal gesichert) · '+e.message);
+  }
+}
+async function writeBackupToGithub(payload){
+  // Aktuelles Backup-SHA holen
+  const r=await fetch(`${GH_API}/repos/${GH_OWNER}/${GH_REPO}/contents/data_backup.json`,{
+    headers:{'Authorization':'Bearer '+ghToken,'Accept':'application/vnd.github+json'}
+  });
+  const body={message:'Backup '+new Date().toISOString(),content:b64encode(payload)};
+  if(r.ok){const m=await r.json();body.sha=m.sha;}
+  await fetch(`${GH_API}/repos/${GH_OWNER}/${GH_REPO}/contents/data_backup.json`,{
+    method:'PUT',
+    headers:{'Authorization':'Bearer '+ghToken,'Accept':'application/vnd.github+json','Content-Type':'application/json'},
+    body:JSON.stringify(body)
+  });
+}
+async function restoreFromBackup(){
+  if(!confirm('Backup von GitHub laden und als aktuelle Daten verwenden?\nDies überschreibt die aktuellen Daten.'))return;
+  setSyncBar('syncing','⏳ Lade Backup…');
+  try{
+    const r=await fetch(`${GH_API}/repos/${GH_OWNER}/${GH_REPO}/contents/data_backup.json`,{
+      headers:{'Authorization':'Bearer '+ghToken,'Accept':'application/vnd.github+json'}
+    });
+    if(!r.ok)throw new Error('Kein Backup gefunden');
+    const meta=await r.json();
+    const rec=JSON.parse(b64decode(meta.content.replace(/\n/g,'')));
+    const cnt=Object.keys(rec.entries||{}).length;
+    if(!confirm(`Backup enthält ${cnt} Einträge. Wiederherstellen?`))return;
+    db=rec.entries||{};team=rec.team||[];medDefs=rec.medDefs||[];
+    await saveToCloud();
+    loadEntry();renderVerlauf();renderStats();
+    showToast(`✅ Backup mit ${cnt} Einträgen wiederhergestellt`);
+  }catch(e){
+    setSyncBar('error','⚠️ Backup-Fehler: '+e.message);
   }
 }
 
