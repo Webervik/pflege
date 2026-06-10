@@ -899,6 +899,14 @@ function setSyncBar(state,msg){
   b.textContent=msg;
 }
 async function loadFromCloud(){
+  // Lokalen Cache vorab sichern – könnte Einträge haben, die noch nicht auf GitHub sind
+  let localEntries={},localTeam=[],localMedDefs=[];
+  try{
+    const c=JSON.parse(localStorage.getItem(LS_CACHE)||'{}');
+    localEntries=c.entries||c.days||{};
+    localTeam=c.team||[];localMedDefs=c.medDefs||[];
+  }catch{}
+
   setSyncBar('syncing','⏳ Lade Daten…');
   try{
     const r=await fetch(`${GH_API}/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`,{
@@ -908,14 +916,29 @@ async function loadFromCloud(){
     const meta=await r.json();
     currentSha=meta.sha;
     const rec=JSON.parse(b64decode(meta.content.replace(/\n/g,'')));
-    db=rec.entries||rec.days||{};
-    team=rec.team||[];medDefs=rec.medDefs||[];
+    const cloudEntries=rec.entries||rec.days||{};
+
+    // Merge: lokale Einträge, die noch nicht auf GitHub sind, hinzufügen
+    const merged={...cloudEntries};
+    let newLocal=0;
+    Object.keys(localEntries).forEach(k=>{
+      if(!merged[k]){merged[k]=localEntries[k];newLocal++;}
+    });
+
+    db=merged;
+    team=rec.team||(localTeam.length?localTeam:[]);
+    medDefs=rec.medDefs||(localMedDefs.length?localMedDefs:[]);
     localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,sha:currentSha}));
-    setSyncBar('ok','☁️ Synchronisiert · '+nowHHMM());
+
+    if(newLocal>0){
+      setSyncBar('syncing',`⏳ ${newLocal} lokale Einträge werden hochgeladen…`);
+      await saveToCloud();
+      showToast(`☁️ ${newLocal} lokale Einträge mit GitHub zusammengeführt`);
+    }else{
+      setSyncBar('ok','☁️ Synchronisiert · '+nowHHMM());
+    }
   }catch(e){
-    try{const c=JSON.parse(localStorage.getItem(LS_CACHE)||'{}');
-      db=c.entries||c.days||{};team=c.team||[];medDefs=c.medDefs||[];
-      if(c.sha)currentSha=c.sha;}catch{}
+    db=localEntries;team=localTeam;medDefs=localMedDefs;
     setSyncBar('error','⚠️ Offline – lokaler Cache · '+e.message);
   }
 }
