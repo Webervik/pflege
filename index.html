@@ -407,11 +407,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
         <button class="rbtn" data-v="Trachealkanüle" onclick="toggleRb('rg-trachea-typ',this)">🫁 Trachealkanüle</button>
         <button class="rbtn" data-v="Stomapflaster"  onclick="toggleRb('rg-trachea-typ',this)">🩹 Stomapflaster</button>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-        <div class="vi"><div class="vlabel">Aufgesetzt um</div>
-          <input type="time" id="trachea-von" class="vinput" style="font-size:14px;padding:7px 9px;width:100%"></div>
-        <div class="vi"><div class="vlabel">Abgenommen um</div>
-          <input type="time" id="trachea-bis" class="vinput" style="font-size:14px;padding:7px 9px;width:100%"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <div class="vi" style="min-width:0"><div class="vlabel">Aufgesetzt</div>
+          <input type="time" id="trachea-von" class="vinput" style="font-size:14px;padding:7px 6px;width:100%;min-width:0"></div>
+        <div class="vi" style="min-width:0"><div class="vlabel">Abgenommen</div>
+          <input type="time" id="trachea-bis" class="vinput" style="font-size:14px;padding:7px 6px;width:100%;min-width:0"></div>
       </div>
       <div class="sec-lbl">Bemerkung (optional)</div>
       <div class="vrow" style="margin-bottom:10px">
@@ -433,11 +433,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   <div class="card">
     <div class="card-head">Beinorthesen <button class="addbtn" onclick="addOrthosenEntry()">+ Eintrag</button></div>
     <div class="card-body">
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
-        <div class="vi" style="flex:1"><div class="vlabel">Von</div>
-          <input type="time" id="orthose-von" class="vinput" style="font-size:14px;padding:7px 9px"></div>
-        <div class="vi" style="flex:1"><div class="vlabel">Bis</div>
-          <input type="time" id="orthose-bis" class="vinput" style="font-size:14px;padding:7px 9px"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <div class="vi" style="min-width:0"><div class="vlabel">Von</div>
+          <input type="time" id="orthose-von" class="vinput" style="font-size:14px;padding:7px 6px;width:100%;min-width:0"></div>
+        <div class="vi" style="min-width:0"><div class="vlabel">Bis</div>
+          <input type="time" id="orthose-bis" class="vinput" style="font-size:14px;padding:7px 6px;width:100%;min-width:0"></div>
       </div>
       <div id="orthosenLog"><div class="nodata" style="padding:8px 0"><span class="ico" style="font-size:18px;margin-bottom:2px">🦵</span>Noch keine Einträge.</div></div>
     </div>
@@ -1806,8 +1806,8 @@ function renderStats(){
   const painCount={};pain.forEach(p=>{painCount[p]=(painCount[p]||0)+1});
   const maxP=Math.max(...Object.values(painCount),1);
 
-  // Letzter Stuhlgang + Urin + Arzttermine aus ALLEN Einträgen
-  let lastStuhl=null,lastUrin=null;
+  // Letzter Stuhlgang + Urin + Absaugen + Arzttermine aus ALLEN Einträgen
+  let lastStuhl=null,lastUrin=null,lastAbsaug=null;
   const lastArzt={};
   const ARZT_CHECKS={
     'ck-hausarzt':'Hausarzt','ck-neurologe':'Neurologe','ck-cabs':'CABS',
@@ -1818,6 +1818,7 @@ function renderStats(){
     const date=k.split('_')[0];
     d.stuhlLog?.forEach(e=>{const dt=date+'T'+(e.time||'00:00');if(!lastStuhl||dt>lastStuhl.dt)lastStuhl={dt,date,time:e.time,menge:e.menge,konst:e.konst}});
     d.urinLog?.forEach(e=>{const dt=date+'T'+(e.time||'00:00');if(!lastUrin||dt>lastUrin.dt)lastUrin={dt,date,time:e.time,menge:e.menge}});
+    d.sekretLog?.forEach(e=>{const dt=date+'T'+(e.time||'00:00');if(!lastAbsaug||dt>lastAbsaug.dt)lastAbsaug={dt,date,time:e.time,art:e.art,qual:e.qual}});
     Object.keys(ARZT_CHECKS).forEach(ck=>{
       if(d.checks?.[ck]&&(!lastArzt[ck]||date>lastArzt[ck]))lastArzt[ck]=date;
     });
@@ -1834,6 +1835,11 @@ function renderStats(){
       <div class="stitle">💧 Letzter Urin</div>
       <div style="font-size:14px;font-weight:600;color:var(--text);margin:4px 0">${lastUrin?fmtDate(lastUrin.date):'–'}</div>
       <div class="ssub">${lastUrin?(lastUrin.time?' '+lastUrin.time+' Uhr ·':'')+' Menge '+lastUrin.menge+'/3':'Keine Einträge'}</div>
+    </div>
+    <div class="scard" style="border-left:4px solid var(--orange)">
+      <div class="stitle">🫁 Letztes Absaugen</div>
+      <div style="font-size:14px;font-weight:600;color:var(--text);margin:4px 0">${lastAbsaug?fmtDate(lastAbsaug.date):'–'}</div>
+      <div class="ssub">${lastAbsaug?(lastAbsaug.time?lastAbsaug.time+' Uhr':'')+( lastAbsaug.art?' · '+escH(lastAbsaug.art):'')+(lastAbsaug.qual?' · '+escH(lastAbsaug.qual):''):'Keine Einträge'}</div>
     </div>
   </div>
   <div class="card"><div class="card-head">🏥 Letzte Arzttermine</div><div class="card-body">
