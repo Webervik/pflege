@@ -350,30 +350,35 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   </div>
 
   <div class="card">
-    <div class="card-head">Schmerzskala <span style="font-weight:400;text-transform:none;font-size:11px;letter-spacing:0">0=kein · 10=sehr stark</span></div>
+    <div class="card-head">😣 Schmerz <button class="addbtn" onclick="addPainEntry()">+ Eintrag</button></div>
     <div class="card-body">
-      <div class="pain-wrap" id="painWrap"></div>
-      <div style="display:flex;align-items:center;gap:8px;margin-top:10px;flex-wrap:wrap">
-        <span style="font-size:11px;color:var(--text3)">Geäußert um:</span>
-        <input type="time" id="pain-time" class="vinput" style="font-size:14px;width:115px;padding:5px 8px" oninput="dirty()">
-        <button onclick="$id('pain-time').value=nowHHMM();dirty()" style="padding:5px 9px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface2);font-size:11px;cursor:pointer;font-family:var(--sans)">Jetzt</button>
-      </div>
-      <div style="margin-top:10px">
-        <div class="sec-lbl">Kontext / Auslöser</div>
-        <div class="vrow">
-          <textarea class="ta" id="pain-context" rows="2" placeholder="z.B. nach Lagerung, Unruhe, Grimassieren…" oninput="dirty()"></textarea>
-          <button class="micbtn" onclick="mic(this,'pain-context')">🎤</button>
+      <div class="sec-lbl">NRS-Stufe (0=kein · 10=sehr stark)</div>
+      <div class="pain-wrap" id="painWrap" style="margin-bottom:10px"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <div class="vi" style="min-width:0">
+          <div class="vlabel">Uhrzeit</div>
+          <input type="time" id="pain-time" class="vinput" style="font-size:14px;padding:7px 6px;width:100%;min-width:0" oninput="dirty()">
+        </div>
+        <div class="vi" style="min-width:0;justify-content:flex-end">
+          <div class="vlabel">&nbsp;</div>
+          <button onclick="$id('pain-time').value=nowHHMM();dirty()" style="padding:7px 10px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);font-size:12px;cursor:pointer;font-family:var(--sans);width:100%">Jetzt</button>
         </div>
       </div>
-      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
-        <div class="sec-lbl" style="margin-bottom:8px">Schmerzmittel verabreicht?</div>
+      <div class="sec-lbl">Kontext / Auslöser</div>
+      <div class="vrow" style="margin-bottom:10px">
+        <textarea class="ta" id="pain-context" rows="2" placeholder="z.B. nach Lagerung, Unruhe, Grimassieren…" oninput="dirty()"></textarea>
+        <button class="micbtn" onclick="mic(this,'pain-context')">🎤</button>
+      </div>
+      <div style="padding:10px;background:var(--green2);border-radius:9px;border:1px solid var(--green3);margin-bottom:12px">
+        <div class="sec-lbl" style="margin-bottom:6px">Novaminsulfon gegeben?</div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <button onclick="addNovaminsulfon()" style="background:var(--green2);border:1.5px solid var(--green3);color:var(--green);border-radius:9px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--sans)">💊 Novaminsulfon</button>
-          <input type="time" id="nova-time" class="vinput" style="font-size:14px;width:115px;padding:5px 8px">
-          <button onclick="$id('nova-time').value=nowHHMM()" style="padding:5px 9px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface2);font-size:11px;cursor:pointer;font-family:var(--sans)">Jetzt</button>
+          <input type="time" id="nova-time" class="vinput" style="font-size:14px;width:115px;padding:5px 8px;flex:none">
+          <button onclick="$id('nova-time').value=nowHHMM()" style="padding:5px 9px;border-radius:7px;border:1.5px solid var(--green3);background:#fff;font-size:11px;cursor:pointer;font-family:var(--sans)">Jetzt</button>
+          <span style="font-size:11px;color:var(--text3)">(leer lassen = nicht gegeben)</span>
         </div>
-        <div id="nova-log" style="margin-top:8px"></div>
       </div>
+      <button class="savebtn" onclick="addPainEntry()">+ Schmerzerfassung eintragen</button>
+      <div id="painLog" style="margin-top:12px"></div>
     </div>
   </div>
 
@@ -799,6 +804,7 @@ let db={}, team=[], medDefs=[];   // db[key] = entry
 let curDate=todayISO(), curDienst='Frühdienst';
 let isDirty=false;
 let painSel=-1, checks={}, radios={}, durations={};
+let painLog=[];
 let lagers=[], medGiven=[], drinkLog=[], stuhlLog=[], urinLog=[], tracheaLog=[];
 let kappeLog=[], orthosenLog=[], sekretLog=[], verbandLog=[];
 let micNode=null, micHintEl=null;
@@ -1196,7 +1202,7 @@ function buildPain(){
     b.id='pb'+i;b.onclick=()=>selectPain(i);w.appendChild(b);
   }
 }
-function selectPain(v){painSel=painSel===v?-1:v;applyPainUI();dirty()}
+function selectPain(v){painSel=painSel===v?-1:v;applyPainUI();}
 function applyPainUI(){
   for(let i=0;i<=10;i++){
     const b=$id('pb'+i);if(!b)continue;
@@ -1204,6 +1210,43 @@ function applyPainUI(){
     if(i===0)b.innerHTML='0<small>kein</small>';
     if(painSel>=0&&i<=painSel)b.classList.add('sel-'+i);
   }
+}
+function addPainEntry(){
+  if(painSel<0){showToast('Bitte NRS-Stufe wählen','err');return}
+  const time=$id('pain-time').value||nowHHMM();
+  if(!warnTime(time))return;
+  const context=$id('pain-context').value.trim();
+  const novaTime=$id('nova-time').value;
+  checkPastDay();
+  const entry={level:painSel,time,context};
+  if(novaTime){
+    entry.novaTime=novaTime;
+    medGiven.push({time:novaTime,name:'Novaminsulfon',dose:'Tropfen',source:'pain'});
+    renderMedGivenList();
+    showToast('💊 Novaminsulfon · '+novaTime+' in Medikamentenliste eingetragen');
+  }
+  painLog.push(entry);
+  // Formular zurücksetzen
+  painSel=-1;applyPainUI();
+  $id('pain-time').value='';$id('pain-context').value='';$id('nova-time').value='';
+  renderPainLog();dirty();
+  showToast('✓ Schmerz Stufe '+entry.level+' · '+time+' eingetragen');
+}
+function renderPainLog(){
+  const w=$id('painLog');if(!w)return;
+  if(!painLog.length){w.innerHTML='';return}
+  const COLOR=lvl=>lvl===0?'#6c8faf':lvl<=3?'#27ae60':lvl<=6?'#e67e22':lvl<=8?'#e74c3c':'#922b21';
+  w.innerHTML='<div class="sec-lbl" style="margin-bottom:6px">Einträge dieser Schicht</div>'+
+    painLog.map((e,i)=>`
+    <div style="display:flex;align-items:flex-start;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div style="background:${COLOR(e.level)};color:#fff;font-family:var(--mono);font-weight:700;font-size:15px;border-radius:8px;min-width:36px;height:36px;display:flex;align-items:center;justify-content:center;flex:none">${e.level}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600">${e.time} Uhr</div>
+        ${e.context?`<div style="font-size:12px;color:var(--text2);margin-top:2px">${escH(e.context)}</div>`:''}
+        ${e.novaTime?`<div style="font-size:12px;color:var(--green);margin-top:3px;font-weight:600">💊 Novaminsulfon · ${e.novaTime} Uhr → auch in Medikamentenliste</div>`:''}
+      </div>
+      <button class="del-btn" onclick="painLog.splice(${i},1);renderPainLog();dirty()">✕</button>
+    </div>`).join('');
 }
 
 /* ── CHECKS ── */
@@ -1452,23 +1495,6 @@ function giveMed(name,dose,btn){
   btn.classList.add('given');setTimeout(()=>btn.classList.remove('given'),1800);
   renderMedGivenList();dirty();showToast('✓ '+name+(dose?' ('+dose+')':'')+' · '+t);
 }
-function addNovaminsulfon(){
-  const t=$id('nova-time').value||nowHHMM();
-  if(!warnTime(t))return;
-  checkPastDay();
-  medGiven.push({time:t,name:'Novaminsulfon',dose:'Tropfen',source:'pain'});
-  $id('nova-time').value='';
-  renderMedGivenList();renderNovaLog();dirty();
-  showToast('💊 Novaminsulfon · '+t);
-}
-function renderNovaLog(){
-  const el=$id('nova-log');if(!el)return;
-  const entries=medGiven.filter(m=>m.name==='Novaminsulfon');
-  if(!entries.length){el.innerHTML='';return;}
-  el.innerHTML=entries.map(m=>
-    `<div style="font-size:12px;color:var(--green);font-family:var(--mono);padding:2px 0">✓ ${m.time||'–'} Uhr · Novaminsulfon Tropfen</div>`
-  ).join('');
-}
 function addMedManual(){const t=nowHHMM();checkPastDay();medGiven.push({time:t,name:'',dose:''});renderMedGivenList();dirty()}
 function renderMedGivenList(){
   const w=$id('medGivenList');
@@ -1639,7 +1665,9 @@ function collectEntry(){
   const r={savedAt:new Date().toISOString(),dienst:curDienst,date:curDate};
   ALL_TXT.forEach(id=>{const el=$id(id);if(el)r[id]=el.value});
   r.pflegerin=$id('hdr-pflegerin')?.value||'';
-  r.pain=painSel;r.checks={...checks};r.radios={...radios};r.durations={...durations};
+  r.painLog=painLog.map(e=>({...e}));
+  r.pain=painLog.length?Math.max(...painLog.map(e=>e.level)):painSel; // backward compat
+  r.checks={...checks};r.radios={...radios};r.durations={...durations};
   r.lagers=lagers.map(l=>({...l}));
   r.medGiven=medGiven.map(m=>({...m}));
   r.tracheaLog=tracheaLog.map(e=>({...e}));
@@ -1682,7 +1710,15 @@ function loadEntry(){
   // Reset ALL text fields – empty if no entry
   ALL_TXT.forEach(id=>{const el=$id(id);if(el)el.value=r[id]||''});
   // Reset pain
-  painSel=r.pain!=null?r.pain:-1;applyPainUI();
+  // painLog: neu; Rückwärts-Compat: alten pain/pain-time als Eintrag übernehmen
+  if(r.painLog?.length){
+    painLog=r.painLog.map(e=>({...e}));
+  }else if(r.pain!=null&&r.pain>=0){
+    painLog=[{level:r.pain,time:r['pain-time']||'',context:r['pain-context']||''}];
+  }else{
+    painLog=[];
+  }
+  painSel=-1;applyPainUI();renderPainLog();
   // Reset checks – clear all boxes first
   checks=r.checks?{...r.checks}:{};applyChecksUI();
   // Reset radios – clear all pill selections first
@@ -1821,7 +1857,8 @@ function renderStats(){
     const date=k.split('_')[0];
     const n=(a,v)=>{const x=parseFloat(v);if(!isNaN(x)&&x>0)a.push(x)};
     n(puls,d['v-puls']);n(spo2,d['v-spo2']);n(rrs,d['v-rr-s']);n(temp,d['v-temp']);
-    const pn=parseInt(d.pain);if(!isNaN(pn)&&pn>=0)pain.push(pn);
+    if(d.painLog?.length)d.painLog.forEach(e=>pain.push(e.level));
+    else{const pn=parseInt(d.pain);if(!isNaN(pn)&&pn>=0)pain.push(pn);}
     if(d.stuhlLog?.length){stuhlTotal+=d.stuhlLog.length;d.stuhlLog.forEach(e=>{if(e.menge)stuhlMengen.push(parseInt(e.menge))})}
     if(d.drinkLog)d.drinkLog.forEach(e=>{trinkmL+=e.ml;drinkByType[e.type]=(drinkByType[e.type]||0)+e.ml});
     const dml=d.drinkLog?d.drinkLog.reduce((a,e)=>a+e.ml,0):0;
@@ -1940,7 +1977,14 @@ function renderVerlauf(){
         if(d['v-spo2'])items.push(['SpO₂',d['v-spo2']+'%']);
         if(d['v-rr-s']&&d['v-rr-d'])items.push(['RR',d['v-rr-s']+'/'+d['v-rr-d']]);
         if(d['v-temp'])items.push(['Temp.',d['v-temp']+'°C']);
-        if(d.pain>=0){
+        if(d.painLog?.length){
+          d.painLog.forEach(e=>{
+            let v=e.level+'/10'+(e.time?' · '+e.time+' Uhr':'');
+            if(e.context)v+=' · '+escH(e.context);
+            if(e.novaTime)v+=' → 💊 Novaminsulfon '+e.novaTime+' Uhr';
+            items.push(['Schmerz',v]);
+          });
+        }else if(d.pain>=0){
           let painVal=d.pain+'/10'+(d['pain-time']?' · '+d['pain-time']+' Uhr':'');
           if(d['pain-context'])painVal+=' · '+d['pain-context'];
           const novaGiven=(d.medGiven||[]).filter(m=>m.name==='Novaminsulfon');
