@@ -1733,7 +1733,7 @@ function loadEntry(){
   document.querySelectorAll('.segbtn').forEach(b=>b.classList.remove('on'));
   // Reset lists
   lagers=r.lagers?r.lagers.map(l=>({...l})):[];renderLagerList();
-  medGiven=r.medGiven?r.medGiven.map(m=>({...m})):[];renderMedGivenList();renderNovaLog();
+  medGiven=r.medGiven?r.medGiven.map(m=>({...m})):[];renderMedGivenList();
   tracheaLog=r.tracheaLog?r.tracheaLog.map(e=>({...e})):[];renderTracheaLog();
   kappeLog=r.kappeLog?r.kappeLog.map(e=>({...e})):[];renderKappeLog();
   orthosenLog=r.orthosenLog?r.orthosenLog.map(e=>({...e})):[];renderOrthosenLog();
