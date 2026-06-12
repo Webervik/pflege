@@ -358,6 +358,22 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
         <input type="time" id="pain-time" class="vinput" style="font-size:14px;width:115px;padding:5px 8px" oninput="dirty()">
         <button onclick="$id('pain-time').value=nowHHMM();dirty()" style="padding:5px 9px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface2);font-size:11px;cursor:pointer;font-family:var(--sans)">Jetzt</button>
       </div>
+      <div style="margin-top:10px">
+        <div class="sec-lbl">Kontext / Auslöser</div>
+        <div class="vrow">
+          <textarea class="ta" id="pain-context" rows="2" placeholder="z.B. nach Lagerung, Unruhe, Grimassieren…" oninput="dirty()"></textarea>
+          <button class="micbtn" onclick="mic(this,'pain-context')">🎤</button>
+        </div>
+      </div>
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
+        <div class="sec-lbl" style="margin-bottom:8px">Schmerzmittel verabreicht?</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button onclick="addNovaminsulfon()" style="background:var(--green2);border:1.5px solid var(--green3);color:var(--green);border-radius:9px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--sans)">💊 Novaminsulfon</button>
+          <input type="time" id="nova-time" class="vinput" style="font-size:14px;width:115px;padding:5px 8px">
+          <button onclick="$id('nova-time').value=nowHHMM()" style="padding:5px 9px;border-radius:7px;border:1.5px solid var(--border);background:var(--surface2);font-size:11px;cursor:pointer;font-family:var(--sans)">Jetzt</button>
+        </div>
+        <div id="nova-log" style="margin-top:8px"></div>
+      </div>
     </div>
   </div>
 
@@ -767,7 +783,7 @@ const LAGER_POS=['Rücken (Rü)','Linke Seite (li)','Rechte Seite (re)',
   'Oberkörperhochlagerung (OK)','Rollstuhl (RS)','Sitzbett (sb)',
   'Mikrolagerung (M)','Bettkante (BK)','nicht toleriert (n.t.)',
   'Versorgung (IKM-Wechsel)'];
-const ALL_TXT=['v-puls','v-spo2','v-rr-s','v-rr-d','v-temp','pain-time',
+const ALL_TXT=['v-puls','v-spo2','v-rr-s','v-rr-d','v-temp','pain-time','pain-context',
   'peg-haut','peg-wunde','stoma',
   'atem-fd','haut-besch',
   'f-sonde','f-infus','f-sonst-ein','pflegebericht','besond',
@@ -1436,6 +1452,23 @@ function giveMed(name,dose,btn){
   btn.classList.add('given');setTimeout(()=>btn.classList.remove('given'),1800);
   renderMedGivenList();dirty();showToast('✓ '+name+(dose?' ('+dose+')':'')+' · '+t);
 }
+function addNovaminsulfon(){
+  const t=$id('nova-time').value||nowHHMM();
+  if(!warnTime(t))return;
+  checkPastDay();
+  medGiven.push({time:t,name:'Novaminsulfon',dose:'Tropfen',source:'pain'});
+  $id('nova-time').value='';
+  renderMedGivenList();renderNovaLog();dirty();
+  showToast('💊 Novaminsulfon · '+t);
+}
+function renderNovaLog(){
+  const el=$id('nova-log');if(!el)return;
+  const entries=medGiven.filter(m=>m.name==='Novaminsulfon');
+  if(!entries.length){el.innerHTML='';return;}
+  el.innerHTML=entries.map(m=>
+    `<div style="font-size:12px;color:var(--green);font-family:var(--mono);padding:2px 0">✓ ${m.time||'–'} Uhr · Novaminsulfon Tropfen</div>`
+  ).join('');
+}
 function addMedManual(){const t=nowHHMM();checkPastDay();medGiven.push({time:t,name:'',dose:''});renderMedGivenList();dirty()}
 function renderMedGivenList(){
   const w=$id('medGivenList');
@@ -1664,7 +1697,7 @@ function loadEntry(){
   document.querySelectorAll('.segbtn').forEach(b=>b.classList.remove('on'));
   // Reset lists
   lagers=r.lagers?r.lagers.map(l=>({...l})):[];renderLagerList();
-  medGiven=r.medGiven?r.medGiven.map(m=>({...m})):[];renderMedGivenList();
+  medGiven=r.medGiven?r.medGiven.map(m=>({...m})):[];renderMedGivenList();renderNovaLog();
   tracheaLog=r.tracheaLog?r.tracheaLog.map(e=>({...e})):[];renderTracheaLog();
   kappeLog=r.kappeLog?r.kappeLog.map(e=>({...e})):[];renderKappeLog();
   orthosenLog=r.orthosenLog?r.orthosenLog.map(e=>({...e})):[];renderOrthosenLog();
@@ -1907,7 +1940,13 @@ function renderVerlauf(){
         if(d['v-spo2'])items.push(['SpO₂',d['v-spo2']+'%']);
         if(d['v-rr-s']&&d['v-rr-d'])items.push(['RR',d['v-rr-s']+'/'+d['v-rr-d']]);
         if(d['v-temp'])items.push(['Temp.',d['v-temp']+'°C']);
-        if(d.pain>=0)items.push(['Schmerz',d.pain+'/10'+(d['pain-time']?' ('+d['pain-time']+' Uhr)':'')]);
+        if(d.pain>=0){
+          let painVal=d.pain+'/10'+(d['pain-time']?' · '+d['pain-time']+' Uhr':'');
+          if(d['pain-context'])painVal+=' · '+d['pain-context'];
+          const novaGiven=(d.medGiven||[]).filter(m=>m.name==='Novaminsulfon');
+          if(novaGiven.length)painVal+=' → 💊 Novaminsulfon '+novaGiven.map(m=>m.time).join(', ')+' Uhr';
+          items.push(['Schmerz',painVal]);
+        }
         if(d.tracheaLog?.length)d.tracheaLog.forEach(e=>{
           items.push([e.typ,[(e.von?'auf '+e.von:''),(e.bis?'ab '+e.bis:''),(e.von&&e.bis?calcDur(e.von,e.bis):'')].filter(Boolean).join(' · ')]);
         });
