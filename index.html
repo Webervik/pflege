@@ -592,8 +592,16 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
         <button class="segbtn" data-v="150" onclick="segSel('seg-drink-ml',this)">150<small>ml</small></button>
         <button class="segbtn" data-v="200" onclick="segSel('seg-drink-ml',this)">200<small>ml</small></button>
         <button class="segbtn" data-v="250" onclick="segSel('seg-drink-ml',this)">250<small>ml</small></button>
+        <button class="segbtn" data-v="300" onclick="segSel('seg-drink-ml',this)">300<small>ml</small></button>
+        <button class="segbtn" data-v="350" onclick="segSel('seg-drink-ml',this)">350<small>ml</small></button>
+        <button class="segbtn" data-v="400" onclick="segSel('seg-drink-ml',this)">400<small>ml</small></button>
       </div>
-      <button class="savebtn" style="margin-top:8px" onclick="addDrinkEntry()">+ Eintrag hinzufügen</button>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:8px;margin-bottom:4px">
+        <input type="time" class="vinput" id="drink-time" style="font-size:14px;padding:7px 9px;width:130px;flex:none">
+        <button onclick="$id('drink-time').value=nowHHMM()" style="padding:7px 10px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);font-size:12px;cursor:pointer;font-family:var(--sans)">Jetzt</button>
+        <span style="font-size:12px;color:var(--text3)">(leer = aktuelle Uhrzeit)</span>
+      </div>
+      <button class="savebtn" style="margin-top:4px" onclick="addDrinkEntry()">+ Eintrag hinzufügen</button>
     </div>
   </div>
   <div class="card" style="margin-top:4px">
@@ -684,6 +692,14 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     </div>
   </div>
   <div class="card"><div class="card-head">Urin</div><div class="card-body" id="urinLog"><div class="nodata"><span class="ico">💧</span>Noch keine Einträge.</div></div></div>
+
+  <div class="card">
+    <div class="card-head">🩸 Periode</div>
+    <div class="card-body">
+      <div class="crow"><div class="cbox" id="ck-periode-start" onclick="tick('ck-periode-start')">✓</div><div class="clabel" onclick="tick('ck-periode-start')">Periode begonnen</div><div class="ctime" id="ct-periode-start"></div></div>
+      <div class="crow"><div class="cbox" id="ck-periode-ende" onclick="tick('ck-periode-ende')">✓</div><div class="clabel" onclick="tick('ck-periode-ende')">Periode beendet</div><div class="ctime" id="ct-periode-ende"></div></div>
+    </div>
+  </div>
 
 </div>
 
@@ -1531,11 +1547,13 @@ function addDrinkEntry(){
   const type=radios['rg-drink-type'],ml=segGet('seg-drink-ml');
   if(!type){showToast('⚠️ Bitte Getränk wählen','err');return}
   if(!ml){showToast('⚠️ Bitte Menge wählen','err');return}
-  const t=nowHHMM();checkPastDay();
+  const t=$id('drink-time').value||nowHHMM();
+  checkPastDay();
+  if(!timeInDienst(t)&&!confirm('Uhrzeit '+t+' liegt außerhalb des '+curDienst+'s ('+DIENST_ZEITEN[curDienst]+').\nTrotzdem eintragen (z.B. Nachtrag)?'))return;
   drinkLog.push({type,ml:parseInt(ml),time:t});
   $id('rg-drink-type').querySelectorAll('.rbtn').forEach(b=>b.classList.remove('on'));
-  delete radios['rg-drink-type'];segClear('seg-drink-ml');
-  renderDrinkLog();dirty();showToast('✓ '+type+' ('+ml+' ml)');
+  delete radios['rg-drink-type'];segClear('seg-drink-ml');$id('drink-time').value='';
+  renderDrinkLog();dirty();showToast('✓ '+type+' ('+ml+' ml) · '+t+' Uhr');
 }
 function renderDrinkLog(){
   const total=drinkLog.reduce((a,e)=>a+e.ml,0);
@@ -1877,7 +1895,7 @@ function renderStats(){
   const maxP=Math.max(...Object.values(painCount),1);
 
   // Letzter Stuhlgang + Urin + Absaugen + Arzttermine aus ALLEN Einträgen
-  let lastStuhl=null,lastUrin=null,lastAbsaug=null;
+  let lastStuhl=null,lastUrin=null,lastAbsaug=null,lastPeriodeStart=null,lastPeriodeEnde=null;
   const lastArzt={};
   const ARZT_CHECKS={
     'ck-hausarzt':'Hausarzt','ck-neurologe':'Neurologe','ck-cabs':'CABS',
@@ -1889,6 +1907,8 @@ function renderStats(){
     d.stuhlLog?.forEach(e=>{const dt=date+'T'+(e.time||'00:00');if(!lastStuhl||dt>lastStuhl.dt)lastStuhl={dt,date,time:e.time,menge:e.menge,konst:e.konst}});
     d.urinLog?.forEach(e=>{const dt=date+'T'+(e.time||'00:00');if(!lastUrin||dt>lastUrin.dt)lastUrin={dt,date,time:e.time,menge:e.menge}});
     d.sekretLog?.forEach(e=>{const dt=date+'T'+(e.time||'00:00');if(!lastAbsaug||dt>lastAbsaug.dt)lastAbsaug={dt,date,time:e.time,art:e.art,qual:e.qual}});
+    if(d.checks?.['ck-periode-start']&&(!lastPeriodeStart||date>lastPeriodeStart))lastPeriodeStart=date;
+    if(d.checks?.['ck-periode-ende']&&(!lastPeriodeEnde||date>lastPeriodeEnde))lastPeriodeEnde=date;
     Object.keys(ARZT_CHECKS).forEach(ck=>{
       if(d.checks?.[ck]&&(!lastArzt[ck]||date>lastArzt[ck]))lastArzt[ck]=date;
     });
@@ -1910,6 +1930,11 @@ function renderStats(){
       <div class="stitle">🫁 Letztes Absaugen</div>
       <div style="font-size:14px;font-weight:600;color:var(--text);margin:4px 0">${lastAbsaug?fmtDate(lastAbsaug.date):'–'}</div>
       <div class="ssub">${lastAbsaug?(lastAbsaug.time?lastAbsaug.time+' Uhr':'')+( lastAbsaug.art?' · '+escH(lastAbsaug.art):'')+(lastAbsaug.qual?' · '+escH(lastAbsaug.qual):''):'Keine Einträge'}</div>
+    </div>
+    <div class="scard" style="border-left:4px solid #e91e8c">
+      <div class="stitle">🩸 Letzte Periode</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin:4px 0">${lastPeriodeStart?'Beginn: '+fmtDate(lastPeriodeStart):'–'}</div>
+      <div class="ssub">${lastPeriodeEnde?'Ende: '+fmtDate(lastPeriodeEnde):'Ende: nicht eingetragen'}</div>
     </div>
   </div>
   <div class="card"><div class="card-head">🏥 Letzte Arzttermine</div><div class="card-body">
