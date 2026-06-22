@@ -327,6 +327,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   <button class="tab"    onclick="showTab('bericht',this)"><span class="tab-ico">📝</span><span class="tab-lbl">Bericht</span></button>
   <button class="tab"    onclick="showTab('stats',this)"><span class="tab-ico">📊</span><span class="tab-lbl">Auswertung</span></button>
   <button class="tab"    onclick="showTab('verlauf',this)"><span class="tab-ico">📋</span><span class="tab-lbl">Verlauf</span></button>
+  <button class="tab"    onclick="showTab('bestellung',this)"><span class="tab-ico">📦</span><span class="tab-lbl">Bestellung</span></button>
   <button class="tab"    onclick="showTab('team',this)"><span class="tab-ico">👥</span><span class="tab-lbl">Team</span></button>
 </div>
 
@@ -767,6 +768,26 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 </div>
 
 <!-- ══ TEAM ══ -->
+<!-- ══ BESTELLUNG ══ -->
+<div class="page" id="pg-bestellung">
+  <div class="card">
+    <div class="card-head">📦 Medikamente &amp; Hilfsmittel anfordern</div>
+    <div class="card-body">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:10px">Menge für gewünschte Produkte eintragen, dann unten senden. Die Mail-App öffnet sich mit vorausgefüllter Anfrage an Viktor – einfach abschicken.</div>
+      <div id="orderCatalogList"><div style="color:var(--text3);font-size:13px">Noch keine Produkte im Katalog.</div></div>
+      <button class="savebtn" style="margin-top:12px" onclick="sendOrder()">✉️ Bestellung senden</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head">⚙️ Katalog verwalten <button class="addbtn" onclick="addOrderItem()">+ Produkt</button></div>
+    <div class="card-body">
+      <div style="color:var(--text3);font-size:12px;margin-bottom:10px">Hier können neue Produkte ergänzt werden (für Viktor).</div>
+      <div id="orderCatalogEdit"><div style="color:var(--text3);font-size:13px">Noch keine Produkte.</div></div>
+      <button class="savebtn" style="margin-top:10px" onclick="saveOrderCatalog()">💾 Katalog speichern</button>
+    </div>
+  </div>
+</div>
+
 <div class="page" id="pg-team">
   <div class="card">
     <div class="card-head">Pflegerinnen <button class="addbtn" onclick="addTeamRow()">+ Hinzufügen</button></div>
@@ -811,12 +832,25 @@ const ALL_TXT=['v-puls','v-spo2','v-rr-s','v-rr-d','v-temp','pain-time','pain-co
   'photo-gastrotube','photo-stoma','photo-bericht'];
 const ALL_CK=['ck-absaug','ck-lifter','ck-cough2','ck-notfall','ck-pulso','ck-hausarzt','ck-neurologe','ck-cabs','ck-phoniatrie','ck-hno','ck-gyn','ck-zahnarzt','ck-zahnprophylaxe'];
 const DRINK_ICO={Kaffee:'☕',Tee:'🍵',Wasser:'💧',Saft:'🍹',Milch:'🥛',Sonstiges:'🥤'};
+const DEFAULT_ORDER_CATALOG=[
+  {cat:'Hilfsmittel',name:'Provox FlexiDerm runde Tracheostomapflaster',unit:'Packungen'},
+  {cat:'Hilfsmittel',name:'Provox Adhesive Remover Kleberentferner',unit:'Packungen'},
+  {cat:'Hilfsmittel',name:'Provox Skin Barrier Tracheostoma Hautpflegecreme',unit:'Packungen'},
+  {cat:'Hilfsmittel',name:'Bisalski Trachealkanüle Gr. 6',unit:'Stück'},
+  {cat:'Hilfsmittel',name:'Bisalski Trachealkanüle Gr. 7',unit:'Stück'},
+  {cat:'Medikamente',name:'Lamotrigin 50 mg',unit:'Stück'},
+  {cat:'Medikamente',name:'Lamotrigin 100 mg',unit:'Stück'},
+  {cat:'Medikamente',name:'Levetiracetam 500 mg',unit:'Stück'},
+  {cat:'Medikamente',name:'Levetiracetam 1000 mg',unit:'Stück'},
+  {cat:'Medikamente',name:'Duloxetin 30 mg',unit:'Stück'},
+];
+const ORDER_EMAIL='v.w@gmx.ch';
 
 /* ── STATE ──
    Key format: "2025-04-26_Tagdienst"
 */
 let ghToken='', currentSha='';
-let db={}, team=[], medDefs=[];   // db[key] = entry
+let db={}, team=[], medDefs=[], orderCatalog=[];   // db[key] = entry
 let curDate=todayISO(), curDienst='Frühdienst';
 let isDirty=false;
 let painSel=-1, checks={}, radios={}, durations={};
@@ -861,7 +895,7 @@ async function doSetup(){
     });
     if(r.status===404){
       // File doesn't exist yet – create it with empty data
-      const body=JSON.stringify({entries:{},team:[],medDefs:[],version:4});
+      const body=JSON.stringify({entries:{},team:[],medDefs:[],orderCatalog:DEFAULT_ORDER_CATALOG,version:4});
       const cr=await fetch(`${GH_API}/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`,{
         method:'PUT',
         headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json','Content-Type':'application/json'},
@@ -939,11 +973,11 @@ function setSyncBar(state,msg){
 }
 async function loadFromCloud(){
   // Lokalen Cache vorab sichern – könnte Einträge haben, die noch nicht auf GitHub sind
-  let localEntries={},localTeam=[],localMedDefs=[];
+  let localEntries={},localTeam=[],localMedDefs=[],localOrderCatalog=[];
   try{
     const c=JSON.parse(localStorage.getItem(LS_CACHE)||'{}');
     localEntries=c.entries||c.days||{};
-    localTeam=c.team||[];localMedDefs=c.medDefs||[];
+    localTeam=c.team||[];localMedDefs=c.medDefs||[];localOrderCatalog=c.orderCatalog||[];
   }catch{}
 
   setSyncBar('syncing','⏳ Lade Daten…');
@@ -967,7 +1001,8 @@ async function loadFromCloud(){
     db=merged;
     team=rec.team||(localTeam.length?localTeam:[]);
     medDefs=rec.medDefs||(localMedDefs.length?localMedDefs:[]);
-    localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,sha:currentSha}));
+    orderCatalog=rec.orderCatalog||(localOrderCatalog.length?localOrderCatalog:DEFAULT_ORDER_CATALOG);
+    localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,sha:currentSha}));
 
     if(newLocal>0){
       setSyncBar('syncing',`⏳ ${newLocal} lokale Einträge werden hochgeladen…`);
@@ -977,7 +1012,7 @@ async function loadFromCloud(){
       setSyncBar('ok','☁️ Synchronisiert · '+nowHHMM());
     }
   }catch(e){
-    db=localEntries;team=localTeam;medDefs=localMedDefs;
+    db=localEntries;team=localTeam;medDefs=localMedDefs;orderCatalog=localOrderCatalog.length?localOrderCatalog:DEFAULT_ORDER_CATALOG;
     setSyncBar('error','⚠️ Offline – lokaler Cache · '+e.message);
   }
 }
@@ -994,8 +1029,8 @@ async function saveToCloud(){
     return;
   }
 
-  const payload=JSON.stringify({entries:db,team,medDefs,version:4,lastSaved:new Date().toISOString()});
-  localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,sha:currentSha}));
+  const payload=JSON.stringify({entries:db,team,medDefs,orderCatalog,version:4,lastSaved:new Date().toISOString()});
+  localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,sha:currentSha}));
   try{
     const body={message:'Pflege-Doku update '+new Date().toISOString(),content:b64encode(payload)};
     if(currentSha)body.sha=currentSha;
@@ -1007,10 +1042,10 @@ async function saveToCloud(){
     if(!r.ok){const e=await r.json();throw new Error(e.message||'HTTP '+r.status)}
     const meta=await r.json();
     currentSha=meta.content.sha;
-    localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,sha:currentSha}));
+    localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,sha:currentSha}));
 
     // ── Backup nach jedem erfolgreichen Speichern aktualisieren ──
-    localStorage.setItem('pflege_backup',JSON.stringify({entries:db,team,medDefs,savedAt:new Date().toISOString()}));
+    localStorage.setItem('pflege_backup',JSON.stringify({entries:db,team,medDefs,orderCatalog,savedAt:new Date().toISOString()}));
     // Auch Backup-Datei auf GitHub schreiben (async, Fehler ignorieren)
     writeBackupToGithub(payload).catch(()=>{});
 
@@ -1044,9 +1079,9 @@ async function restoreFromBackup(){
     const rec=JSON.parse(b64decode(meta.content.replace(/\n/g,'')));
     const cnt=Object.keys(rec.entries||{}).length;
     if(!confirm(`Backup enthält ${cnt} Einträge. Wiederherstellen?`))return;
-    db=rec.entries||{};team=rec.team||[];medDefs=rec.medDefs||[];
+    db=rec.entries||{};team=rec.team||[];medDefs=rec.medDefs||[];orderCatalog=rec.orderCatalog||orderCatalog;
     await saveToCloud();
-    loadEntry();renderVerlauf();renderStats();
+    loadEntry();renderVerlauf();renderStats();renderOrderCatalog();renderOrderCatalogEdit();
     showToast(`✅ Backup mit ${cnt} Einträgen wiederhergestellt`);
   }catch(e){
     setSyncBar('error','⚠️ Backup-Fehler: '+e.message);
@@ -1065,7 +1100,7 @@ function fixLayout(){
 /* ── INIT / BOOT ── */
 function init(){
   buildPain();autoDetectDienst();updateHeaderUI();updateDateDisplay();
-  renderTeamList();renderMedDefList();renderMedPresets();
+  renderTeamList();renderMedDefList();renderMedPresets();renderOrderCatalog();renderOrderCatalogEdit();
   loadEntry();renderVerlauf();renderStats();
   fixLayout();
   window.addEventListener('resize', fixLayout);
@@ -1510,6 +1545,57 @@ function giveMed(name,dose,btn){
   const t=nowHHMM();checkPastDay();medGiven.push({time:t,name,dose});
   btn.classList.add('given');setTimeout(()=>btn.classList.remove('given'),1800);
   renderMedGivenList();dirty();showToast('✓ '+name+(dose?' ('+dose+')':'')+' · '+t);
+}
+
+/* ── BESTELLUNG ── */
+function renderOrderCatalog(){
+  const w=$id('orderCatalogList');if(!w)return;
+  if(!orderCatalog.length){w.innerHTML='<div style="color:var(--text3);font-size:13px">Noch keine Produkte im Katalog.</div>';return}
+  const cats=[...new Set(orderCatalog.map(c=>c.cat))];
+  w.innerHTML=cats.map(cat=>`
+    <div class="sec-lbl" style="margin-top:10px">${escH(cat)}</div>
+    ${orderCatalog.map((c,i)=>c.cat===cat?`
+      <div class="frow">
+        <div class="flabel">${escH(c.name)}</div>
+        <input class="finput" type="number" inputmode="numeric" min="0" id="ord-qty-${i}" placeholder="0">
+        <div class="funit">${escH(c.unit)}</div>
+      </div>`:'').join('')}
+  `).join('');
+}
+function addOrderItem(){
+  orderCatalog.push({cat:'Hilfsmittel',name:'',unit:'Packungen'});
+  renderOrderCatalogEdit();renderOrderCatalog();
+}
+function renderOrderCatalogEdit(){
+  const w=$id('orderCatalogEdit');if(!w)return;
+  if(!orderCatalog.length){w.innerHTML='<div style="color:var(--text3);font-size:13px">Noch keine Produkte.</div>';return}
+  w.innerHTML=orderCatalog.map((c,i)=>`
+    <div style="display:flex;gap:6px;margin-bottom:6px;align-items:center;flex-wrap:wrap">
+      <select class="mdinput" style="flex:0 0 110px" onchange="orderCatalog[${i}].cat=this.value;renderOrderCatalog()">
+        <option value="Hilfsmittel" ${c.cat==='Hilfsmittel'?'selected':''}>Hilfsmittel</option>
+        <option value="Medikamente" ${c.cat==='Medikamente'?'selected':''}>Medikamente</option>
+      </select>
+      <input class="mdinput" value="${escH(c.name)}" placeholder="Produktname" style="flex:2;min-width:140px" oninput="orderCatalog[${i}].name=this.value;renderOrderCatalog()">
+      <select class="mdinput" style="flex:0 0 100px" onchange="orderCatalog[${i}].unit=this.value;renderOrderCatalog()">
+        <option value="Packungen" ${c.unit==='Packungen'?'selected':''}>Packungen</option>
+        <option value="Stück" ${c.unit==='Stück'?'selected':''}>Stück</option>
+      </select>
+      <button class="del-btn" onclick="orderCatalog.splice(${i},1);renderOrderCatalogEdit();renderOrderCatalog()">✕</button>
+    </div>`).join('');
+}
+async function saveOrderCatalog(){
+  await saveToCloud();
+  showToast('✓ Katalog gespeichert');
+}
+function sendOrder(){
+  const items=orderCatalog.map((c,i)=>({...c,qty:parseInt($id('ord-qty-'+i)?.value)||0})).filter(c=>c.qty>0);
+  if(!items.length){showToast('⚠️ Bitte Menge für mind. ein Produkt angeben','err');return}
+  const lines=items.map(c=>'* '+c.name+' – '+c.qty+' '+c.unit);
+  const body='Sehr geehrte Damen und Herren,\n\nich bitte um die Ausstellung eines Rezeptes bzw. eine Verordnung für folgende Produkte:\n\n'
+    +lines.join('\n')
+    +'\n\nVielen Dank und viele Grüße \n\nViktor Weber \n+49 172 9977 385\nMeraner Str. 18a, 10825 Berlin';
+  const mailto='mailto:'+ORDER_EMAIL+'?subject='+encodeURIComponent('VO Sarah Salin')+'&body='+encodeURIComponent(body);
+  window.location.href=mailto;
 }
 function addMedManual(){const t=nowHHMM();checkPastDay();medGiven.push({time:t,name:'',dose:''});renderMedGivenList();dirty()}
 function renderMedGivenList(){
