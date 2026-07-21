@@ -66,14 +66,17 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .pflegerin-sel{flex:1;min-width:0;background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.35);color:#fff;border-radius:8px;padding:7px 10px;font-size:13px;font-weight:500;font-family:var(--sans);-webkit-appearance:none;appearance:none;cursor:pointer}
 .pflegerin-sel option{color:var(--text);background:#fff}
 
-/* TABS */
-.tabs{display:flex;background:var(--surface);border-bottom:2px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;position:sticky;top:var(--tabs-top, 120px);z-index:190}
-.tabs::-webkit-scrollbar{display:none}
-.tab{flex:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 14px;border:none;background:none;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;color:var(--text3)}
-.tab-ico{font-size:20px;line-height:1}
-.tab-lbl{font-size:11px;font-weight:600;white-space:nowrap;letter-spacing:.1px}
-.tab.on{color:var(--green);border-bottom-color:var(--green)}
-.tab.on .tab-lbl{font-weight:700}
+/* BURGER / NAV MENU */
+#burger-btn{background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.4);color:#fff;border-radius:9px;padding:0;width:44px;height:44px;font-size:24px;cursor:pointer;flex:none;line-height:1;display:flex;align-items:center;justify-content:center}
+#nav-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:185}
+#nav-backdrop.open{display:block}
+#nav-menu{display:none;position:fixed;top:var(--hdr-b,120px);left:0;width:100%;max-height:70vh;overflow-y:auto;background:var(--surface);z-index:190;box-shadow:0 6px 24px rgba(0,0,0,.18);border-top:1px solid var(--border)}
+#nav-menu.open{display:block}
+.nav-item{width:100%;display:flex;align-items:center;gap:14px;padding:15px 18px;border:none;border-bottom:1px solid var(--border);background:none;font-size:15px;font-weight:500;color:var(--text);cursor:pointer;font-family:var(--sans);border-left:4px solid transparent;text-align:left;transition:background .1s}
+.nav-item:last-child{border-bottom:none}
+.nav-item:active{background:var(--surface2)}
+.nav-item.on{border-left-color:var(--green);color:var(--green);background:var(--green2);font-weight:600}
+.nav-ico{font-size:20px;flex:none;width:28px;text-align:center}
 
 /* CONTENT */
 .content{padding:14px;max-width:600px;margin:0 auto}
@@ -190,9 +193,16 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .dtt-row:last-child{border-bottom:none}
 
 /* TOTAL BAR */
-.total-bar{background:var(--green2);border:1px solid var(--green3);border-radius:9px;padding:9px 13px;margin-top:4px;display:flex;justify-content:space-between;align-items:center}
-.total-bar-lbl{font-size:12px;color:var(--green);font-weight:600}
-.total-bar-val{font-family:var(--mono);font-size:19px;font-weight:600;color:var(--green)}
+.total-bar{background:var(--green2);border:2px solid var(--green3);border-radius:12px;padding:12px 16px;margin-top:8px;display:flex;justify-content:space-between;align-items:center}
+.total-bar-lbl{font-size:13px;color:var(--green);font-weight:700}
+.total-bar-sub{font-size:10px;color:var(--green);opacity:.65;margin-top:2px}
+.total-bar-val{font-family:var(--mono);font-size:26px;font-weight:600;color:var(--green)}
+/* IMPFUNGEN */
+.impf-table{width:100%;border-collapse:collapse;font-size:13px}
+.impf-table td{padding:6px 4px;border-bottom:1px solid var(--border);vertical-align:top}
+.impf-table tr:last-child td{border-bottom:none}
+.impf-date{font-family:var(--mono);font-size:11px;color:var(--text3);white-space:nowrap;padding-right:10px;width:86px}
+.impf-praep{font-size:11px;color:var(--text3);padding-left:6px}
 
 /* BUTTONS */
 .savebtn{width:100%;padding:14px;background:var(--green);color:#fff;border:none;border-radius:var(--r);font-size:16px;font-weight:600;cursor:pointer;font-family:var(--sans);margin-top:4px}
@@ -309,8 +319,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
     <button class="dbtn" data-d="Spätdienst"  onclick="setDienst('Spätdienst')">🌆 Spätdienst</button>
     <button class="dbtn" data-d="Nachtdienst" onclick="setDienst('Nachtdienst')">🌙 Nachtdienst</button>
   </div>
-  <!-- Row 3: Pflegerin-Dropdown + Speichern -->
+  <!-- Row 3: Burger + Pflegerin-Dropdown + Speichern -->
   <div class="hdr-row3">
+    <button id="burger-btn" onclick="toggleMenu()">☰</button>
     <select class="pflegerin-sel" id="hdr-pflegerin" onchange="dirty()">
       <option value="">👤 Pflegerin wählen…</option>
     </select>
@@ -318,17 +329,20 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   </div>
 </div>
 
-<!-- TABS -->
-<div class="tabs">
-  <button class="tab on" onclick="showTab('vitals',this)"><span class="tab-ico">🩺</span><span class="tab-lbl">Vital</span></button>
-  <button class="tab"    onclick="showTab('pflege',this)"><span class="tab-ico">💊</span><span class="tab-lbl">Pflege</span></button>
-  <button class="tab"    onclick="showTab('lager',this)"><span class="tab-ico">🛏</span><span class="tab-lbl">Lagerung</span></button>
-  <button class="tab"    onclick="showTab('bilanz',this)"><span class="tab-ico">💧</span><span class="tab-lbl">Bilanz</span></button>
-  <button class="tab"    onclick="showTab('bericht',this)"><span class="tab-ico">📝</span><span class="tab-lbl">Bericht</span></button>
-  <button class="tab"    onclick="showTab('stats',this)"><span class="tab-ico">📊</span><span class="tab-lbl">Auswertung</span></button>
-  <button class="tab"    onclick="showTab('verlauf',this)"><span class="tab-ico">📋</span><span class="tab-lbl">Verlauf</span></button>
-  <button class="tab"    onclick="showTab('bestellung',this)"><span class="tab-ico">📦</span><span class="tab-lbl">Bestellung</span></button>
-  <button class="tab"    onclick="showTab('team',this)"><span class="tab-ico">👥</span><span class="tab-lbl">Team</span></button>
+<!-- NAV BACKDROP -->
+<div id="nav-backdrop" onclick="closeMenu()"></div>
+<!-- NAV MENU -->
+<div id="nav-menu">
+  <button class="nav-item on" onclick="showTab('vitals',this)"><span class="nav-ico">🩺</span><span>Vital</span></button>
+  <button class="nav-item"    onclick="showTab('pflege',this)"><span class="nav-ico">💊</span><span>Pflege</span></button>
+  <button class="nav-item"    onclick="showTab('lager',this)"><span class="nav-ico">🛏</span><span>Lagerung</span></button>
+  <button class="nav-item"    onclick="showTab('bilanz',this)"><span class="nav-ico">💧</span><span>Bilanz</span></button>
+  <button class="nav-item"    onclick="showTab('bericht',this)"><span class="nav-ico">📝</span><span>Bericht</span></button>
+  <button class="nav-item"    onclick="showTab('stats',this)"><span class="nav-ico">📊</span><span>Auswertung</span></button>
+  <button class="nav-item"    onclick="showTab('verlauf',this)"><span class="nav-ico">📋</span><span>Verlauf</span></button>
+  <button class="nav-item"    onclick="showTab('bestellung',this)"><span class="nav-ico">📦</span><span>Bestellung</span></button>
+  <button class="nav-item"    onclick="showTab('impfungen',this)"><span class="nav-ico">💉</span><span>Impfungen</span></button>
+  <button class="nav-item"    onclick="showTab('team',this)"><span class="nav-ico">👥</span><span>Team</span></button>
 </div>
 
 <div class="content">
@@ -624,12 +638,15 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
       <div class="frow"><div class="flabel">Sondenkost (Gastrotube)</div><input class="finput" id="f-sonde" type="number" inputmode="numeric" placeholder="0" oninput="calcFluid()"><div class="funit">ml</div></div>
       <div class="frow"><div class="flabel">Infusion</div><input class="finput" id="f-infus" type="number" inputmode="numeric" placeholder="0" oninput="calcFluid()"><div class="funit">ml</div></div>
       <div class="frow"><div class="flabel">Sonstiges</div><input class="finput" id="f-sonst-ein" type="number" inputmode="numeric" placeholder="0" oninput="calcFluid()"><div class="funit">ml</div></div>
-      <div class="ftotal" id="ft-ein">Gesamt Zufuhr: – ml</div>
+      <div class="ftotal" id="ft-ein" style="display:none">Gesamt Zufuhr: – ml</div>
     </div>
   </div>
 
   <div class="total-bar">
-    <div class="total-bar-lbl">⬇️ Gesamtzufuhr dieser Schicht</div>
+    <div>
+      <div class="total-bar-lbl">☀️ Gesamtzufuhr heute</div>
+      <div class="total-bar-sub">inkl. aller Schichten</div>
+    </div>
     <div class="total-bar-val" id="drinkTotalVal">0 ml</div>
   </div>
 
@@ -784,6 +801,118 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
       <div style="color:var(--text3);font-size:12px;margin-bottom:10px">Hier können neue Produkte ergänzt werden (für Viktor).</div>
       <div id="orderCatalogEdit"><div style="color:var(--text3);font-size:13px">Noch keine Produkte.</div></div>
       <button class="savebtn" style="margin-top:10px" onclick="saveOrderCatalog()">💾 Katalog speichern</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ IMPFUNGEN ══ -->
+<div class="page" id="pg-impfungen">
+  <div style="font-size:12px;color:var(--text3);padding:2px 2px 10px">Sarah Salin · geb. 29.04.1986 · Quelle: Impfbuch</div>
+
+  <div class="card">
+    <div class="card-head">💉 COVID-19</div>
+    <div class="card-body" style="padding:10px 14px">
+      <table class="impf-table">
+        <tr><td class="impf-date">21.03.2021</td><td>Dosis 1</td><td class="impf-praep">COMIRNATY (Ch.-B. ER7812)</td></tr>
+        <tr><td class="impf-date">12.04.2021</td><td>Dosis 2</td><td class="impf-praep">COMIRNATY (Ch.-B. EW8904)</td></tr>
+        <tr><td class="impf-date">03.12.2021</td><td>Dosis 3</td><td class="impf-praep">COMIRNATY (Ch.-B. 1F1023A)</td></tr>
+        <tr><td class="impf-date">07.11.2022</td><td>Dosis 4</td><td class="impf-praep">COMIRNATY Bivalent BA.4-5 (Ch.-B. GH9715)</td></tr>
+        <tr><td class="impf-date">21.11.2023</td><td>Dosis 5</td><td class="impf-praep">COMIRNATY</td></tr>
+        <tr><td class="impf-date">25.11.2024</td><td>Dosis 6</td><td class="impf-praep">COMIRNATY JN.1 bretovameran</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">🤧 Influenza</div>
+    <div class="card-body" style="padding:10px 14px">
+      <table class="impf-table">
+        <tr><td class="impf-date">19.11.2021</td><td>Saison 2021/22</td><td class="impf-praep">Influvac Tetra (Ch.-B. Z05)</td></tr>
+        <tr><td class="impf-date">~2022</td><td>Saison 2022/23</td><td class="impf-praep">Influvac Tetra (Ch.-B. E01)</td></tr>
+        <tr><td class="impf-date">14.11.2023</td><td>Saison 2023/24</td><td class="impf-praep">Influvac</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">🫁 Pneumokokken</div>
+    <div class="card-body" style="padding:10px 14px">
+      <table class="impf-table">
+        <tr><td class="impf-date">10.09.2021</td><td>Dosis 1</td><td class="impf-praep">Pneumovax 23</td></tr>
+        <tr><td class="impf-date">02.11.2023</td><td>Dosis 2</td><td class="impf-praep">Pneumokokken</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">💪 Tetanus · Diphtherie · Pertussis</div>
+    <div class="card-body" style="padding:10px 14px">
+      <table class="impf-table">
+        <tr><td class="impf-date">29.08.1986</td><td>DT (1)</td><td class="impf-praep">DT-Wellcovax</td></tr>
+        <tr><td class="impf-date">~1986</td><td>DT (2)</td><td class="impf-praep">DT-Wellcovax</td></tr>
+        <tr><td class="impf-date">18.09.1987</td><td>DT (3)</td><td class="impf-praep">DT-Impfstoff Behring</td></tr>
+        <tr><td class="impf-date">15.09.1992</td><td>Td</td><td class="impf-praep">Td-Impfstoff Behring</td></tr>
+        <tr><td class="impf-date">15.10.1997</td><td>Td</td><td class="impf-praep">Td-Impfstoff Behring</td></tr>
+        <tr><td class="impf-date">2007</td><td>Td</td><td class="impf-praep">Td</td></tr>
+        <tr><td class="impf-date">11.02.2008</td><td>Tdap</td><td class="impf-praep">Boostrix (Ch.-B. AC37B024DJ)</td></tr>
+        <tr><td class="impf-date">04.01.2018</td><td>Tdap-IPV</td><td class="impf-praep">Repevax (Ch.-B. M0019-1 6285-A)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">🧬 Masern · Mumps · Röteln</div>
+    <div class="card-body" style="padding:10px 14px">
+      <table class="impf-table">
+        <tr><td class="impf-date">24.11.1987</td><td>MMR</td><td class="impf-praep">M-M-R</td></tr>
+        <tr><td class="impf-date">Dez. 1989</td><td>Röteln</td><td class="impf-praep">–</td></tr>
+        <tr><td class="impf-date">Sep. 1999</td><td>Röteln</td><td class="impf-praep">Gesundheitsamt</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">💉 Polio</div>
+    <div class="card-body" style="padding:10px 14px">
+      <table class="impf-table">
+        <tr><td class="impf-date">29.08.1986</td><td>Dosis 1</td><td class="impf-praep">Oral-Virelon</td></tr>
+        <tr><td class="impf-date">~1986</td><td>Dosis 2</td><td class="impf-praep">Oral-Virelon</td></tr>
+        <tr><td class="impf-date">18.09.1987</td><td>Dosis 3</td><td class="impf-praep">Oral-Virelon</td></tr>
+        <tr><td class="impf-date">15.10.1997</td><td>Auffrischung</td><td class="impf-praep">PolyVaccinol</td></tr>
+        <tr><td class="impf-date">2007</td><td>Auffrischung</td><td class="impf-praep">–</td></tr>
+        <tr><td class="impf-date">04.01.2018</td><td>in Repevax</td><td class="impf-praep">Tdap-IPV</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">💉 HPV</div>
+    <div class="card-body" style="padding:10px 14px">
+      <table class="impf-table">
+        <tr><td class="impf-date">29.11.2007</td><td>Dosis 1</td><td class="impf-praep">GARDASIL (Ch.-B. NF58550)</td></tr>
+        <tr><td class="impf-date">~2007/08</td><td>Dosis 2</td><td class="impf-praep">GARDASIL (Ch.-B. NF14205)</td></tr>
+        <tr><td class="impf-date">~2008</td><td>Dosis 3</td><td class="impf-praep">GARDASIL (Ch.-B. NH10940)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">🩸 Hepatitis B</div>
+    <div class="card-body" style="padding:10px 14px">
+      <table class="impf-table">
+        <tr><td class="impf-date">15.10.1997</td><td>Dosis 1</td><td class="impf-praep">Gen H-B-Vax K (Ch.-B. 457011)</td></tr>
+        <tr><td class="impf-date">25.11.1997</td><td>Dosis 2</td><td class="impf-praep">Gen H-B-Vax K (Ch.-B. 492011)</td></tr>
+        <tr><td class="impf-date">20.05.2019</td><td>Boost</td><td class="impf-praep">Engerix-B (Ch.-B. AHBVC768AE)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head">🫧 Tuberkulose (BCG)</div>
+    <div class="card-body" style="padding:10px 14px">
+      <table class="impf-table">
+        <tr><td class="impf-date">02.05.1986</td><td>BCG</td><td class="impf-praep">Knappschafts-Krankenhaus Bochum-Langendreer</td></tr>
+      </table>
     </div>
   </div>
 </div>
@@ -1094,7 +1223,7 @@ function fixLayout(){
   const hdrH=$id('hdr')?.offsetHeight||0;
   const root=document.documentElement;
   root.style.setProperty('--sync-h', syncH+'px');
-  root.style.setProperty('--tabs-top', (syncH+hdrH)+'px');
+  root.style.setProperty('--hdr-b', (syncH+hdrH)+'px');
 }
 
 /* ── INIT / BOOT ── */
@@ -1235,13 +1364,23 @@ function gotoToday(){
 
 /* ── TABS ── */
 function showTab(name,btn){
-  // Alte Tab-IDs auf neuen Bilanz-Tab umleiten
   if(name==='trinken'||name==='fluid'||name==='ausscheid')name='bilanz';
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
-  $id('pg-'+name).classList.add('on');btn.classList.add('on');
+  document.querySelectorAll('.nav-item').forEach(t=>t.classList.remove('on'));
+  $id('pg-'+name).classList.add('on');
+  if(btn)btn.classList.add('on');
   if(name==='stats')renderStats();
   if(name==='verlauf')renderVerlauf();
+  closeMenu();
+}
+function toggleMenu(){
+  const open=!$id('nav-menu').classList.contains('open');
+  $id('nav-menu').classList.toggle('open',open);
+  $id('nav-backdrop').classList.toggle('open',open);
+}
+function closeMenu(){
+  $id('nav-menu').classList.remove('open');
+  $id('nav-backdrop').classList.remove('open');
 }
 
 /* ── PAIN ── */
@@ -1643,7 +1782,7 @@ function addDrinkEntry(){
 }
 function renderDrinkLog(){
   const total=drinkLog.reduce((a,e)=>a+e.ml,0);
-  $id('drinkTotalVal').textContent=total+' ml';
+  $id('drinkTotalVal').textContent=calcTodayFluid()+' ml';
   const fd=$id('f-drink-display');if(fd)fd.textContent=total+' ml';
   const byType={};drinkLog.forEach(e=>{byType[e.type]=(byType[e.type]||0)+e.ml});
   const tw=$id('drinkTypeTotals');
@@ -1716,14 +1855,25 @@ function renderUrinLog(){
 }
 
 /* ── FLUID ── */
+function calcTodayFluid(){
+  const curKey=entryKey(curDate,curDienst);
+  const v=id=>parseFloat($id(id)?.value)||0;
+  let total=drinkLog.reduce((a,e)=>a+e.ml,0)+v('f-sonde')+v('f-infus')+v('f-sonst-ein');
+  Object.entries(db).forEach(([k,d])=>{
+    if(k.split('_')[0]===curDate&&k!==curKey){
+      if(d.drinkLog)d.drinkLog.forEach(e=>total+=e.ml);
+      total+=(parseFloat(d['f-sonde'])||0)+(parseFloat(d['f-infus'])||0)+(parseFloat(d['f-sonst-ein'])||0);
+    }
+  });
+  return total;
+}
 function calcFluid(){
   dirty();calcFluidSilent();
 }
 function calcFluidSilent(){
   const v=id=>parseFloat($id(id)?.value)||0;
   const dml=drinkLog.reduce((a,e)=>a+e.ml,0);
-  const ein=dml+v('f-sonde')+v('f-infus')+v('f-sonst-ein');
-  $id('ft-ein').textContent='Gesamt Zufuhr: '+(ein?ein+' ml':'–');
+  $id('drinkTotalVal').textContent=calcTodayFluid()+' ml';
   const fd=$id('f-drink-display');if(fd)fd.textContent=dml+' ml';
 }
 
