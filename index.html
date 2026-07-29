@@ -660,13 +660,24 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
         <input type="time" class="vinput" id="stuhl-time" style="font-size:14px;padding:7px 9px;width:130px;flex:none">
         <button onclick="$id('stuhl-time').value=nowHHMM();dirty()" style="padding:7px 10px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);font-size:12px;cursor:pointer;font-family:var(--sans)">Jetzt</button>
       </div>
-      <div class="sec-lbl">Menge (1=wenig · 5=sehr viel)</div>
-      <div class="seg" id="seg-stuhl-menge" style="margin-bottom:8px">
-        <button class="segbtn" data-v="1" onclick="segSel('seg-stuhl-menge',this)">1<small>wenig</small></button>
-        <button class="segbtn" data-v="2" onclick="segSel('seg-stuhl-menge',this)">2</button>
-        <button class="segbtn" data-v="3" onclick="segSel('seg-stuhl-menge',this)">3</button>
-        <button class="segbtn" data-v="4" onclick="segSel('seg-stuhl-menge',this)">4</button>
-        <button class="segbtn" data-v="5" onclick="segSel('seg-stuhl-menge',this)">5<small>viel</small></button>
+      <div class="sec-lbl">Menge (0.5=wenig · 8=sehr viel)</div>
+      <div class="seg" id="seg-stuhl-menge" style="margin-bottom:8px;flex-wrap:wrap">
+        <button class="segbtn" data-v="0.5" onclick="segSel('seg-stuhl-menge',this)">0.5<small>wenig</small></button>
+        <button class="segbtn" data-v="1"   onclick="segSel('seg-stuhl-menge',this)">1</button>
+        <button class="segbtn" data-v="1.5" onclick="segSel('seg-stuhl-menge',this)">1.5</button>
+        <button class="segbtn" data-v="2"   onclick="segSel('seg-stuhl-menge',this)">2</button>
+        <button class="segbtn" data-v="2.5" onclick="segSel('seg-stuhl-menge',this)">2.5</button>
+        <button class="segbtn" data-v="3"   onclick="segSel('seg-stuhl-menge',this)">3</button>
+        <button class="segbtn" data-v="3.5" onclick="segSel('seg-stuhl-menge',this)">3.5</button>
+        <button class="segbtn" data-v="4"   onclick="segSel('seg-stuhl-menge',this)">4</button>
+        <button class="segbtn" data-v="4.5" onclick="segSel('seg-stuhl-menge',this)">4.5</button>
+        <button class="segbtn" data-v="5"   onclick="segSel('seg-stuhl-menge',this)">5</button>
+        <button class="segbtn" data-v="5.5" onclick="segSel('seg-stuhl-menge',this)">5.5</button>
+        <button class="segbtn" data-v="6"   onclick="segSel('seg-stuhl-menge',this)">6</button>
+        <button class="segbtn" data-v="6.5" onclick="segSel('seg-stuhl-menge',this)">6.5</button>
+        <button class="segbtn" data-v="7"   onclick="segSel('seg-stuhl-menge',this)">7</button>
+        <button class="segbtn" data-v="7.5" onclick="segSel('seg-stuhl-menge',this)">7.5</button>
+        <button class="segbtn" data-v="8"   onclick="segSel('seg-stuhl-menge',this)">8<small>viel</small></button>
       </div>
       <div class="sec-lbl">Konsistenz</div>
       <div class="seg" id="seg-stuhl-konst" style="margin-bottom:8px">
@@ -1820,7 +1831,7 @@ function renderStuhlLog(){
     <div class="aus-entry">
       <div class="aus-ico">🚽</div>
       <div class="aus-info">
-        <div class="aus-title">Menge ${e.menge}/5${e.konst?' · '+escH(e.konst):''}</div>
+        <div class="aus-title">Menge ${e.menge}/8${e.konst?' · '+escH(e.konst):''}</div>
         ${e.bem?'<div class="aus-meta">'+escH(e.bem)+'</div>':''}
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
@@ -2113,7 +2124,7 @@ function renderStats(){
     n(puls,d['v-puls']);n(spo2,d['v-spo2']);n(rrs,d['v-rr-s']);n(temp,d['v-temp']);
     if(d.painLog?.length)d.painLog.forEach(e=>pain.push(e.level));
     else{const pn=parseInt(d.pain);if(!isNaN(pn)&&pn>=0)pain.push(pn);}
-    if(d.stuhlLog?.length){stuhlTotal+=d.stuhlLog.length;d.stuhlLog.forEach(e=>{if(e.menge)stuhlMengen.push(parseInt(e.menge))})}
+    if(d.stuhlLog?.length){stuhlTotal+=d.stuhlLog.length;d.stuhlLog.forEach(e=>{if(e.menge)stuhlMengen.push(parseFloat(e.menge))})}
     if(d.drinkLog)d.drinkLog.forEach(e=>{trinkmL+=e.ml;drinkByType[e.type]=(drinkByType[e.type]||0)+e.ml});
     const dml=d.drinkLog?d.drinkLog.reduce((a,e)=>a+e.ml,0):0;
     const ein=dml+(parseFloat(d['f-sonde'])||0)+(parseFloat(d['f-infus'])||0)+(parseFloat(d['f-sonst-ein'])||0);
@@ -2155,7 +2166,7 @@ function renderStats(){
     <div class="scard" style="border-left:4px solid var(--green)">
       <div class="stitle">🚽 Letzter Stuhlgang</div>
       <div style="font-size:14px;font-weight:600;color:var(--text);margin:4px 0">${lastStuhl?fmtDate(lastStuhl.date):'–'}</div>
-      <div class="ssub">${lastStuhl?(lastStuhl.time?' '+lastStuhl.time+' Uhr ·':'')+' Menge '+lastStuhl.menge+'/5'+(lastStuhl.konst?' · '+escH(lastStuhl.konst):''):'Keine Einträge'}</div>
+      <div class="ssub">${lastStuhl?(lastStuhl.time?' '+lastStuhl.time+' Uhr ·':'')+' Menge '+lastStuhl.menge+'/8'+(lastStuhl.konst?' · '+escH(lastStuhl.konst):''):'Keine Einträge'}</div>
     </div>
     <div class="scard" style="border-left:4px solid var(--blue)">
       <div class="stitle">💧 Letzter Urin</div>
@@ -2183,7 +2194,7 @@ function renderStats(){
   `+`
   <div class="sgrid">
     <div class="scard"><div class="stitle">Dok. Tage</div><div class="sval">${uniqueDays}</div><div class="ssub">${rel.length} Dienste</div></div>
-    <div class="scard"><div class="stitle">Stuhlgang</div><div class="sval">${stuhlTotal}×</div><div class="ssub">⌀ Menge ${stuhlMengen.length?avg(stuhlMengen):'–'}/5</div></div>
+    <div class="scard"><div class="stitle">Stuhlgang</div><div class="sval">${stuhlTotal}×</div><div class="ssub">⌀ Menge ${stuhlMengen.length?avg(stuhlMengen):'–'}/8</div></div>
     <div class="scard"><div class="stitle">Ø Puls</div><div class="sval">${avg(puls)}</div><div class="ssub">↓${mn(puls)} ↑${mx(puls)}</div></div>
     <div class="scard"><div class="stitle">Ø SpO₂</div><div class="sval">${avg(spo2)}%</div><div class="ssub">↓${mn(spo2)} ↑${mx(spo2)}</div></div>
     <div class="scard"><div class="stitle">Ø RR syst.</div><div class="sval">${avg(rrs)}</div><div class="ssub">↓${mn(rrs)} ↑${mx(rrs)}</div></div>
@@ -2255,7 +2266,7 @@ function renderVerlauf(){
         if(d.checks?.['ck-kappe'])items.push(['Verschlusskappe',d.checks['ck-kappe']+(d.durations?.['dur-kappe']?' · '+d.durations['dur-kappe']:'')]);
         if(d.checks?.['ck-orthese'])items.push(['Beinorthesen',d.durations?.['dur-orthese']||'✓']);
         if(d.checks?.['ck-bewegung'])items.push(['Bewegungstrainer',d.durations?.['dur-bewegung']||'✓']);
-        if(d.stuhlLog?.length)items.push(['Stuhlgang',d.stuhlLog.length+'× · ⌀ '+(d.stuhlLog.reduce((a,e)=>a+(+e.menge||0),0)/d.stuhlLog.length).toFixed(1)+'/5']);
+        if(d.stuhlLog?.length)items.push(['Stuhlgang',d.stuhlLog.length+'× · ⌀ '+(d.stuhlLog.reduce((a,e)=>a+(+e.menge||0),0)/d.stuhlLog.length).toFixed(1)+'/8']);
         if(d.urinLog?.length)items.push(['Urin',d.urinLog.length+'× eingetragen']);
         const dml=d.drinkLog?d.drinkLog.reduce((a,e)=>a+e.ml,0):0;
         if(dml)items.push(['Trinkmenge',dml+' ml']);
