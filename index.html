@@ -2189,23 +2189,7 @@ function renderStats(){
     <div class="scard"><div class="stitle">Ø RR syst.</div><div class="sval">${avg(rrs)}</div><div class="ssub">↓${mn(rrs)} ↑${mx(rrs)}</div></div>
     <div class="scard"><div class="stitle">Ø Temperatur</div><div class="sval">${avg(temp)}°</div><div class="ssub">↓${mn(temp)} ↑${mx(temp)}</div></div>
   </div>
-  <div class="card"><div class="card-head">☕ Trinkmenge</div><div class="card-body">
-    <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-      <span>Gesamt</span><span style="font-family:var(--mono);font-weight:600;font-size:17px;color:var(--green)">${trinkmL} ml</span></div>
-    <div style="font-size:11px;color:var(--text3);margin-bottom:8px">⌀ ${uniqueDays?Math.round(trinkmL/uniqueDays):0} ml / Tag</div>
-    ${Object.entries(drinkByType).sort((a,b)=>b[1]-a[1]).map(([t,ml])=>`
-    <div class="crow2"><div class="clbl2">${DRINK_ICO[t]||'🥤'} ${escH(t)}</div>
-      <div class="cbarw"><div class="cbar" style="width:${Math.round(ml/maxD*100)}%"></div></div>
-      <div class="cval2">${ml}</div></div>`).join('')}
-  </div></div>
-  <div class="card"><div class="card-head">💧 Gesamtzufuhr pro Tag</div><div class="card-body">
-    ${Object.keys(einByDay).length
-      ?Object.entries(einByDay).sort((a,b)=>b[0].localeCompare(a[0])).map(([date,ml])=>
-        `<div class="frow"><div class="flabel">${fmtDate(date)}</div>
-         <span style="font-family:var(--mono);font-weight:600;color:var(--green)">${ml} ml</span></div>`).join('')
-      :'<div style="color:var(--text3);font-size:13px">Keine Flüssigkeitsdaten.</div>'}
-  </div></div>
-  ${pain.length?`<div class="card"><div class="card-head">😣 Schmerz · Ø ${avg(pain)}/10</div><div class="card-body">
+${pain.length?`<div class="card"><div class="card-head">😣 Schmerz · Ø ${avg(pain)}/10</div><div class="card-body">
     ${Object.entries(painCount).sort((a,b)=>+a[0]-+b[0]).map(([lvl,cnt])=>`
     <div class="crow2"><div class="clbl2">Stufe ${lvl}</div>
       <div class="cbarw"><div class="cbar" style="width:${Math.round(cnt/maxP*100)}%;background:${+lvl===0?'#6c8faf':+lvl<=3?'#27ae60':+lvl<=6?'#e67e22':+lvl<=8?'#e74c3c':'#922b21'}"></div></div>
