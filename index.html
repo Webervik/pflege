@@ -425,11 +425,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   <div class="card">
     <div class="card-head">Verschlusskappe <button class="addbtn" onclick="addKappeEntry()">+ Eintrag</button></div>
     <div class="card-body">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-        <div class="vi"><div class="vlabel">Von</div>
-          <input type="time" id="kappe-von" class="vinput" style="font-size:14px;padding:7px 9px;width:100%"></div>
-        <div class="vi"><div class="vlabel">Bis</div>
-          <input type="time" id="kappe-bis" class="vinput" style="font-size:14px;padding:7px 9px;width:100%"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;overflow:hidden;min-width:0">
+        <div class="vi" style="min-width:0;overflow:hidden"><div class="vlabel">Von</div>
+          <input type="time" id="kappe-von" class="vinput" style="font-size:13px;padding:7px 4px;width:100%;min-width:0;box-sizing:border-box"></div>
+        <div class="vi" style="min-width:0;overflow:hidden"><div class="vlabel">Bis</div>
+          <input type="time" id="kappe-bis" class="vinput" style="font-size:13px;padding:7px 4px;width:100%;min-width:0;box-sizing:border-box"></div>
       </div>
       <div id="kappeLog"><div class="nodata" style="padding:8px 0"><span class="ico" style="font-size:18px;margin-bottom:2px">🔵</span>Noch keine Einträge.</div></div>
     </div>
@@ -443,11 +443,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
         <button class="rbtn" data-v="Trachealkanüle" onclick="toggleRb('rg-trachea-typ',this)">🫁 Trachealkanüle</button>
         <button class="rbtn" data-v="Stomapflaster"  onclick="toggleRb('rg-trachea-typ',this)">🩹 Stomapflaster</button>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-        <div class="vi" style="min-width:0"><div class="vlabel">Aufgesetzt</div>
-          <input type="time" id="trachea-von" class="vinput" style="font-size:14px;padding:7px 6px;width:100%;min-width:0"></div>
-        <div class="vi" style="min-width:0"><div class="vlabel">Abgenommen</div>
-          <input type="time" id="trachea-bis" class="vinput" style="font-size:14px;padding:7px 6px;width:100%;min-width:0"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;overflow:hidden;min-width:0">
+        <div class="vi" style="min-width:0;overflow:hidden"><div class="vlabel">Aufgesetzt</div>
+          <input type="time" id="trachea-von" class="vinput" style="font-size:13px;padding:7px 4px;width:100%;min-width:0;box-sizing:border-box"></div>
+        <div class="vi" style="min-width:0;overflow:hidden"><div class="vlabel">Abgenommen</div>
+          <input type="time" id="trachea-bis" class="vinput" style="font-size:13px;padding:7px 4px;width:100%;min-width:0;box-sizing:border-box"></div>
       </div>
       <div class="sec-lbl">Bemerkung (optional)</div>
       <div class="vrow" style="margin-bottom:10px">
@@ -469,11 +469,11 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   <div class="card">
     <div class="card-head">Beinorthesen <button class="addbtn" onclick="addOrthosenEntry()">+ Eintrag</button></div>
     <div class="card-body">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-        <div class="vi" style="min-width:0"><div class="vlabel">Von</div>
-          <input type="time" id="orthose-von" class="vinput" style="font-size:14px;padding:7px 6px;width:100%;min-width:0"></div>
-        <div class="vi" style="min-width:0"><div class="vlabel">Bis</div>
-          <input type="time" id="orthose-bis" class="vinput" style="font-size:14px;padding:7px 6px;width:100%;min-width:0"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;overflow:hidden;min-width:0">
+        <div class="vi" style="min-width:0;overflow:hidden"><div class="vlabel">Von</div>
+          <input type="time" id="orthose-von" class="vinput" style="font-size:13px;padding:7px 4px;width:100%;min-width:0;box-sizing:border-box"></div>
+        <div class="vi" style="min-width:0;overflow:hidden"><div class="vlabel">Bis</div>
+          <input type="time" id="orthose-bis" class="vinput" style="font-size:13px;padding:7px 4px;width:100%;min-width:0;box-sizing:border-box"></div>
       </div>
       <div id="orthosenLog"><div class="nodata" style="padding:8px 0"><span class="ico" style="font-size:18px;margin-bottom:2px">🦵</span>Noch keine Einträge.</div></div>
     </div>
