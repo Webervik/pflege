@@ -199,6 +199,18 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .total-bar-val{font-family:var(--mono);font-size:26px;font-weight:600;color:var(--green)}
 /* IMPFUNGEN */
 /* ── WECHSELPLAN ── */
+#burger-btn{position:relative}
+#burgerDot{display:none;position:absolute;top:5px;right:5px;width:11px;height:11px;border-radius:50%;background:#e5534b;border:2px solid var(--green)}
+.nav-badge{display:none;margin-left:auto;background:#e5534b;color:#fff;font-size:11px;font-weight:700;font-family:var(--mono);min-width:21px;height:21px;border-radius:11px;padding:0 6px;line-height:21px;text-align:center}
+.wp-count{margin-left:auto;background:var(--surface2);color:var(--text2);font-size:12px;font-weight:700;font-family:var(--mono);min-width:24px;height:24px;border-radius:12px;padding:0 8px;line-height:24px;text-align:center}
+.wp-count.due{background:#e5534b;color:#fff}
+.wp-fold{cursor:pointer;user-select:none}
+.wp-chev{margin-left:auto;color:var(--text3);font-size:13px;transition:transform .15s;display:inline-block}
+.wp-chev.open{transform:rotate(90deg)}
+.wp-ok{text-align:center;padding:16px 6px;color:var(--green)}
+.wp-ok-ico{font-size:30px;line-height:1}
+.wp-ok-txt{font-size:14px;font-weight:600;margin-top:5px}
+.wp-ok-sub{font-size:11px;color:var(--text3);margin-top:3px}
 .wp-grp{font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--text3);padding:13px 0 5px}
 .wp-grp:first-child{padding-top:2px}
 .wp-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)}
@@ -212,6 +224,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .wp-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;flex:none;white-space:nowrap}
 .wp-due{background:#fdecea;color:#b3261e}
 .wp-soon{background:#fff4e5;color:#8a5300}
+.wp-new{background:var(--surface2);color:var(--text3)}
 .wp-mnav{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px}
 .wp-mnav button{border:1.5px solid var(--border);background:var(--surface2);border-radius:9px;width:38px;height:34px;font-size:16px;cursor:pointer;font-family:var(--sans);color:var(--text)}
 .wp-mnav .wp-mlabel{font-family:var(--mono);font-size:13px;font-weight:600;min-width:130px;text-align:center}
@@ -352,7 +365,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   </div>
   <!-- Row 3: Burger + Pflegerin-Dropdown + Speichern -->
   <div class="hdr-row3">
-    <button id="burger-btn" onclick="toggleMenu()">☰</button>
+    <button id="burger-btn" onclick="toggleMenu()">☰<span id="burgerDot"></span></button>
     <select class="pflegerin-sel" id="hdr-pflegerin" onchange="dirty()">
       <option value="">👤 Pflegerin wählen…</option>
     </select>
@@ -371,7 +384,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   <button class="nav-item"    onclick="showTab('bericht',this)"><span class="nav-ico">📝</span><span>Bericht</span></button>
   <button class="nav-item"    onclick="showTab('stats',this)"><span class="nav-ico">📊</span><span>Auswertung</span></button>
   <button class="nav-item"    onclick="showTab('verlauf',this)"><span class="nav-ico">📋</span><span>Verlauf</span></button>
-  <button class="nav-item"    onclick="showTab('wechsel',this)"><span class="nav-ico">🔄</span><span>Wechselplan</span></button>
+  <button class="nav-item"    onclick="showTab('wechsel',this)"><span class="nav-ico">🔄</span><span>Wechselplan</span><span class="nav-badge" id="navWechselBadge"></span></button>
   <button class="nav-item"    onclick="showTab('bestellung',this)"><span class="nav-ico">📦</span><span>Bestellung</span></button>
   <button class="nav-item"    onclick="showTab('impfungen',this)"><span class="nav-ico">💉</span><span>Impfungen</span></button>
   <button class="nav-item"    onclick="showTab('team',this)"><span class="nav-ico">👥</span><span>Team</span></button>
@@ -830,15 +843,19 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 <!-- ══ WECHSELPLAN ══ -->
 <div class="page" id="pg-wechsel">
   <div class="card">
-    <div class="card-head">🔄 Heute erledigt</div>
-    <div class="card-body">
-      <div style="font-size:12px;color:var(--text3);margin-bottom:2px">Antippen = für heute abhaken. Wird sofort gespeichert.</div>
+    <div class="card-head">🔔 Jetzt fällig <span class="wp-count" id="wpDueCount">0</span></div>
+    <div class="card-body"><div id="wpDue"></div></div>
+  </div>
+  <div class="card">
+    <div class="card-head wp-fold" onclick="wpFold('wpAllBody',this)">📋 Alle Aufgaben <span class="wp-chev">▸</span></div>
+    <div class="card-body" id="wpAllBody" style="display:none">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:2px">Antippen = für heute abhaken. Wird automatisch gespeichert.</div>
       <div id="wpToday"></div>
     </div>
   </div>
   <div class="card">
-    <div class="card-head">📅 Monatsübersicht</div>
-    <div class="card-body">
+    <div class="card-head wp-fold" onclick="wpFold('wpGridBody',this)">📅 Monatsübersicht <span class="wp-chev">▸</span></div>
+    <div class="card-body" id="wpGridBody" style="display:none">
       <div class="wp-mnav">
         <button onclick="changeWechselMonth(-1)">‹</button>
         <span class="wp-mlabel" id="wpMonthLabel">—</span>
@@ -1238,7 +1255,8 @@ async function loadFromCloud(){
     setSyncBar('error','⚠️ Offline – lokaler Cache · '+e.message);
   }
 }
-async function saveToCloud(){
+// opts.light: häufige Kleinspeicherung (Wechselplan-Haken) – GitHub-Backup wird gedrosselt
+async function saveToCloud(opts={}){
   setSyncBar('syncing','⏳ Speichert…');
   const entryCount=Object.keys(db).length;
 
@@ -1268,8 +1286,13 @@ async function saveToCloud(){
 
     // ── Backup nach jedem erfolgreichen Speichern aktualisieren ──
     localStorage.setItem('pflege_backup',JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,savedAt:new Date().toISOString()}));
-    // Auch Backup-Datei auf GitHub schreiben (async, Fehler ignorieren)
-    writeBackupToGithub(payload).catch(()=>{});
+    // Backup-Datei auf GitHub: bei normalen Speicherungen immer,
+    // bei Wechselplan-Haken höchstens alle 30 Minuten (data.json hat ohnehin Git-Historie)
+    const lastBk=+(localStorage.getItem('pflege_backup_ts')||0);
+    if(!opts.light || Date.now()-lastBk>18e5){
+      localStorage.setItem('pflege_backup_ts',String(Date.now()));
+      writeBackupToGithub(payload).catch(()=>{});
+    }
 
     setSyncBar('ok','☁️ Gespeichert · '+nowHHMM());
   }catch(e){
@@ -1323,13 +1346,16 @@ function fixLayout(){
 function init(){
   buildPain();autoDetectDienst();updateHeaderUI();updateDateDisplay();
   renderTeamList();renderMedDefList();renderMedPresets();renderOrderCatalog();renderOrderCatalogEdit();
-  loadEntry();renderVerlauf();renderStats();
+  loadEntry();renderVerlauf();renderStats();renderWechsel();
   fixLayout();
+  // Erinnerung beim Start: was ist heute zu wechseln/laden?
+  const dueN=updateWechselBadge();
+  if(dueN)setTimeout(()=>showToast('🔄 '+dueN+' Aufgabe'+(dueN!==1?'n':'')+' im Wechselplan fällig','err'),1400);
   window.addEventListener('resize', fixLayout);
   window.addEventListener('orientationchange', ()=>setTimeout(fixLayout, 200));
   setInterval(async()=>{
     checkMidnight();
-    if(!isDirty){await loadFromCloud();loadEntry();renderVerlauf();renderStats()}
+    if(!isDirty){await loadFromCloud();loadEntry();renderVerlauf();renderStats();renderWechsel()}
   },60000);
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkMidnight();});
 }
@@ -1849,6 +1875,60 @@ function wechselLastDone(id){
 function daysSince(iso){
   return Math.round((new Date(todayISO()+'T12:00:00')-new Date(iso+'T12:00:00'))/864e5);
 }
+/* Fällige Aufgaben: überfällig zuerst, nie eingetragene ans Ende */
+function wechselDueList(){
+  const today=todayISO(),out=[];
+  WECHSEL_TASKS.forEach(t=>{
+    if(!t.iv)return;
+    if(wechselDone[t.id]&&wechselDone[t.id][today])return;
+    const last=wechselLastDone(t.id);
+    if(last===null){out.push({t,last:null,ds:null,over:-1});return}
+    const ds=daysSince(last);
+    if(ds>=t.iv)out.push({t,last,ds,over:ds-t.iv});
+  });
+  return out.sort((a,b)=>b.over-a.over);
+}
+/* Erinnerung: roter Punkt am ☰ und Zähler im Menü – auf jedem Tab sichtbar */
+function updateWechselBadge(){
+  const n=wechselDueList().length;
+  const dot=$id('burgerDot');if(dot)dot.style.display=n?'block':'none';
+  const nb=$id('navWechselBadge');
+  if(nb){nb.textContent=n||'';nb.style.display=n?'inline-block':'none'}
+  return n;
+}
+/* Eine Aufgaben-Zeile – von beiden Karten genutzt. opts.grp = Gruppenname mit anzeigen */
+function wpRow(t,opts){
+  const today=todayISO();
+  const done=!!(wechselDone[t.id]&&wechselDone[t.id][today]);
+  const last=wechselLastDone(t.id);
+  const ds=last!==null?daysSince(last):null;
+  let badge='';
+  if(t.iv&&!done){
+    if(ds===null)badge='<span class="wp-badge wp-new">noch nie</span>';
+    else if(ds>=t.iv)badge='<span class="wp-badge wp-due">'+(ds-t.iv===0?'fällig':'+'+(ds-t.iv)+' Tage')+'</span>';
+    else if(ds>=t.iv-1)badge='<span class="wp-badge wp-soon">bald</span>';
+  }
+  let sub='noch nie eingetragen';
+  if(last!==null){
+    const dt=new Date(last+'T12:00:00').toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'});
+    sub='zuletzt '+dt+(ds===0?' · heute':ds===1?' · gestern':' · vor '+ds+' Tagen');
+    const who=wechselDone[t.id][last];
+    if(typeof who==='string'&&who)sub+=' · '+who;
+  }
+  const name=(opts.grp?escH(t.g)+' · ':'')+escH(t.n);
+  return `<div class="wp-row">
+    <div class="wp-box${done?' on':''}" onclick="wechselToggle('${t.id}','${today}')">✓</div>
+    <div class="wp-info">
+      <div class="wp-name">${name}${t.note?' <span class="wp-note">· '+t.note+'</span>':''}</div>
+      <div class="wp-sub">${escH(sub)}</div>
+    </div>${badge}</div>`;
+}
+function wpFold(bodyId,head){
+  const b=$id(bodyId),open=b.style.display==='none';
+  b.style.display=open?'':'none';
+  head.querySelector('.wp-chev').classList.toggle('open',open);
+  if(open&&bodyId==='wpGridBody')renderWechsel();
+}
 function wechselToggle(id,iso){
   if(!wechselDone[id])wechselDone[id]={};
   if(wechselDone[id][iso]){
@@ -1858,8 +1938,9 @@ function wechselToggle(id,iso){
     wechselDone[id][iso]=$id('hdr-pflegerin')?.value||1;
   }
   renderWechsel();
+  // Mehrere Haken hintereinander zu einem Upload bündeln (spart GitHub-Commits)
   clearTimeout(wechselToggle._t);
-  wechselToggle._t=setTimeout(()=>saveToCloud(),1200);
+  wechselToggle._t=setTimeout(()=>saveToCloud({light:true}),5000);
 }
 function changeWechselMonth(delta){
   const [Y,M]=wechselMonth.split('-').map(Number);
@@ -1872,36 +1953,27 @@ function renderWechsel(){
   if(!wechselMonth)wechselMonth=todayISO().slice(0,7);
   const today=todayISO();
 
-  /* Tages-Checkliste */
+  /* ── Karte „Jetzt fällig“ ── */
+  const due=wechselDueList();
+  const cnt=$id('wpDueCount');
+  cnt.textContent=due.length;cnt.classList.toggle('due',due.length>0);
+  $id('wpDue').innerHTML = due.length
+    ? due.map(d=>wpRow(d.t,{grp:true})).join('')
+    : `<div class="wp-ok"><div class="wp-ok-ico">✓</div>
+       <div class="wp-ok-txt">Alles erledigt</div>
+       <div class="wp-ok-sub">Heute ist nichts zu wechseln oder zu laden.</div></div>`;
+
+  /* ── Karte „Alle Aufgaben“ ── */
   let h='',lastG='';
   WECHSEL_TASKS.forEach(t=>{
     if(t.g!==lastG){h+=`<div class="wp-grp">${t.g}</div>`;lastG=t.g}
-    const done=!!(wechselDone[t.id]&&wechselDone[t.id][today]);
-    const last=wechselLastDone(t.id);
-    const ds=last!==null?daysSince(last):null;
-    let badge='';
-    if(t.iv&&!done){
-      if(ds===null)badge='<span class="wp-badge wp-due">offen</span>';
-      else if(ds>=t.iv)badge='<span class="wp-badge wp-due">fällig</span>';
-      else if(ds>=t.iv-1)badge='<span class="wp-badge wp-soon">bald</span>';
-    }
-    let sub='noch nie eingetragen';
-    if(last!==null){
-      const dt=new Date(last+'T12:00:00').toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'});
-      sub='zuletzt '+dt+(ds===0?' · heute':ds===1?' · gestern':' · vor '+ds+' Tagen');
-      const who=wechselDone[t.id][last];
-      if(typeof who==='string'&&who)sub+=' · '+who;
-    }
-    h+=`<div class="wp-row">
-      <div class="wp-box${done?' on':''}" onclick="wechselToggle('${t.id}','${today}')">✓</div>
-      <div class="wp-info">
-        <div class="wp-name">${escH(t.n)}${t.note?' <span class="wp-note">· '+t.note+'</span>':''}</div>
-        <div class="wp-sub">${escH(sub)}</div>
-      </div>${badge}</div>`;
+    h+=wpRow(t,{});
   });
   $id('wpToday').innerHTML=h;
+  updateWechselBadge();
 
-  /* Monatsraster */
+  /* Monatsraster – nur aufbauen, wenn ausgeklappt (558 Zellen) */
+  if($id('wpGridBody').style.display==='none')return;
   const [Y,M]=wechselMonth.split('-').map(Number);
   const nDays=new Date(Y,M,0).getDate();
   $id('wpMonthLabel').textContent=MONATE_DE[M-1]+' '+Y;
