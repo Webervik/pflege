@@ -198,6 +198,37 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .total-bar-sub{font-size:10px;color:var(--green);opacity:.65;margin-top:2px}
 .total-bar-val{font-family:var(--mono);font-size:26px;font-weight:600;color:var(--green)}
 /* IMPFUNGEN */
+/* ── WECHSELPLAN ── */
+.wp-grp{font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--text3);padding:13px 0 5px}
+.wp-grp:first-child{padding-top:2px}
+.wp-row{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)}
+.wp-row:last-child{border-bottom:none}
+.wp-box{width:34px;height:34px;flex:none;border:2px solid var(--border);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;color:transparent;background:var(--bg);cursor:pointer;transition:all .12s}
+.wp-box.on{background:var(--green);border-color:var(--green);color:#fff}
+.wp-info{flex:1;min-width:0}
+.wp-name{font-size:14px;font-weight:600;color:var(--text);line-height:1.3}
+.wp-note{font-weight:400;color:var(--text3);font-size:11px}
+.wp-sub{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:2px}
+.wp-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px;flex:none;white-space:nowrap}
+.wp-due{background:#fdecea;color:#b3261e}
+.wp-soon{background:#fff4e5;color:#8a5300}
+.wp-mnav{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px}
+.wp-mnav button{border:1.5px solid var(--border);background:var(--surface2);border-radius:9px;width:38px;height:34px;font-size:16px;cursor:pointer;font-family:var(--sans);color:var(--text)}
+.wp-mnav .wp-mlabel{font-family:var(--mono);font-size:13px;font-weight:600;min-width:130px;text-align:center}
+.wp-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--border);border-radius:9px}
+.wp-grid{border-collapse:separate;border-spacing:0;font-family:var(--mono)}
+.wp-grid td,.wp-grid th{border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:0}
+.wp-grid tr:last-child td{border-bottom:none}
+.wp-tname{position:sticky;left:0;z-index:2;background:var(--surface);text-align:left;padding:4px 7px;min-width:126px;max-width:126px;font-family:var(--sans);font-size:11px;font-weight:600;line-height:1.25;color:var(--text)}
+.wp-glabel{position:sticky;left:0;z-index:2;background:var(--surface2);padding:3px 7px;font-family:var(--sans);font-size:9.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text3);min-width:126px;max-width:126px}
+.wp-gfill{background:var(--surface2)}
+.wp-day{width:25px;min-width:25px;font-size:9.5px;color:var(--text3);font-weight:600;text-align:center;padding:3px 0;background:var(--surface)}
+.wp-day.we{background:var(--surface2)}
+.wp-day.today{background:var(--green);color:#fff}
+.wp-cell{width:25px;height:25px;text-align:center;cursor:pointer;color:transparent;font-size:12px;background:var(--surface)}
+.wp-cell.we{background:var(--surface2)}
+.wp-cell.on{background:var(--green2);color:var(--green);font-weight:700}
+.wp-cell.today{box-shadow:inset 0 0 0 2px var(--green3)}
 .impf-table{width:100%;border-collapse:collapse;font-size:13px}
 .impf-table td{padding:6px 4px;border-bottom:1px solid var(--border);vertical-align:top}
 .impf-table tr:last-child td{border-bottom:none}
@@ -340,6 +371,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   <button class="nav-item"    onclick="showTab('bericht',this)"><span class="nav-ico">📝</span><span>Bericht</span></button>
   <button class="nav-item"    onclick="showTab('stats',this)"><span class="nav-ico">📊</span><span>Auswertung</span></button>
   <button class="nav-item"    onclick="showTab('verlauf',this)"><span class="nav-ico">📋</span><span>Verlauf</span></button>
+  <button class="nav-item"    onclick="showTab('wechsel',this)"><span class="nav-ico">🔄</span><span>Wechselplan</span></button>
   <button class="nav-item"    onclick="showTab('bestellung',this)"><span class="nav-ico">📦</span><span>Bestellung</span></button>
   <button class="nav-item"    onclick="showTab('impfungen',this)"><span class="nav-ico">💉</span><span>Impfungen</span></button>
   <button class="nav-item"    onclick="showTab('team',this)"><span class="nav-ico">👥</span><span>Team</span></button>
@@ -795,6 +827,30 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   <div id="verlaufContent"><div class="nodata"><span class="ico">📋</span>Noch keine Einträge.</div></div>
 </div>
 
+<!-- ══ WECHSELPLAN ══ -->
+<div class="page" id="pg-wechsel">
+  <div class="card">
+    <div class="card-head">🔄 Heute erledigt</div>
+    <div class="card-body">
+      <div style="font-size:12px;color:var(--text3);margin-bottom:2px">Antippen = für heute abhaken. Wird sofort gespeichert.</div>
+      <div id="wpToday"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head">📅 Monatsübersicht</div>
+    <div class="card-body">
+      <div class="wp-mnav">
+        <button onclick="changeWechselMonth(-1)">‹</button>
+        <span class="wp-mlabel" id="wpMonthLabel">—</span>
+        <button onclick="changeWechselMonth(1)">›</button>
+        <button onclick="wechselToday()" style="width:auto;padding:0 12px;font-size:12px;font-weight:600">Heute</button>
+      </div>
+      <div class="wp-scroll"><table class="wp-grid" id="wpGrid"></table></div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px">Zum Nachtragen seitlich scrollen und die gewünschte Zelle antippen.</div>
+    </div>
+  </div>
+</div>
+
 <!-- ══ TEAM ══ -->
 <!-- ══ BESTELLUNG ══ -->
 <div class="page" id="pg-bestellung">
@@ -986,11 +1042,36 @@ const DEFAULT_ORDER_CATALOG=[
 ];
 const ORDER_EMAIL='v.w@gmx.ch';
 
+/* Wechselplan – Aufgaben laut Papierplan. iv = Soll-Intervall in Tagen (0 = kein festes Intervall) */
+const WECHSEL_TASKS=[
+  {g:'Lifter',        id:'lifter-laden',    n:'Laden',               iv:7,  note:'1× wö · Samstag'},
+  {g:'Absauge',       id:'abs-filter',      n:'Bakterienfilter',     iv:30, note:'1× monatlich'},
+  {g:'Absauge',       id:'abs-schlauch',    n:'Schlauchsystem',      iv:30, note:'1× monatlich'},
+  {g:'Absauge mobil', id:'absm-laden',      n:'Laden',               iv:7,  note:'1× wö · Montag'},
+  {g:'Absauge mobil', id:'absm-filter',     n:'Bakterienfilter',     iv:30, note:'1× monatlich'},
+  {g:'Absauge mobil', id:'absm-schlauch',   n:'Schlauchsystem',      iv:30, note:'1× monatlich'},
+  {g:'Cough Assist',  id:'cough-laden',     n:'Laden',               iv:7,  note:'1× wö · Montag'},
+  {g:'Cough Assist',  id:'cough-filter',    n:'Bakterienfilter',     iv:7,  note:'1× wöchentlich'},
+  {g:'Cough Assist',  id:'cough-schlauch',  n:'Schlauchsystem',      iv:30, note:'1× monatlich'},
+  {g:'Cough Assist',  id:'cough-maske',     n:'Maske',               iv:30, note:'1× monatlich'},
+  {g:'Pflege',        id:'kanuelenband',    n:'Kanülenband',         iv:2,  note:'alle 2 Tage'},
+  {g:'Pflege',        id:'medspritze',      n:'Medikamentenspritze', iv:3,  note:'3× wöchentlich'},
+  {g:'Pflege',        id:'tk-wechsel',      n:'TK-Wechsel',          iv:0,  note:'nach Bedarf'},
+  {g:'Desinfektion',  id:'des-schieber',    n:'Schieber',            iv:0},
+  {g:'Desinfektion',  id:'des-urinflasche', n:'Urinflasche',         iv:0},
+  {g:'Desinfektion',  id:'des-bett',        n:'Bett',                iv:0},
+  {g:'Desinfektion',  id:'des-kommode',     n:'Kommode',             iv:0},
+  {g:'Desinfektion',  id:'des-schreibtisch',n:'Schreibtisch',        iv:0},
+];
+const MONATE_DE=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+
 /* ── STATE ──
    Key format: "2025-04-26_Tagdienst"
 */
 let ghToken='', currentSha='';
 let db={}, team=[], medDefs=[], orderCatalog=[];   // db[key] = entry
+let wechselDone={};      // wechselDone[taskId][ISO-Datum] = Pflegerin-Name oder 1
+let wechselMonth='';     // 'YYYY-MM' im Monatsraster angezeigt
 let curDate=todayISO(), curDienst='Frühdienst';
 let isDirty=false;
 let painSel=-1, checks={}, radios={}, durations={};
@@ -1035,7 +1116,7 @@ async function doSetup(){
     });
     if(r.status===404){
       // File doesn't exist yet – create it with empty data
-      const body=JSON.stringify({entries:{},team:[],medDefs:[],orderCatalog:DEFAULT_ORDER_CATALOG,version:4});
+      const body=JSON.stringify({entries:{},team:[],medDefs:[],orderCatalog:DEFAULT_ORDER_CATALOG,wechselDone:{},version:4});
       const cr=await fetch(`${GH_API}/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`,{
         method:'PUT',
         headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json','Content-Type':'application/json'},
@@ -1113,11 +1194,11 @@ function setSyncBar(state,msg){
 }
 async function loadFromCloud(){
   // Lokalen Cache vorab sichern – könnte Einträge haben, die noch nicht auf GitHub sind
-  let localEntries={},localTeam=[],localMedDefs=[],localOrderCatalog=[];
+  let localEntries={},localTeam=[],localMedDefs=[],localOrderCatalog=[],localWechsel={};
   try{
     const c=JSON.parse(localStorage.getItem(LS_CACHE)||'{}');
     localEntries=c.entries||c.days||{};
-    localTeam=c.team||[];localMedDefs=c.medDefs||[];localOrderCatalog=c.orderCatalog||[];
+    localTeam=c.team||[];localMedDefs=c.medDefs||[];localOrderCatalog=c.orderCatalog||[];localWechsel=c.wechselDone||{};
   }catch{}
 
   setSyncBar('syncing','⏳ Lade Daten…');
@@ -1142,7 +1223,8 @@ async function loadFromCloud(){
     team=rec.team||(localTeam.length?localTeam:[]);
     medDefs=rec.medDefs||(localMedDefs.length?localMedDefs:[]);
     orderCatalog=rec.orderCatalog||(localOrderCatalog.length?localOrderCatalog:DEFAULT_ORDER_CATALOG);
-    localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,sha:currentSha}));
+    wechselDone=mergeWechsel(rec.wechselDone||{},localWechsel);
+    localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,sha:currentSha}));
 
     if(newLocal>0){
       setSyncBar('syncing',`⏳ ${newLocal} lokale Einträge werden hochgeladen…`);
@@ -1152,7 +1234,7 @@ async function loadFromCloud(){
       setSyncBar('ok','☁️ Synchronisiert · '+nowHHMM());
     }
   }catch(e){
-    db=localEntries;team=localTeam;medDefs=localMedDefs;orderCatalog=localOrderCatalog.length?localOrderCatalog:DEFAULT_ORDER_CATALOG;
+    db=localEntries;team=localTeam;medDefs=localMedDefs;orderCatalog=localOrderCatalog.length?localOrderCatalog:DEFAULT_ORDER_CATALOG;wechselDone=localWechsel;
     setSyncBar('error','⚠️ Offline – lokaler Cache · '+e.message);
   }
 }
@@ -1169,8 +1251,8 @@ async function saveToCloud(){
     return;
   }
 
-  const payload=JSON.stringify({entries:db,team,medDefs,orderCatalog,version:4,lastSaved:new Date().toISOString()});
-  localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,sha:currentSha}));
+  const payload=JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,version:4,lastSaved:new Date().toISOString()});
+  localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,sha:currentSha}));
   try{
     const body={message:'Pflege-Doku update '+new Date().toISOString(),content:b64encode(payload)};
     if(currentSha)body.sha=currentSha;
@@ -1182,10 +1264,10 @@ async function saveToCloud(){
     if(!r.ok){const e=await r.json();throw new Error(e.message||'HTTP '+r.status)}
     const meta=await r.json();
     currentSha=meta.content.sha;
-    localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,sha:currentSha}));
+    localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,sha:currentSha}));
 
     // ── Backup nach jedem erfolgreichen Speichern aktualisieren ──
-    localStorage.setItem('pflege_backup',JSON.stringify({entries:db,team,medDefs,orderCatalog,savedAt:new Date().toISOString()}));
+    localStorage.setItem('pflege_backup',JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,savedAt:new Date().toISOString()}));
     // Auch Backup-Datei auf GitHub schreiben (async, Fehler ignorieren)
     writeBackupToGithub(payload).catch(()=>{});
 
@@ -1219,9 +1301,9 @@ async function restoreFromBackup(){
     const rec=JSON.parse(b64decode(meta.content.replace(/\n/g,'')));
     const cnt=Object.keys(rec.entries||{}).length;
     if(!confirm(`Backup enthält ${cnt} Einträge. Wiederherstellen?`))return;
-    db=rec.entries||{};team=rec.team||[];medDefs=rec.medDefs||[];orderCatalog=rec.orderCatalog||orderCatalog;
+    db=rec.entries||{};team=rec.team||[];medDefs=rec.medDefs||[];orderCatalog=rec.orderCatalog||orderCatalog;wechselDone=rec.wechselDone||{};
     await saveToCloud();
-    loadEntry();renderVerlauf();renderStats();renderOrderCatalog();renderOrderCatalogEdit();
+    loadEntry();renderVerlauf();renderStats();renderOrderCatalog();renderOrderCatalogEdit();renderWechsel();
     showToast(`✅ Backup mit ${cnt} Einträgen wiederhergestellt`);
   }catch(e){
     setSyncBar('error','⚠️ Backup-Fehler: '+e.message);
@@ -1382,6 +1464,7 @@ function showTab(name,btn){
   if(btn)btn.classList.add('on');
   if(name==='stats')renderStats();
   if(name==='verlauf')renderVerlauf();
+  if(name==='wechsel')renderWechsel();
   closeMenu();
 }
 function toggleMenu(){
@@ -1747,6 +1830,106 @@ function sendOrder(){
   const mailto='mailto:'+ORDER_EMAIL+'?subject='+encodeURIComponent('VO Sarah Salin')+'&body='+encodeURIComponent(body);
   window.location.href=mailto;
 }
+/* ── WECHSELPLAN ── */
+/* Cloud-Stand mit lokalen, noch nicht hochgeladenen Haken zusammenführen */
+function mergeWechsel(cloud,local){
+  const out={};
+  Object.keys(cloud).forEach(id=>out[id]={...cloud[id]});
+  Object.keys(local||{}).forEach(id=>{
+    if(!out[id])out[id]={};
+    Object.keys(local[id]).forEach(d=>{if(!out[id][d])out[id][d]=local[id][d]});
+  });
+  return out;
+}
+function wechselLastDone(id){
+  const today=todayISO();
+  const ks=Object.keys(wechselDone[id]||{}).filter(k=>k<=today).sort();
+  return ks.length?ks[ks.length-1]:null;
+}
+function daysSince(iso){
+  return Math.round((new Date(todayISO()+'T12:00:00')-new Date(iso+'T12:00:00'))/864e5);
+}
+function wechselToggle(id,iso){
+  if(!wechselDone[id])wechselDone[id]={};
+  if(wechselDone[id][iso]){
+    delete wechselDone[id][iso];
+    if(!Object.keys(wechselDone[id]).length)delete wechselDone[id];
+  }else{
+    wechselDone[id][iso]=$id('hdr-pflegerin')?.value||1;
+  }
+  renderWechsel();
+  clearTimeout(wechselToggle._t);
+  wechselToggle._t=setTimeout(()=>saveToCloud(),1200);
+}
+function changeWechselMonth(delta){
+  const [Y,M]=wechselMonth.split('-').map(Number);
+  const d=new Date(Y,M-1+delta,1);
+  wechselMonth=d.getFullYear()+'-'+p2(d.getMonth()+1);
+  renderWechsel();
+}
+function wechselToday(){wechselMonth=todayISO().slice(0,7);renderWechsel()}
+function renderWechsel(){
+  if(!wechselMonth)wechselMonth=todayISO().slice(0,7);
+  const today=todayISO();
+
+  /* Tages-Checkliste */
+  let h='',lastG='';
+  WECHSEL_TASKS.forEach(t=>{
+    if(t.g!==lastG){h+=`<div class="wp-grp">${t.g}</div>`;lastG=t.g}
+    const done=!!(wechselDone[t.id]&&wechselDone[t.id][today]);
+    const last=wechselLastDone(t.id);
+    const ds=last!==null?daysSince(last):null;
+    let badge='';
+    if(t.iv&&!done){
+      if(ds===null)badge='<span class="wp-badge wp-due">offen</span>';
+      else if(ds>=t.iv)badge='<span class="wp-badge wp-due">fällig</span>';
+      else if(ds>=t.iv-1)badge='<span class="wp-badge wp-soon">bald</span>';
+    }
+    let sub='noch nie eingetragen';
+    if(last!==null){
+      const dt=new Date(last+'T12:00:00').toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'});
+      sub='zuletzt '+dt+(ds===0?' · heute':ds===1?' · gestern':' · vor '+ds+' Tagen');
+      const who=wechselDone[t.id][last];
+      if(typeof who==='string'&&who)sub+=' · '+who;
+    }
+    h+=`<div class="wp-row">
+      <div class="wp-box${done?' on':''}" onclick="wechselToggle('${t.id}','${today}')">✓</div>
+      <div class="wp-info">
+        <div class="wp-name">${escH(t.n)}${t.note?' <span class="wp-note">· '+t.note+'</span>':''}</div>
+        <div class="wp-sub">${escH(sub)}</div>
+      </div>${badge}</div>`;
+  });
+  $id('wpToday').innerHTML=h;
+
+  /* Monatsraster */
+  const [Y,M]=wechselMonth.split('-').map(Number);
+  const nDays=new Date(Y,M,0).getDate();
+  $id('wpMonthLabel').textContent=MONATE_DE[M-1]+' '+Y;
+  let head='<tr><th class="wp-tname" style="background:var(--surface2)">Aufgabe</th>';
+  for(let d=1;d<=nDays;d++){
+    const wd=new Date(Y,M-1,d).getDay();
+    const iso=wechselMonth+'-'+p2(d);
+    head+=`<th class="wp-day${wd===0||wd===6?' we':''}${iso===today?' today':''}">${d}</th>`;
+  }
+  head+='</tr>';
+  let rows='';lastG='';
+  WECHSEL_TASKS.forEach(t=>{
+    if(t.g!==lastG){
+      rows+=`<tr><td class="wp-glabel">${t.g}</td><td class="wp-gfill" colspan="${nDays}"></td></tr>`;
+      lastG=t.g;
+    }
+    rows+=`<tr><td class="wp-tname">${escH(t.n)}</td>`;
+    for(let d=1;d<=nDays;d++){
+      const wd=new Date(Y,M-1,d).getDay();
+      const iso=wechselMonth+'-'+p2(d);
+      const on=!!(wechselDone[t.id]&&wechselDone[t.id][iso]);
+      rows+=`<td class="wp-cell${on?' on':''}${wd===0||wd===6?' we':''}${iso===today?' today':''}" onclick="wechselToggle('${t.id}','${iso}')">✓</td>`;
+    }
+    rows+='</tr>';
+  });
+  $id('wpGrid').innerHTML=head+rows;
+}
+
 function addMedManual(){const t=nowHHMM();checkPastDay();medGiven.push({time:t,name:'',dose:''});renderMedGivenList();dirty()}
 function renderMedGivenList(){
   const w=$id('medGivenList');
