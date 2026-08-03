@@ -1059,27 +1059,48 @@ const DEFAULT_ORDER_CATALOG=[
 ];
 const ORDER_EMAIL='v.w@gmx.ch';
 
-/* Wechselplan – Aufgaben laut Papierplan. iv = Soll-Intervall in Tagen (0 = kein festes Intervall) */
+/* Wechselplan – Aufgaben laut Papierplan (Stand Juni/Juli 2026, handschriftliche Änderungen übernommen).
+   iv = Soll-Intervall in Tagen (0 = kein festes Intervall), pause = ausgesetzt, keine Erinnerung */
 const WECHSEL_TASKS=[
-  {g:'Lifter',        id:'lifter-laden',    n:'Laden',               iv:7,  note:'1× wö · Samstag'},
-  {g:'Absauge',       id:'abs-filter',      n:'Bakterienfilter',     iv:30, note:'1× monatlich'},
-  {g:'Absauge',       id:'abs-schlauch',    n:'Schlauchsystem',      iv:30, note:'1× monatlich'},
-  {g:'Absauge mobil', id:'absm-laden',      n:'Laden',               iv:7,  note:'1× wö · Montag'},
-  {g:'Absauge mobil', id:'absm-filter',     n:'Bakterienfilter',     iv:30, note:'1× monatlich'},
-  {g:'Absauge mobil', id:'absm-schlauch',   n:'Schlauchsystem',      iv:30, note:'1× monatlich'},
-  {g:'Cough Assist',  id:'cough-laden',     n:'Laden',               iv:7,  note:'1× wö · Montag'},
-  {g:'Cough Assist',  id:'cough-filter',    n:'Bakterienfilter',     iv:7,  note:'1× wöchentlich'},
-  {g:'Cough Assist',  id:'cough-schlauch',  n:'Schlauchsystem',      iv:30, note:'1× monatlich'},
-  {g:'Cough Assist',  id:'cough-maske',     n:'Maske',               iv:30, note:'1× monatlich'},
-  {g:'Pflege',        id:'kanuelenband',    n:'Kanülenband',         iv:2,  note:'alle 2 Tage'},
-  {g:'Pflege',        id:'medspritze',      n:'Medikamentenspritze', iv:3,  note:'3× wöchentlich'},
-  {g:'Pflege',        id:'tk-wechsel',      n:'TK-Wechsel',          iv:0,  note:'nach Bedarf'},
-  {g:'Desinfektion',  id:'des-schieber',    n:'Schieber',            iv:0},
-  {g:'Desinfektion',  id:'des-urinflasche', n:'Urinflasche',         iv:0},
-  {g:'Desinfektion',  id:'des-bett',        n:'Bett',                iv:0},
-  {g:'Desinfektion',  id:'des-kommode',     n:'Kommode',             iv:0},
-  {g:'Desinfektion',  id:'des-schreibtisch',n:'Schreibtisch',        iv:0},
+  {g:'Absauge',        id:'abs-filter',      n:'Bakterienfilter',      iv:30, note:'1× monatlich'},
+  {g:'Absauge',        id:'abs-schlauch',    n:'Schlauchsystem',       iv:30, note:'1× monatlich'},
+  {g:'Absauge mobil',  id:'absm-laden',      n:'Laden',                iv:7,  note:'1× wö · Montag'},
+  {g:'Absauge mobil',  id:'absm-filter',     n:'Bakterienfilter',      iv:30, note:'1× monatlich'},
+  {g:'Absauge mobil',  id:'absm-schlauch',   n:'Schlauchsystem',       iv:30, note:'1× monatlich'},
+  {g:'Inhalierset',    id:'inhalierset',     n:'Inhalierset',          iv:30, note:'1× monatlich', pause:true},
+  {g:'Cough Assist',   id:'cough-laden',     n:'Laden',                iv:7,  note:'1× wö · Montag'},
+  {g:'Cough Assist',   id:'cough-filter',    n:'Bakterienfilter',      iv:7,  note:'1× wöchentlich'},
+  {g:'Cough Assist',   id:'cough-schlauch',  n:'Schlauchsystem',       iv:30, note:'1× monatlich'},
+  {g:'Cough Assist',   id:'cough-maske',     n:'Tubus',                iv:30, note:'1× monatlich'},
+  {g:'Trachealkanüle', id:'kanuelenband',    n:'Kanülenband (TK-Band)',iv:7,  note:'1× wöchentlich'},
+  {g:'Trachealkanüle', id:'tk-wechsel',      n:'TK-Wechsel',           iv:42, note:'alle 6 Wochen'},
+  {g:'GastroTube',     id:'gt-blockung',     n:'Blockung prüfen',      iv:14, note:'alle 14 Tage · 10 ml Aqua'},
+  {g:'GastroTube',     id:'gt-wechsel',      n:'GastroTube wechseln',  iv:120,note:'alle 4–6 Monate'},
+  {g:'Medikamente',    id:'medspritze',      n:'Medikamentenspritze',  iv:7,  note:'1× wöchentlich'},
+  {g:'Desinfektion',   id:'des-bett',        n:'Bett',                 iv:0},
+  {g:'Desinfektion',   id:'des-kommode',     n:'Kommode',              iv:0},
+  {g:'Desinfektion',   id:'des-schreibtisch',n:'Schreibtisch',         iv:0},
 ];
+/* Startstand aus den Papierblättern Juni/Juli 2026 – wird einmalig eingespielt (siehe applyWechselSeed) */
+const WECHSEL_SEED_V=1;
+const WECHSEL_SEED={
+  'abs-filter':      {'2026-07-08':'Regina'},
+  'abs-schlauch':    {'2026-07-08':'Regina'},
+  'absm-laden':      {'2026-07-01':'Regina','2026-07-08':'Regina','2026-07-14':'Regina','2026-07-19':'Regina','2026-07-28':'Tina'},
+  'absm-filter':     {'2026-07-08':'Regina'},
+  'absm-schlauch':   {'2026-07-08':'Regina'},
+  'cough-laden':     {'2026-07-01':'Regina','2026-07-08':'Regina','2026-07-28':'Tina'},
+  'cough-filter':    {'2026-07-08':'Regina'},
+  'cough-schlauch':  {'2026-07-08':'Regina'},
+  'cough-maske':     {'2026-07-08':'Regina'},
+  'medspritze':      {'2026-07-07':'Regina','2026-07-12':'Regina','2026-07-19':'Regina','2026-07-28':'Tina'},
+  'tk-wechsel':      {'2026-07-15':'Regina'},
+  'gt-blockung':     {'2026-07-14':'Regina','2026-08-02':'Regina'},
+  'gt-wechsel':      {'2026-04-04':1},
+  'des-bett':        {'2026-07-04':'Tina','2026-07-12':'Regina','2026-07-23':'Regina'},
+  'des-kommode':     {'2026-07-04':'Tina','2026-07-12':'Regina','2026-07-23':'Regina','2026-07-30':'Tina'},
+  'des-schreibtisch':{'2026-07-04':'Tina','2026-07-12':'Regina','2026-07-23':'Regina','2026-07-30':'Tina'},
+};
 const MONATE_DE=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 
 /* ── STATE ──
@@ -1089,6 +1110,7 @@ let ghToken='', currentSha='';
 let db={}, team=[], medDefs=[], orderCatalog=[];   // db[key] = entry
 let wechselDone={};      // wechselDone[taskId][ISO-Datum] = Pflegerin-Name oder 1
 let wechselMonth='';     // 'YYYY-MM' im Monatsraster angezeigt
+let wechselSeedV=0;      // Version des eingespielten Papier-Startstands
 let curDate=todayISO(), curDienst='Frühdienst';
 let isDirty=false;
 let painSel=-1, checks={}, radios={}, durations={};
@@ -1133,7 +1155,7 @@ async function doSetup(){
     });
     if(r.status===404){
       // File doesn't exist yet – create it with empty data
-      const body=JSON.stringify({entries:{},team:[],medDefs:[],orderCatalog:DEFAULT_ORDER_CATALOG,wechselDone:{},version:4});
+      const body=JSON.stringify({entries:{},team:[],medDefs:[],orderCatalog:DEFAULT_ORDER_CATALOG,wechselDone:{},wechselSeedV:0,version:4});
       const cr=await fetch(`${GH_API}/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`,{
         method:'PUT',
         headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json','Content-Type':'application/json'},
@@ -1215,7 +1237,7 @@ async function loadFromCloud(){
   try{
     const c=JSON.parse(localStorage.getItem(LS_CACHE)||'{}');
     localEntries=c.entries||c.days||{};
-    localTeam=c.team||[];localMedDefs=c.medDefs||[];localOrderCatalog=c.orderCatalog||[];localWechsel=c.wechselDone||{};
+    localTeam=c.team||[];localMedDefs=c.medDefs||[];localOrderCatalog=c.orderCatalog||[];localWechsel=c.wechselDone||{};wechselSeedV=c.wechselSeedV||0;
   }catch{}
 
   setSyncBar('syncing','⏳ Lade Daten…');
@@ -1241,9 +1263,12 @@ async function loadFromCloud(){
     medDefs=rec.medDefs||(localMedDefs.length?localMedDefs:[]);
     orderCatalog=rec.orderCatalog||(localOrderCatalog.length?localOrderCatalog:DEFAULT_ORDER_CATALOG);
     wechselDone=mergeWechsel(rec.wechselDone||{},localWechsel);
-    localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,sha:currentSha}));
+    wechselSeedV=rec.wechselSeedV||0;
+    const seedNeeded=wechselSeedV<WECHSEL_SEED_V;
+    if(seedNeeded)applyWechselSeed();
+    localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,sha:currentSha}));
 
-    if(newLocal>0){
+    if(newLocal>0||seedNeeded){
       setSyncBar('syncing',`⏳ ${newLocal} lokale Einträge werden hochgeladen…`);
       await saveToCloud();
       showToast(`☁️ ${newLocal} lokale Einträge mit GitHub zusammengeführt`);
@@ -1252,6 +1277,7 @@ async function loadFromCloud(){
     }
   }catch(e){
     db=localEntries;team=localTeam;medDefs=localMedDefs;orderCatalog=localOrderCatalog.length?localOrderCatalog:DEFAULT_ORDER_CATALOG;wechselDone=localWechsel;
+    if(wechselSeedV<WECHSEL_SEED_V)applyWechselSeed();
     setSyncBar('error','⚠️ Offline – lokaler Cache · '+e.message);
   }
 }
@@ -1269,8 +1295,8 @@ async function saveToCloud(opts={}){
     return;
   }
 
-  const payload=JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,version:4,lastSaved:new Date().toISOString()});
-  localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,sha:currentSha}));
+  const payload=JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,version:4,lastSaved:new Date().toISOString()});
+  localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,sha:currentSha}));
   try{
     const body={message:'Pflege-Doku update '+new Date().toISOString(),content:b64encode(payload)};
     if(currentSha)body.sha=currentSha;
@@ -1282,10 +1308,10 @@ async function saveToCloud(opts={}){
     if(!r.ok){const e=await r.json();throw new Error(e.message||'HTTP '+r.status)}
     const meta=await r.json();
     currentSha=meta.content.sha;
-    localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,sha:currentSha}));
+    localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,sha:currentSha}));
 
     // ── Backup nach jedem erfolgreichen Speichern aktualisieren ──
-    localStorage.setItem('pflege_backup',JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,savedAt:new Date().toISOString()}));
+    localStorage.setItem('pflege_backup',JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,savedAt:new Date().toISOString()}));
     // Backup-Datei auf GitHub: bei normalen Speicherungen immer,
     // bei Wechselplan-Haken höchstens alle 30 Minuten (data.json hat ohnehin Git-Historie)
     const lastBk=+(localStorage.getItem('pflege_backup_ts')||0);
@@ -1324,7 +1350,7 @@ async function restoreFromBackup(){
     const rec=JSON.parse(b64decode(meta.content.replace(/\n/g,'')));
     const cnt=Object.keys(rec.entries||{}).length;
     if(!confirm(`Backup enthält ${cnt} Einträge. Wiederherstellen?`))return;
-    db=rec.entries||{};team=rec.team||[];medDefs=rec.medDefs||[];orderCatalog=rec.orderCatalog||orderCatalog;wechselDone=rec.wechselDone||{};
+    db=rec.entries||{};team=rec.team||[];medDefs=rec.medDefs||[];orderCatalog=rec.orderCatalog||orderCatalog;wechselDone=rec.wechselDone||{};wechselSeedV=rec.wechselSeedV||0;
     await saveToCloud();
     loadEntry();renderVerlauf();renderStats();renderOrderCatalog();renderOrderCatalogEdit();renderWechsel();
     showToast(`✅ Backup mit ${cnt} Einträgen wiederhergestellt`);
@@ -1867,6 +1893,14 @@ function mergeWechsel(cloud,local){
   });
   return out;
 }
+/* Startstand aus den Papierblättern – nur fehlende Tage ergänzen, nie überschreiben */
+function applyWechselSeed(){
+  Object.entries(WECHSEL_SEED).forEach(([id,days])=>{
+    if(!wechselDone[id])wechselDone[id]={};
+    Object.entries(days).forEach(([d,who])=>{if(!wechselDone[id][d])wechselDone[id][d]=who});
+  });
+  wechselSeedV=WECHSEL_SEED_V;
+}
 function wechselLastDone(id){
   const today=todayISO();
   const ks=Object.keys(wechselDone[id]||{}).filter(k=>k<=today).sort();
@@ -1879,7 +1913,7 @@ function daysSince(iso){
 function wechselDueList(){
   const today=todayISO(),out=[];
   WECHSEL_TASKS.forEach(t=>{
-    if(!t.iv)return;
+    if(!t.iv||t.pause)return;
     if(wechselDone[t.id]&&wechselDone[t.id][today])return;
     const last=wechselLastDone(t.id);
     if(last===null){out.push({t,last:null,ds:null,over:-1});return}
@@ -1903,9 +1937,10 @@ function wpRow(t,opts){
   const last=wechselLastDone(t.id);
   const ds=last!==null?daysSince(last):null;
   let badge='';
-  if(t.iv&&!done){
+  if(t.pause)badge='<span class="wp-badge wp-new">Pause</span>';
+  else if(t.iv&&!done){
     if(ds===null)badge='<span class="wp-badge wp-new">noch nie</span>';
-    else if(ds>=t.iv)badge='<span class="wp-badge wp-due">'+(ds-t.iv===0?'fällig':'+'+(ds-t.iv)+' Tage')+'</span>';
+    else if(ds>=t.iv){const ov=ds-t.iv;badge='<span class="wp-badge wp-due">'+(ov===0?'fällig':'+'+ov+(ov===1?' Tag':' Tage'))+'</span>'}
     else if(ds>=t.iv-1)badge='<span class="wp-badge wp-soon">bald</span>';
   }
   let sub='noch nie eingetragen';
