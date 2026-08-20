@@ -198,6 +198,19 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .total-bar-sub{font-size:10px;color:var(--green);opacity:.65;margin-top:2px}
 .total-bar-val{font-family:var(--mono);font-size:26px;font-weight:600;color:var(--green)}
 /* IMPFUNGEN */
+/* ── PACKLISTE ── */
+.pk-trip{width:100%;border:2px solid var(--border);border-radius:9px;padding:9px 11px;font-size:15px;font-weight:600;background:var(--bg);color:var(--text);font-family:var(--sans)}
+.pk-trip:focus{outline:none;border-color:var(--green);background:var(--green2)}
+.pk-prog{height:9px;border-radius:5px;background:var(--surface2);overflow:hidden;margin:10px 0 5px}
+.pk-prog-in{height:100%;background:var(--green);border-radius:5px;transition:width .25s}
+.pk-stat{display:flex;justify-content:space-between;align-items:baseline;font-size:12px;color:var(--text3)}
+.pk-stat b{font-family:var(--mono);font-size:19px;color:var(--green)}
+.pk-row{display:flex;align-items:center;gap:12px;padding:7px 0;border-bottom:1px solid var(--border)}
+.pk-row:last-child{border-bottom:none}
+.pk-name{flex:1;min-width:0;font-size:14px;color:var(--text);line-height:1.3}
+.pk-row.on .pk-name{color:var(--text3);text-decoration:line-through}
+.pk-who{font-size:10px;color:var(--text3);font-family:var(--mono);flex:none}
+.pk-done{text-align:center;padding:18px 6px;color:var(--green)}
 /* ── WECHSELPLAN ── */
 #burger-btn{position:relative}
 #burgerDot{display:none;position:absolute;top:5px;right:5px;width:11px;height:11px;border-radius:50%;background:#e5534b;border:2px solid var(--green)}
@@ -385,6 +398,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   <button class="nav-item"    onclick="showTab('stats',this)"><span class="nav-ico">📊</span><span>Auswertung</span></button>
   <button class="nav-item"    onclick="showTab('verlauf',this)"><span class="nav-ico">📋</span><span>Verlauf</span></button>
   <button class="nav-item"    onclick="showTab('wechsel',this)"><span class="nav-ico">🔄</span><span>Wechselplan</span><span class="nav-badge" id="navWechselBadge"></span></button>
+  <button class="nav-item"    onclick="showTab('pack',this)"><span class="nav-ico">🧳</span><span>Packliste</span></button>
   <button class="nav-item"    onclick="showTab('bestellung',this)"><span class="nav-ico">📦</span><span>Bestellung</span></button>
   <button class="nav-item"    onclick="showTab('impfungen',this)"><span class="nav-ico">💉</span><span>Impfungen</span></button>
   <button class="nav-item"    onclick="showTab('team',this)"><span class="nav-ico">👥</span><span>Team</span></button>
@@ -868,6 +882,26 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
   </div>
 </div>
 
+<!-- ══ PACKLISTE ══ -->
+<div class="page" id="pg-pack">
+  <div class="card">
+    <div class="card-head">🧳 Reise</div>
+    <div class="card-body">
+      <input class="pk-trip" id="pk-trip" placeholder="Reiseziel, z. B. Schwarzwald" oninput="packSetTrip(this.value)">
+      <div class="pk-prog"><div class="pk-prog-in" id="pk-prog"></div></div>
+      <div class="pk-stat"><span><b id="pk-count">0</b> von <span id="pk-total">0</span> gepackt</span><span id="pk-left"></span></div>
+      <button class="savebtn" style="margin-top:12px;background:var(--surface2);color:var(--text2);font-size:14px;padding:11px" onclick="packReset()">🔄 Neue Reise starten</button>
+      <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:5px">Setzt alle Haken zurück, die Liste bleibt erhalten.</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-head">Gegenstände
+      <button class="addbtn" id="pk-editbtn" onclick="togglePackEdit()">✏️ Bearbeiten</button>
+    </div>
+    <div class="card-body"><div id="pkList"></div></div>
+  </div>
+</div>
+
 <!-- ══ TEAM ══ -->
 <!-- ══ BESTELLUNG ══ -->
 <div class="page" id="pg-bestellung">
@@ -1101,6 +1135,47 @@ const WECHSEL_SEED={
   'des-kommode':     {'2026-07-04':'Tina','2026-07-12':'Regina','2026-07-23':'Regina','2026-07-30':'Tina'},
   'des-schreibtisch':{'2026-07-04':'Tina','2026-07-12':'Regina','2026-07-23':'Regina','2026-07-30':'Tina'},
 };
+/* Packliste – Grundstock aus „Checkliste Reise Schwarzwald“ (Word), nach Gerät/Zweck gruppiert.
+   Doppelnennungen zusammengeführt: Ladekabel Absauggerät, Ladekabel Rollstuhl, Medikamente. */
+const DEFAULT_PACK_ITEMS=[
+  {cat:'Absaugen',         name:'Absauggerät'},
+  {cat:'Absaugen',         name:'Ladekabel Absauggerät'},
+  {cat:'Absaugen',         name:'Mobiles Absauggerät'},
+  {cat:'Absaugen',         name:'Absaugschlauch'},
+  {cat:'Absaugen',         name:'Absaugkatheter'},
+  {cat:'Atmung & Notfall', name:'Cough Assist'},
+  {cat:'Atmung & Notfall', name:'Filter für Cough Assist'},
+  {cat:'Atmung & Notfall', name:'Gänsegurgel für Cough Assist'},
+  {cat:'Atmung & Notfall', name:'Ambu-Beutel'},
+  {cat:'Atmung & Notfall', name:'Notfallkanüle'},
+  {cat:'Atmung & Notfall', name:'Blubber-Flasche'},
+  {cat:'Trachealkanüle',   name:'Trachealkanüle Biesalski Gr. 8'},
+  {cat:'Trachealkanüle',   name:'Trachealkanülen-Bürste'},
+  {cat:'Trachealkanüle',   name:'Tracheal-Kompressen'},
+  {cat:'Trachealkanüle',   name:'Tracheostoma-Reinigungstücher'},
+  {cat:'Trachealkanüle',   name:'Haltebände'},
+  {cat:'Trachealkanüle',   name:'Feuchte Nase'},
+  {cat:'Trachealkanüle',   name:'Sprechventil'},
+  {cat:'Trachealkanüle',   name:'Verschlusskappe'},
+  {cat:'PEG',              name:'PEG-Kompressen'},
+  {cat:'PEG',              name:'PEG-Spritze'},
+  {cat:'Messgeräte',       name:'Blutdruckmessgerät'},
+  {cat:'Messgeräte',       name:'Pulsoxymeter'},
+  {cat:'Messgeräte',       name:'Thermometer'},
+  {cat:'Medikamente',      name:'Medikamente (Tavor, Bisoprolol)'},
+  {cat:'Haut & Hygiene',   name:'Desinfektionsmittel'},
+  {cat:'Haut & Hygiene',   name:'Pflaster'},
+  {cat:'Haut & Hygiene',   name:'Nivea'},
+  {cat:'Haut & Hygiene',   name:'Palliativcreme'},
+  {cat:'Haut & Hygiene',   name:'Xeracalm'},
+  {cat:'Haut & Hygiene',   name:'Feuchttücher'},
+  {cat:'Haut & Hygiene',   name:'Papiertaschentücher'},
+  {cat:'Hilfsmittel',      name:'Ladekabel Rollstuhl'},
+  {cat:'Hilfsmittel',      name:'Fingerorthese'},
+  {cat:'Hilfsmittel',      name:'IKM'},
+  {cat:'Hilfsmittel',      name:'Smiley Puster'},
+].map((it,i)=>({id:'p'+(i+1),...it}));
+const PACK_CATS=['Absaugen','Atmung & Notfall','Trachealkanüle','PEG','Messgeräte','Medikamente','Haut & Hygiene','Hilfsmittel','Sonstiges'];
 const MONATE_DE=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 
 /* ── STATE ──
@@ -1111,6 +1186,10 @@ let db={}, team=[], medDefs=[], orderCatalog=[];   // db[key] = entry
 let wechselDone={};      // wechselDone[taskId][ISO-Datum] = Pflegerin-Name oder 1
 let wechselMonth='';     // 'YYYY-MM' im Monatsraster angezeigt
 let wechselSeedV=0;      // Version des eingespielten Papier-Startstands
+let packItems=[];        // Packlisten-Katalog (bearbeitbar)
+let packChecked={};      // packChecked[itemId] = Pflegerin-Name oder 1
+let packTrip='';         // Name der aktuellen Reise
+let packEdit=false;      // Bearbeitungsmodus der Packliste
 let curDate=todayISO(), curDienst='Frühdienst';
 let isDirty=false;
 let painSel=-1, checks={}, radios={}, durations={};
@@ -1155,7 +1234,7 @@ async function doSetup(){
     });
     if(r.status===404){
       // File doesn't exist yet – create it with empty data
-      const body=JSON.stringify({entries:{},team:[],medDefs:[],orderCatalog:DEFAULT_ORDER_CATALOG,wechselDone:{},wechselSeedV:0,version:4});
+      const body=JSON.stringify({entries:{},team:[],medDefs:[],orderCatalog:DEFAULT_ORDER_CATALOG,wechselDone:{},wechselSeedV:0,packItems:DEFAULT_PACK_ITEMS,packChecked:{},packTrip:'',version:4});
       const cr=await fetch(`${GH_API}/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`,{
         method:'PUT',
         headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json','Content-Type':'application/json'},
@@ -1233,11 +1312,14 @@ function setSyncBar(state,msg){
 }
 async function loadFromCloud(){
   // Lokalen Cache vorab sichern – könnte Einträge haben, die noch nicht auf GitHub sind
-  let localEntries={},localTeam=[],localMedDefs=[],localOrderCatalog=[],localWechsel={};
+  let localEntries={},localTeam=[],localMedDefs=[],localOrderCatalog=[],localWechsel={},localPackItems=null,localPackChecked=null,localPackTrip=null;
   try{
     const c=JSON.parse(localStorage.getItem(LS_CACHE)||'{}');
     localEntries=c.entries||c.days||{};
     localTeam=c.team||[];localMedDefs=c.medDefs||[];localOrderCatalog=c.orderCatalog||[];localWechsel=c.wechselDone||{};wechselSeedV=c.wechselSeedV||0;
+    if(c.packItems)localPackItems=c.packItems;
+    if(c.packChecked)localPackChecked=c.packChecked;
+    if(typeof c.packTrip==='string')localPackTrip=c.packTrip;
   }catch{}
 
   setSyncBar('syncing','⏳ Lade Daten…');
@@ -1264,9 +1346,12 @@ async function loadFromCloud(){
     orderCatalog=rec.orderCatalog||(localOrderCatalog.length?localOrderCatalog:DEFAULT_ORDER_CATALOG);
     wechselDone=mergeWechsel(rec.wechselDone||{},localWechsel);
     wechselSeedV=rec.wechselSeedV||0;
+    packItems=rec.packItems||localPackItems||DEFAULT_PACK_ITEMS.map(i=>({...i}));
+    packChecked=rec.packChecked||localPackChecked||{};
+    packTrip=rec.packTrip!==undefined?rec.packTrip:(localPackTrip||'');
     const seedNeeded=wechselSeedV<WECHSEL_SEED_V;
     if(seedNeeded)applyWechselSeed();
-    localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,sha:currentSha}));
+    localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,packItems,packChecked,packTrip,sha:currentSha}));
 
     if(newLocal>0||seedNeeded){
       setSyncBar('syncing',`⏳ ${newLocal} lokale Einträge werden hochgeladen…`);
@@ -1277,6 +1362,7 @@ async function loadFromCloud(){
     }
   }catch(e){
     db=localEntries;team=localTeam;medDefs=localMedDefs;orderCatalog=localOrderCatalog.length?localOrderCatalog:DEFAULT_ORDER_CATALOG;wechselDone=localWechsel;
+    packItems=localPackItems||DEFAULT_PACK_ITEMS.map(i=>({...i}));packChecked=localPackChecked||{};packTrip=localPackTrip||'';
     if(wechselSeedV<WECHSEL_SEED_V)applyWechselSeed();
     setSyncBar('error','⚠️ Offline – lokaler Cache · '+e.message);
   }
@@ -1295,8 +1381,8 @@ async function saveToCloud(opts={}){
     return;
   }
 
-  const payload=JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,version:4,lastSaved:new Date().toISOString()});
-  localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,sha:currentSha}));
+  const payload=JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,packItems,packChecked,packTrip,version:4,lastSaved:new Date().toISOString()});
+  localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,packItems,packChecked,packTrip,sha:currentSha}));
   try{
     const body={message:'Pflege-Doku update '+new Date().toISOString(),content:b64encode(payload)};
     if(currentSha)body.sha=currentSha;
@@ -1308,10 +1394,10 @@ async function saveToCloud(opts={}){
     if(!r.ok){const e=await r.json();throw new Error(e.message||'HTTP '+r.status)}
     const meta=await r.json();
     currentSha=meta.content.sha;
-    localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,sha:currentSha}));
+    localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,packItems,packChecked,packTrip,sha:currentSha}));
 
     // ── Backup nach jedem erfolgreichen Speichern aktualisieren ──
-    localStorage.setItem('pflege_backup',JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,savedAt:new Date().toISOString()}));
+    localStorage.setItem('pflege_backup',JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,packItems,packChecked,packTrip,savedAt:new Date().toISOString()}));
     // Backup-Datei auf GitHub: bei normalen Speicherungen immer,
     // bei Wechselplan-Haken höchstens alle 30 Minuten (data.json hat ohnehin Git-Historie)
     const lastBk=+(localStorage.getItem('pflege_backup_ts')||0);
@@ -1350,9 +1436,9 @@ async function restoreFromBackup(){
     const rec=JSON.parse(b64decode(meta.content.replace(/\n/g,'')));
     const cnt=Object.keys(rec.entries||{}).length;
     if(!confirm(`Backup enthält ${cnt} Einträge. Wiederherstellen?`))return;
-    db=rec.entries||{};team=rec.team||[];medDefs=rec.medDefs||[];orderCatalog=rec.orderCatalog||orderCatalog;wechselDone=rec.wechselDone||{};wechselSeedV=rec.wechselSeedV||0;
+    db=rec.entries||{};team=rec.team||[];medDefs=rec.medDefs||[];orderCatalog=rec.orderCatalog||orderCatalog;wechselDone=rec.wechselDone||{};wechselSeedV=rec.wechselSeedV||0;packItems=rec.packItems||packItems;packChecked=rec.packChecked||{};packTrip=rec.packTrip||'';
     await saveToCloud();
-    loadEntry();renderVerlauf();renderStats();renderOrderCatalog();renderOrderCatalogEdit();renderWechsel();
+    loadEntry();renderVerlauf();renderStats();renderOrderCatalog();renderOrderCatalogEdit();renderWechsel();renderPack();
     showToast(`✅ Backup mit ${cnt} Einträgen wiederhergestellt`);
   }catch(e){
     setSyncBar('error','⚠️ Backup-Fehler: '+e.message);
@@ -1372,7 +1458,7 @@ function fixLayout(){
 function init(){
   buildPain();autoDetectDienst();updateHeaderUI();updateDateDisplay();
   renderTeamList();renderMedDefList();renderMedPresets();renderOrderCatalog();renderOrderCatalogEdit();
-  loadEntry();renderVerlauf();renderStats();renderWechsel();
+  loadEntry();renderVerlauf();renderStats();renderWechsel();renderPack();
   fixLayout();
   // Erinnerung beim Start: was ist heute zu wechseln/laden?
   const dueN=updateWechselBadge();
@@ -1381,7 +1467,7 @@ function init(){
   window.addEventListener('orientationchange', ()=>setTimeout(fixLayout, 200));
   setInterval(async()=>{
     checkMidnight();
-    if(!isDirty){await loadFromCloud();loadEntry();renderVerlauf();renderStats();renderWechsel()}
+    if(!isDirty){await loadFromCloud();loadEntry();renderVerlauf();renderStats();renderWechsel();renderPack()}
   },60000);
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkMidnight();});
 }
@@ -1517,6 +1603,7 @@ function showTab(name,btn){
   if(name==='stats')renderStats();
   if(name==='verlauf')renderVerlauf();
   if(name==='wechsel')renderWechsel();
+  if(name==='pack')renderPack();
   closeMenu();
 }
 function toggleMenu(){
@@ -1882,6 +1969,78 @@ function sendOrder(){
   const mailto='mailto:'+ORDER_EMAIL+'?subject='+encodeURIComponent('VO Sarah Salin')+'&body='+encodeURIComponent(body);
   window.location.href=mailto;
 }
+/* ── PACKLISTE ── */
+function packSave(){
+  clearTimeout(packSave._t);
+  packSave._t=setTimeout(()=>saveToCloud({light:true}),5000);
+}
+function packToggle(id){
+  if(packChecked[id])delete packChecked[id];
+  else packChecked[id]=$id('hdr-pflegerin')?.value||1;
+  renderPack();packSave();
+}
+function packSetTrip(v){packTrip=v;packSave()}
+function packReset(){
+  const n=Object.keys(packChecked).length;
+  if(n&&!confirm(`${n} Haken zurücksetzen? Die Liste der Gegenstände bleibt erhalten.`))return;
+  packChecked={};renderPack();packSave();
+  showToast('🧳 Packliste zurückgesetzt');
+}
+function togglePackEdit(){
+  packEdit=!packEdit;
+  $id('pk-editbtn').textContent=packEdit?'✓ Fertig':'✏️ Bearbeiten';
+  renderPack();
+  if(!packEdit)packSave();
+}
+function packAddItem(cat){
+  packItems.push({id:'p'+Date.now().toString(36),cat,name:''});
+  renderPack();
+  const inp=$id('pkList').querySelector('.mdinput[value=""]')||[...$id('pkList').querySelectorAll('.mdinput')].pop();
+  inp?.focus();
+}
+function packDelItem(id){
+  const it=packItems.find(i=>i.id===id);
+  if(it&&it.name&&!confirm('„'+it.name+'“ aus der Liste löschen?'))return;
+  packItems=packItems.filter(i=>i.id!==id);
+  delete packChecked[id];
+  renderPack();packSave();
+}
+function renderPack(){
+  const trip=$id('pk-trip');
+  if(trip&&document.activeElement!==trip)trip.value=packTrip;
+  const total=packItems.length, done=packItems.filter(i=>packChecked[i.id]).length;
+  $id('pk-count').textContent=done;
+  $id('pk-total').textContent=total;
+  $id('pk-prog').style.width=total?Math.round(done/total*100)+'%':'0%';
+  $id('pk-left').textContent=total&&done===total?'✓ vollständig':(total-done)+' fehlen noch';
+
+  const cats=PACK_CATS.filter(c=>packItems.some(i=>i.cat===c));
+  if(packEdit)cats.push(...PACK_CATS.filter(c=>!cats.includes(c)));
+  let h='';
+  cats.forEach(cat=>{
+    h+=`<div class="wp-grp">${escH(cat)}</div>`;
+    packItems.filter(i=>i.cat===cat).forEach(i=>{
+      if(packEdit){
+        h+=`<div class="pk-row">
+          <input class="mdinput" value="${escH(i.name)}" placeholder="Gegenstand…" oninput="packItems.find(x=>x.id==='${i.id}').name=this.value">
+          <select class="mdinput" style="flex:0 0 118px" onchange="packItems.find(x=>x.id==='${i.id}').cat=this.value;renderPack()">
+            ${PACK_CATS.map(c=>`<option${c===i.cat?' selected':''}>${escH(c)}</option>`).join('')}
+          </select>
+          <button class="del-btn" onclick="packDelItem('${i.id}')">✕</button></div>`;
+      }else{
+        const on=!!packChecked[i.id], who=packChecked[i.id];
+        h+=`<div class="pk-row${on?' on':''}">
+          <div class="wp-box${on?' on':''}" onclick="packToggle('${i.id}')">✓</div>
+          <div class="pk-name" onclick="packToggle('${i.id}')">${escH(i.name)}</div>
+          ${typeof who==='string'&&who?'<span class="pk-who">'+escH(who)+'</span>':''}</div>`;
+      }
+    });
+    if(packEdit)h+=`<button class="addbtn" style="margin-top:6px" onclick="packAddItem('${cat.replace(/'/g,"\\'")}')">+ Gegenstand</button>`;
+  });
+  if(!total&&!packEdit)h='<div style="color:var(--text3);font-size:13px">Noch keine Gegenstände. Auf „Bearbeiten“ tippen, um welche anzulegen.</div>';
+  $id('pkList').innerHTML=h;
+}
+
 /* ── WECHSELPLAN ── */
 /* Cloud-Stand mit lokalen, noch nicht hochgeladenen Haken zusammenführen */
 function mergeWechsel(cloud,local){
