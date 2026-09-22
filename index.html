@@ -1077,7 +1077,6 @@ const ALL_TXT=['v-puls','v-spo2','v-rr-s','v-rr-d','v-temp','pain-time','pain-co
   'atem-fd','haut-besch',
   'f-sonde','f-infus','f-sonst-ein','pflegebericht','besond',
   'photo-gastrotube','photo-stoma','photo-bericht'];
-const ALL_CK=['ck-absaug','ck-lifter','ck-cough2','ck-notfall','ck-pulso','ck-hausarzt','ck-neurologe','ck-cabs','ck-phoniatrie','ck-hno','ck-gyn','ck-zahnarzt','ck-zahnprophylaxe'];
 const DRINK_ICO={Kaffee:'☕',Tee:'🍵',Wasser:'💧',Saft:'🍹',Milch:'🥛',Sonstiges:'🥤'};
 const DEFAULT_ORDER_CATALOG=[
   {cat:'Hilfsmittel',name:'Provox FlexiDerm runde Tracheostomapflaster',unit:'Packungen'},
@@ -1681,8 +1680,10 @@ function tick(id){
   dirty();
 }
 function applyChecksUI(){
-  ALL_CK.forEach(id=>{
-    const box=$id(id);if(!box)return;
+  // Alle Kästchen direkt aus der Seite lesen – eine Liste würde bei neuen Kästchen vergessen
+  // (so blieben Periode, Inhalation, Cough Assist und Bewegungstrainer beim Tageswechsel stehen)
+  document.querySelectorAll('.cbox[id^="ck-"]').forEach(box=>{
+    const id=box.id;
     const tel=$id('ct-'+id.slice(3));
     if(checks[id]!==undefined){box.classList.add('on');if(tel)tel.textContent=checks[id]}
     else{box.classList.remove('on');if(tel)tel.textContent=''}
