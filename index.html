@@ -925,114 +925,33 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 
 <!-- ══ IMPFUNGEN ══ -->
 <div class="page" id="pg-impfungen">
-  <div style="font-size:12px;color:var(--text3);padding:2px 2px 10px">Sarah Salin · geb. 29.04.1986 · Quelle: Impfbuch</div>
-
   <div class="card">
-    <div class="card-head">💉 COVID-19</div>
-    <div class="card-body" style="padding:10px 14px">
-      <table class="impf-table">
-        <tr><td class="impf-date">21.03.2021</td><td>Dosis 1</td><td class="impf-praep">COMIRNATY (Ch.-B. ER7812)</td></tr>
-        <tr><td class="impf-date">12.04.2021</td><td>Dosis 2</td><td class="impf-praep">COMIRNATY (Ch.-B. EW8904)</td></tr>
-        <tr><td class="impf-date">03.12.2021</td><td>Dosis 3</td><td class="impf-praep">COMIRNATY (Ch.-B. 1F1023A)</td></tr>
-        <tr><td class="impf-date">07.11.2022</td><td>Dosis 4</td><td class="impf-praep">COMIRNATY Bivalent BA.4-5 (Ch.-B. GH9715)</td></tr>
-        <tr><td class="impf-date">21.11.2023</td><td>Dosis 5</td><td class="impf-praep">COMIRNATY</td></tr>
-        <tr><td class="impf-date">25.11.2024</td><td>Dosis 6</td><td class="impf-praep">COMIRNATY JN.1 bretovameran</td></tr>
-      </table>
+    <div class="card-head">💉 Impfung eintragen</div>
+    <div class="card-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;overflow:hidden">
+        <div class="vi" style="min-width:0;overflow:hidden"><div class="vlabel">Datum</div>
+          <input type="date" id="if-datum" class="vinput" style="font-size:13px;padding:7px 4px;width:100%;min-width:0;box-sizing:border-box"></div>
+        <div class="vi" style="min-width:0;overflow:hidden"><div class="vlabel">Impfung</div>
+          <select id="if-grp" class="mdinput" style="width:100%;min-width:0;box-sizing:border-box"></select></div>
+      </div>
+      <div class="sec-lbl">Bezeichnung</div>
+      <input id="if-bez" class="mdinput" style="width:100%;box-sizing:border-box;margin-bottom:8px" placeholder="z. B. Saison 2026/27 oder Dosis 4">
+      <div class="sec-lbl">Präparat &amp; Chargennummer (kann nachgetragen werden)</div>
+      <input id="if-praep" class="mdinput" style="width:100%;box-sizing:border-box;margin-bottom:10px" placeholder="z. B. Influvac Tetra (Ch.-B. Z05)">
+      <button class="savebtn" onclick="addImpf()">+ Impfung eintragen</button>
     </div>
   </div>
-
   <div class="card">
-    <div class="card-head">🤧 Influenza</div>
-    <div class="card-body" style="padding:10px 14px">
-      <table class="impf-table">
-        <tr><td class="impf-date">19.11.2021</td><td>Saison 2021/22</td><td class="impf-praep">Influvac Tetra (Ch.-B. Z05)</td></tr>
-        <tr><td class="impf-date">~2022</td><td>Saison 2022/23</td><td class="impf-praep">Influvac Tetra (Ch.-B. E01)</td></tr>
-        <tr><td class="impf-date">14.11.2023</td><td>Saison 2023/24</td><td class="impf-praep">Influvac</td></tr>
-      </table>
+    <div class="card-head wp-fold" onclick="wpFold('impfBody',this)">📖 Impfhistorie <span class="wp-chev">▸</span></div>
+    <div class="card-body" id="impfBody" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <span style="font-size:12px;color:var(--text3)" id="impfCount">—</span>
+        <button class="addbtn" id="impfEditBtn" onclick="toggleImpfEdit()">✏️ Bearbeiten</button>
+      </div>
+      <div id="impfList"></div>
     </div>
   </div>
-
-  <div class="card">
-    <div class="card-head">🫁 Pneumokokken</div>
-    <div class="card-body" style="padding:10px 14px">
-      <table class="impf-table">
-        <tr><td class="impf-date">10.09.2021</td><td>Dosis 1</td><td class="impf-praep">Pneumovax 23</td></tr>
-        <tr><td class="impf-date">02.11.2023</td><td>Dosis 2</td><td class="impf-praep">Pneumokokken</td></tr>
-      </table>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-head">💪 Tetanus · Diphtherie · Pertussis</div>
-    <div class="card-body" style="padding:10px 14px">
-      <table class="impf-table">
-        <tr><td class="impf-date">29.08.1986</td><td>DT (1)</td><td class="impf-praep">DT-Wellcovax</td></tr>
-        <tr><td class="impf-date">~1986</td><td>DT (2)</td><td class="impf-praep">DT-Wellcovax</td></tr>
-        <tr><td class="impf-date">18.09.1987</td><td>DT (3)</td><td class="impf-praep">DT-Impfstoff Behring</td></tr>
-        <tr><td class="impf-date">15.09.1992</td><td>Td</td><td class="impf-praep">Td-Impfstoff Behring</td></tr>
-        <tr><td class="impf-date">15.10.1997</td><td>Td</td><td class="impf-praep">Td-Impfstoff Behring</td></tr>
-        <tr><td class="impf-date">2007</td><td>Td</td><td class="impf-praep">Td</td></tr>
-        <tr><td class="impf-date">11.02.2008</td><td>Tdap</td><td class="impf-praep">Boostrix (Ch.-B. AC37B024DJ)</td></tr>
-        <tr><td class="impf-date">04.01.2018</td><td>Tdap-IPV</td><td class="impf-praep">Repevax (Ch.-B. M0019-1 6285-A)</td></tr>
-      </table>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-head">🧬 Masern · Mumps · Röteln</div>
-    <div class="card-body" style="padding:10px 14px">
-      <table class="impf-table">
-        <tr><td class="impf-date">24.11.1987</td><td>MMR</td><td class="impf-praep">M-M-R</td></tr>
-        <tr><td class="impf-date">Dez. 1989</td><td>Röteln</td><td class="impf-praep">–</td></tr>
-        <tr><td class="impf-date">Sep. 1999</td><td>Röteln</td><td class="impf-praep">Gesundheitsamt</td></tr>
-      </table>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-head">💉 Polio</div>
-    <div class="card-body" style="padding:10px 14px">
-      <table class="impf-table">
-        <tr><td class="impf-date">29.08.1986</td><td>Dosis 1</td><td class="impf-praep">Oral-Virelon</td></tr>
-        <tr><td class="impf-date">~1986</td><td>Dosis 2</td><td class="impf-praep">Oral-Virelon</td></tr>
-        <tr><td class="impf-date">18.09.1987</td><td>Dosis 3</td><td class="impf-praep">Oral-Virelon</td></tr>
-        <tr><td class="impf-date">15.10.1997</td><td>Auffrischung</td><td class="impf-praep">PolyVaccinol</td></tr>
-        <tr><td class="impf-date">2007</td><td>Auffrischung</td><td class="impf-praep">–</td></tr>
-        <tr><td class="impf-date">04.01.2018</td><td>in Repevax</td><td class="impf-praep">Tdap-IPV</td></tr>
-      </table>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-head">💉 HPV</div>
-    <div class="card-body" style="padding:10px 14px">
-      <table class="impf-table">
-        <tr><td class="impf-date">29.11.2007</td><td>Dosis 1</td><td class="impf-praep">GARDASIL (Ch.-B. NF58550)</td></tr>
-        <tr><td class="impf-date">~2007/08</td><td>Dosis 2</td><td class="impf-praep">GARDASIL (Ch.-B. NF14205)</td></tr>
-        <tr><td class="impf-date">~2008</td><td>Dosis 3</td><td class="impf-praep">GARDASIL (Ch.-B. NH10940)</td></tr>
-      </table>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-head">🩸 Hepatitis B</div>
-    <div class="card-body" style="padding:10px 14px">
-      <table class="impf-table">
-        <tr><td class="impf-date">15.10.1997</td><td>Dosis 1</td><td class="impf-praep">Gen H-B-Vax K (Ch.-B. 457011)</td></tr>
-        <tr><td class="impf-date">25.11.1997</td><td>Dosis 2</td><td class="impf-praep">Gen H-B-Vax K (Ch.-B. 492011)</td></tr>
-        <tr><td class="impf-date">20.05.2019</td><td>Boost</td><td class="impf-praep">Engerix-B (Ch.-B. AHBVC768AE)</td></tr>
-      </table>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-head">🫧 Tuberkulose (BCG)</div>
-    <div class="card-body" style="padding:10px 14px">
-      <table class="impf-table">
-        <tr><td class="impf-date">02.05.1986</td><td>BCG</td><td class="impf-praep">Knappschafts-Krankenhaus Bochum-Langendreer</td></tr>
-      </table>
-    </div>
-  </div>
+  <div style="font-size:11px;color:var(--text3);padding:2px 4px 10px">Sarah Salin · geb. 29.04.1986 · Grundbestand aus dem Impfbuch</div>
 </div>
 
 <div class="page" id="pg-team">
@@ -1174,6 +1093,48 @@ const DEFAULT_PACK_ITEMS=[
   {cat:'Hilfsmittel',      name:'IKM'},
   {cat:'Hilfsmittel',      name:'Smiley Puster'},
 ].map((it,i)=>({id:'p'+(i+1),...it}));
+/* Impfungen – Startbestand aus dem Impfbuch (Fotos vom 29.08.2026). Unscharfe Daten
+   wie "~2022" stehen in `text`, exakte in `datum` (ISO, sortierbar). */
+const DEFAULT_IMPF=[
+  {id:'i1',grp:'COVID-19',datum:'2021-03-21',text:'',bez:'Dosis 1',praep:'COMIRNATY (Ch.-B. ER7812)'},
+  {id:'i2',grp:'COVID-19',datum:'2021-04-12',text:'',bez:'Dosis 2',praep:'COMIRNATY (Ch.-B. EW8904)'},
+  {id:'i3',grp:'COVID-19',datum:'2021-12-03',text:'',bez:'Dosis 3',praep:'COMIRNATY (Ch.-B. 1F1023A)'},
+  {id:'i4',grp:'COVID-19',datum:'2022-11-07',text:'',bez:'Dosis 4',praep:'COMIRNATY Bivalent BA.4-5 (Ch.-B. GH9715)'},
+  {id:'i5',grp:'COVID-19',datum:'2023-11-21',text:'',bez:'Dosis 5',praep:'COMIRNATY'},
+  {id:'i6',grp:'COVID-19',datum:'2024-11-25',text:'',bez:'Dosis 6',praep:'COMIRNATY JN.1 bretovameran'},
+  {id:'i7',grp:'Influenza',datum:'2021-11-19',text:'',bez:'Saison 2021/22',praep:'Influvac Tetra (Ch.-B. Z05)'},
+  {id:'i8',grp:'Influenza',datum:'',text:'~2022',bez:'Saison 2022/23',praep:'Influvac Tetra (Ch.-B. E01)'},
+  {id:'i9',grp:'Influenza',datum:'2023-11-14',text:'',bez:'Saison 2023/24',praep:'Influvac'},
+  {id:'i10',grp:'Pneumokokken',datum:'2021-09-10',text:'',bez:'Dosis 1',praep:'Pneumovax 23'},
+  {id:'i11',grp:'Pneumokokken',datum:'2023-11-02',text:'',bez:'Dosis 2',praep:'Pneumokokken'},
+  {id:'i12',grp:'Tetanus · Diphtherie · Pertussis',datum:'1986-08-29',text:'',bez:'DT (1)',praep:'DT-Wellcovax'},
+  {id:'i13',grp:'Tetanus · Diphtherie · Pertussis',datum:'',text:'~1986',bez:'DT (2)',praep:'DT-Wellcovax'},
+  {id:'i14',grp:'Tetanus · Diphtherie · Pertussis',datum:'1987-09-18',text:'',bez:'DT (3)',praep:'DT-Impfstoff Behring'},
+  {id:'i15',grp:'Tetanus · Diphtherie · Pertussis',datum:'1992-09-15',text:'',bez:'Td',praep:'Td-Impfstoff Behring'},
+  {id:'i16',grp:'Tetanus · Diphtherie · Pertussis',datum:'1997-10-15',text:'',bez:'Td',praep:'Td-Impfstoff Behring'},
+  {id:'i17',grp:'Tetanus · Diphtherie · Pertussis',datum:'',text:'2007',bez:'Td',praep:'Td'},
+  {id:'i18',grp:'Tetanus · Diphtherie · Pertussis',datum:'2008-02-11',text:'',bez:'Tdap',praep:'Boostrix (Ch.-B. AC37B024DJ)'},
+  {id:'i19',grp:'Tetanus · Diphtherie · Pertussis',datum:'2018-01-04',text:'',bez:'Tdap-IPV',praep:'Repevax (Ch.-B. M0019-1 6285-A)'},
+  {id:'i20',grp:'Masern · Mumps · Röteln',datum:'1987-11-24',text:'',bez:'MMR',praep:'M-M-R'},
+  {id:'i21',grp:'Masern · Mumps · Röteln',datum:'',text:'Dez. 1989',bez:'Röteln',praep:'–'},
+  {id:'i22',grp:'Masern · Mumps · Röteln',datum:'',text:'Sep. 1999',bez:'Röteln',praep:'Gesundheitsamt'},
+  {id:'i23',grp:'Polio',datum:'1986-08-29',text:'',bez:'Dosis 1',praep:'Oral-Virelon'},
+  {id:'i24',grp:'Polio',datum:'',text:'~1986',bez:'Dosis 2',praep:'Oral-Virelon'},
+  {id:'i25',grp:'Polio',datum:'1987-09-18',text:'',bez:'Dosis 3',praep:'Oral-Virelon'},
+  {id:'i26',grp:'Polio',datum:'1997-10-15',text:'',bez:'Auffrischung',praep:'PolyVaccinol'},
+  {id:'i27',grp:'Polio',datum:'',text:'2007',bez:'Auffrischung',praep:'–'},
+  {id:'i28',grp:'Polio',datum:'2018-01-04',text:'',bez:'in Repevax',praep:'Tdap-IPV'},
+  {id:'i29',grp:'HPV',datum:'2007-11-29',text:'',bez:'Dosis 1',praep:'GARDASIL (Ch.-B. NF58550)'},
+  {id:'i30',grp:'HPV',datum:'',text:'~2007/08',bez:'Dosis 2',praep:'GARDASIL (Ch.-B. NF14205)'},
+  {id:'i31',grp:'HPV',datum:'',text:'~2008',bez:'Dosis 3',praep:'GARDASIL (Ch.-B. NH10940)'},
+  {id:'i32',grp:'Hepatitis B',datum:'1997-10-15',text:'',bez:'Dosis 1',praep:'Gen H-B-Vax K (Ch.-B. 457011)'},
+  {id:'i33',grp:'Hepatitis B',datum:'1997-11-25',text:'',bez:'Dosis 2',praep:'Gen H-B-Vax K (Ch.-B. 492011)'},
+  {id:'i34',grp:'Hepatitis B',datum:'2019-05-20',text:'',bez:'Boost',praep:'Engerix-B (Ch.-B. AHBVC768AE)'},
+  {id:'i35',grp:'Tuberkulose (BCG)',datum:'1986-05-02',text:'',bez:'BCG',praep:'Knappschafts-Krankenhaus Bochum-Langendreer'},
+];
+const IMPF_GRUPPEN=['COVID-19','Influenza','Pneumokokken','Tetanus · Diphtherie · Pertussis','Masern · Mumps · Röteln','Polio','HPV','Hepatitis B','Tuberkulose (BCG)','Sonstiges'];
+const IMPF_ICO={'COVID-19':'💉','Influenza':'🤧','Pneumokokken':'🫁','Tetanus · Diphtherie · Pertussis':'💪','Masern · Mumps · Röteln':'🧬','Polio':'💉','HPV':'💉','Hepatitis B':'🩸','Tuberkulose (BCG)':'🫧','Sonstiges':'💉'};
+const IMPF_SEED_V=1;
 const PACK_CATS=['Absaugen','Atmung & Notfall','Trachealkanüle','PEG','Messgeräte','Medikamente','Haut & Hygiene','Hilfsmittel','Sonstiges'];
 const MONATE_DE=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
 
@@ -1189,6 +1150,9 @@ let packItems=[];        // Packlisten-Katalog (bearbeitbar)
 let packChecked={};      // packChecked[itemId] = Pflegerin-Name oder 1
 let packTrip='';         // Name der aktuellen Reise
 let packEdit=false;      // Bearbeitungsmodus der Packliste
+let impfungen=[];        // Impfhistorie (bearbeitbar)
+let impfSeedV=0;         // Version des eingespielten Impfbuch-Startbestands
+let impfEdit=false;      // Bearbeitungsmodus der Impfliste
 let curDate=todayISO(), curDienst='Frühdienst';
 let isDirty=false;
 let painSel=-1, checks={}, radios={}, durations={};
@@ -1236,7 +1200,7 @@ async function doSetup(){
     });
     if(r.status===404){
       // File doesn't exist yet – create it with empty data
-      const body=JSON.stringify({entries:{},team:[],medDefs:[],orderCatalog:DEFAULT_ORDER_CATALOG,wechselDone:{},wechselSeedV:0,packItems:DEFAULT_PACK_ITEMS,packChecked:{},packTrip:'',version:4});
+      const body=JSON.stringify({entries:{},team:[],medDefs:[],orderCatalog:DEFAULT_ORDER_CATALOG,wechselDone:{},wechselSeedV:0,packItems:DEFAULT_PACK_ITEMS,packChecked:{},packTrip:'',impfungen:DEFAULT_IMPF,impfSeedV:IMPF_SEED_V,version:4});
       const cr=await fetch(`${GH_API}/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`,{
         method:'PUT',
         headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json','Content-Type':'application/json'},
@@ -1314,7 +1278,7 @@ function setSyncBar(state,msg){
 }
 async function loadFromCloud(){
   // Lokalen Cache vorab sichern – könnte Einträge haben, die noch nicht auf GitHub sind
-  let localEntries={},localTeam=[],localMedDefs=[],localOrderCatalog=[],localWechsel={},localPackItems=null,localPackChecked=null,localPackTrip=null;
+  let localEntries={},localTeam=[],localMedDefs=[],localOrderCatalog=[],localWechsel={},localPackItems=null,localPackChecked=null,localPackTrip=null,localImpf=null;
   try{
     const c=JSON.parse(localStorage.getItem(LS_CACHE)||'{}');
     localEntries=c.entries||c.days||{};
@@ -1322,6 +1286,8 @@ async function loadFromCloud(){
     if(c.packItems)localPackItems=c.packItems;
     if(c.packChecked)localPackChecked=c.packChecked;
     if(typeof c.packTrip==='string')localPackTrip=c.packTrip;
+    if(c.impfungen)localImpf=c.impfungen;
+    impfSeedV=c.impfSeedV||0;
   }catch{}
 
   setSyncBar('syncing','⏳ Lade Daten…');
@@ -1351,9 +1317,12 @@ async function loadFromCloud(){
     packItems=rec.packItems||localPackItems||DEFAULT_PACK_ITEMS.map(i=>({...i}));
     packChecked=rec.packChecked||localPackChecked||{};
     packTrip=rec.packTrip!==undefined?rec.packTrip:(localPackTrip||'');
-    const seedNeeded=wechselSeedV<WECHSEL_SEED_V;
+    impfungen=rec.impfungen||localImpf||[];
+    impfSeedV=rec.impfSeedV||impfSeedV||0;
+    let seedNeeded=wechselSeedV<WECHSEL_SEED_V;
     if(seedNeeded)applyWechselSeed();
-    localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,packItems,packChecked,packTrip,sha:currentSha}));
+    if(impfSeedV<IMPF_SEED_V){applyImpfSeed();seedNeeded=true;}
+    localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,packItems,packChecked,packTrip,impfungen,impfSeedV,sha:currentSha}));
 
     if(newLocal>0||seedNeeded){
       setSyncBar('syncing',`⏳ ${newLocal} lokale Einträge werden hochgeladen…`);
@@ -1365,6 +1334,7 @@ async function loadFromCloud(){
   }catch(e){
     db=localEntries;team=localTeam;medDefs=localMedDefs;orderCatalog=localOrderCatalog.length?localOrderCatalog:DEFAULT_ORDER_CATALOG;wechselDone=localWechsel;
     packItems=localPackItems||DEFAULT_PACK_ITEMS.map(i=>({...i}));packChecked=localPackChecked||{};packTrip=localPackTrip||'';
+    impfungen=localImpf||[];if(impfSeedV<IMPF_SEED_V)applyImpfSeed();
     if(wechselSeedV<WECHSEL_SEED_V)applyWechselSeed();
     setSyncBar('error','⚠️ Offline – lokaler Cache · '+e.message);
   }
@@ -1383,8 +1353,8 @@ async function saveToCloud(opts={}){
     return false;
   }
 
-  const payload=JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,packItems,packChecked,packTrip,version:4,lastSaved:new Date().toISOString()});
-  localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,packItems,packChecked,packTrip,sha:currentSha}));
+  const payload=JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,packItems,packChecked,packTrip,impfungen,impfSeedV,version:4,lastSaved:new Date().toISOString()});
+  localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,packItems,packChecked,packTrip,impfungen,impfSeedV,sha:currentSha}));
   try{
     const put=async (sha,inhalt)=>{
       const body={message:'Pflege-Doku update '+new Date().toISOString(),content:b64encode(inhalt)};
@@ -1413,17 +1383,17 @@ async function saveToCloud(opts={}){
           Object.entries(rec.entries||{}).forEach(([k,v])=>{if(!db[k])db[k]=v});
           wechselDone=mergeWechsel(rec.wechselDone||{},wechselDone);
         }catch{}
-        gesendet=JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,packItems,packChecked,packTrip,version:4,lastSaved:new Date().toISOString()});
+        gesendet=JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,packItems,packChecked,packTrip,impfungen,impfSeedV,version:4,lastSaved:new Date().toISOString()});
         r=await put(currentSha,gesendet);
       }
     }
     if(!r.ok){const e=await r.json();throw new Error(e.message||'HTTP '+r.status)}
     const meta=await r.json();
     currentSha=meta.content.sha;
-    localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,packItems,packChecked,packTrip,sha:currentSha}));
+    localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,packItems,packChecked,packTrip,impfungen,impfSeedV,sha:currentSha}));
 
     // ── Backup nach jedem erfolgreichen Speichern aktualisieren ──
-    localStorage.setItem('pflege_backup',JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,packItems,packChecked,packTrip,savedAt:new Date().toISOString()}));
+    localStorage.setItem('pflege_backup',JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,packItems,packChecked,packTrip,impfungen,impfSeedV,savedAt:new Date().toISOString()}));
     // Backup-Datei auf GitHub: bei normalen Speicherungen immer,
     // bei Wechselplan-Haken höchstens alle 30 Minuten (data.json hat ohnehin Git-Historie)
     const lastBk=+(localStorage.getItem('pflege_backup_ts')||0);
@@ -1464,9 +1434,9 @@ async function restoreFromBackup(){
     const rec=JSON.parse(b64decode(meta.content.replace(/\n/g,'')));
     const cnt=Object.keys(rec.entries||{}).length;
     if(!confirm(`Backup enthält ${cnt} Einträge. Wiederherstellen?`))return;
-    db=rec.entries||{};team=rec.team||[];medDefs=rec.medDefs||[];orderCatalog=rec.orderCatalog||orderCatalog;wechselDone=rec.wechselDone||{};wechselSeedV=rec.wechselSeedV||0;packItems=rec.packItems||packItems;packChecked=rec.packChecked||{};packTrip=rec.packTrip||'';
+    db=rec.entries||{};team=rec.team||[];medDefs=rec.medDefs||[];orderCatalog=rec.orderCatalog||orderCatalog;wechselDone=rec.wechselDone||{};wechselSeedV=rec.wechselSeedV||0;packItems=rec.packItems||packItems;packChecked=rec.packChecked||{};packTrip=rec.packTrip||'';impfungen=rec.impfungen||impfungen;impfSeedV=rec.impfSeedV||0;
     await saveToCloud();
-    loadEntry();renderVerlauf();renderStats();renderOrderCatalog();renderOrderCatalogEdit();renderWechsel();renderPack();
+    loadEntry();renderVerlauf();renderStats();renderOrderCatalog();renderOrderCatalogEdit();renderWechsel();renderPack();renderImpf();
     showToast(`✅ Backup mit ${cnt} Einträgen wiederhergestellt`);
   }catch(e){
     setSyncBar('error','⚠️ Backup-Fehler: '+e.message);
@@ -1486,7 +1456,7 @@ function fixLayout(){
 function init(){
   buildPain();autoDetectDienst();updateHeaderUI();updateDateDisplay();
   renderTeamList();renderMedDefList();renderMedPresets();renderOrderCatalog();renderOrderCatalogEdit();
-  loadEntry();renderVerlauf();renderStats();renderWechsel();renderPack();
+  loadEntry();renderVerlauf();renderStats();renderWechsel();renderPack();renderImpf();
   fixLayout();
   // Erinnerung beim Start: was ist heute zu wechseln/laden?
   const dueN=updateWechselBadge();
@@ -1496,7 +1466,7 @@ function init(){
   setInterval(async()=>{
     checkMidnight();
     // Nicht abgleichen, solange Stammdaten unsaved sind – sonst gehen sie verloren.
-    if(!isDirty && !stammDirty){await loadFromCloud();loadEntry();renderVerlauf();renderStats();renderWechsel();renderPack();
+    if(!isDirty && !stammDirty){await loadFromCloud();loadEntry();renderVerlauf();renderStats();renderWechsel();renderPack();renderImpf();
       renderOrderCatalog();renderOrderCatalogEdit();renderTeamList();renderMedDefList()}
   },60000);
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkMidnight();});
@@ -1634,6 +1604,7 @@ function showTab(name,btn){
   if(name==='verlauf')renderVerlauf();
   if(name==='wechsel')renderWechsel();
   if(name==='pack')renderPack();
+  if(name==='impfungen')renderImpf();
   closeMenu();
 }
 function toggleMenu(){
@@ -2017,6 +1988,64 @@ function sendOrder(){
   window.location.href=mailto;
 }
 /* ── PACKLISTE ── */
+/* ── IMPFUNGEN ── */
+function applyImpfSeed(){
+  const da=new Set(impfungen.map(i=>i.id));
+  DEFAULT_IMPF.forEach(d=>{if(!da.has(d.id))impfungen.push({...d})});
+  impfSeedV=IMPF_SEED_V;
+}
+function impfSave(){
+  clearTimeout(impfSave._t);
+  impfSave._t=setTimeout(()=>saveToCloud({light:true}),4000);
+}
+function impfDatumText(e){
+  if(e.datum)return new Date(e.datum+'T12:00:00').toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'numeric'});
+  return e.text||'—';
+}
+function addImpf(){
+  const datum=$id('if-datum').value, grp=$id('if-grp').value;
+  const bez=$id('if-bez').value.trim(), praep=$id('if-praep').value.trim();
+  if(!datum){showToast('\u26a0\ufe0f Bitte Datum w\u00e4hlen','err');return}
+  if(!bez){showToast('\u26a0\ufe0f Bitte Bezeichnung angeben','err');return}
+  impfungen.push({id:'i'+Date.now().toString(36),grp,datum,text:'',bez,praep});
+  $id('if-bez').value='';$id('if-praep').value='';
+  $id('impfBody').style.display='';
+  const h=[...document.querySelectorAll('.wp-fold')].find(x=>x.textContent.includes('Impfhistorie'));
+  if(h){const c=h.querySelector('.wp-chev');if(c)c.classList.add('open');}
+  renderImpf();impfSave();
+  showToast('\u2713 '+grp+' vom '+impfDatumText({datum:datum})+' eingetragen'+(praep?'':' \u2013 Pr\u00e4parat offen'));
+}
+function delImpf(id){
+  const e=impfungen.find(x=>x.id===id);
+  if(e&&!confirm('Impfung l\u00f6schen?\n\n'+impfDatumText(e)+' \u00b7 '+e.grp+' \u00b7 '+e.bez))return;
+  impfungen=impfungen.filter(x=>x.id!==id);
+  renderImpf();impfSave();
+}
+function toggleImpfEdit(){
+  impfEdit=!impfEdit;
+  $id('impfEditBtn').textContent=impfEdit?'\u2713 Fertig':'\u270f\ufe0f Bearbeiten';
+  renderImpf();
+}
+function renderImpf(){
+  const sel=$id('if-grp');
+  if(sel&&!sel.options.length)
+    sel.innerHTML=IMPF_GRUPPEN.map(g=>'<option'+(g==='Influenza'?' selected':'')+'>'+escH(g)+'</option>').join('');
+  const dt=$id('if-datum'); if(dt&&!dt.value)dt.value=todayISO();
+  const w=$id('impfList'); if(!w)return;
+  const offen=impfungen.filter(e=>!e.praep).length;
+  $id('impfCount').textContent=impfungen.length+' Eintr\u00e4ge'+(offen?' \u00b7 '+offen+' ohne Pr\u00e4parat':'');
+  const grp=IMPF_GRUPPEN.filter(g=>impfungen.some(e=>e.grp===g));
+  w.innerHTML=grp.map(g=>{
+    const list=impfungen.filter(e=>e.grp===g).sort((a,b)=>((a.datum||'9999')<(b.datum||'9999')?-1:1));
+    return '<div class="wp-grp">'+(IMPF_ICO[g]||'\ud83d\udc89')+' '+escH(g)+'</div>'+list.map(e=>
+      '<div class="pk-row"><div class="pk-name">'+
+        '<span style="font-family:var(--mono);font-size:12px;color:var(--text3)">'+escH(impfDatumText(e))+'</span>&nbsp;'+escH(e.bez)+
+        (e.praep ? '<div style="font-size:11px;color:var(--text3);margin-top:1px">'+escH(e.praep)+'</div>'
+                 : '<div style="font-size:11px;color:#8a5300;margin-top:1px">Pr\u00e4parat nachtragen</div>')+
+      '</div>'+(impfEdit?'<button class="del-btn" onclick="delImpf(\''+e.id+'\')">\u2715</button>':'')+'</div>').join('');
+  }).join('');
+}
+
 function packSave(){
   clearTimeout(packSave._t);
   packSave._t=setTimeout(()=>saveToCloud({light:true}),5000);
