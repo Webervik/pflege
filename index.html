@@ -1228,8 +1228,8 @@ async function doSetup(){
   $id('setupBtn').disabled=true;$id('setupBtn').textContent='⏳ Verbinde…';hideSetupErr();
   try{
     // Verify token by accessing the repo
-    const r=await fetch(`${GH_API}/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`,{
-      headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json'}
+    const r=await fetch(`${GH_API}/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}?t=${Date.now()}`,{
+      headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json'},cache:'no-store'
     });
     if(r.status===404){
       // File doesn't exist yet – create it with empty data
@@ -1323,8 +1323,8 @@ async function loadFromCloud(){
 
   setSyncBar('syncing','⏳ Lade Daten…');
   try{
-    const r=await fetch(`${GH_API}/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`,{
-      headers:{'Authorization':'Bearer '+ghToken,'Accept':'application/vnd.github+json'}
+    const r=await fetch(`${GH_API}/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}?t=${Date.now()}`,{
+      headers:{'Authorization':'Bearer '+ghToken,'Accept':'application/vnd.github+json'},cache:'no-store'
     });
     if(!r.ok)throw new Error('HTTP '+r.status);
     const meta=await r.json();
@@ -1377,19 +1377,43 @@ async function saveToCloud(opts={}){
   if(backupCount>0 && entryCount < backupCount-5){
     setSyncBar('error',`⚠️ Speichern abgebrochen: nur ${entryCount} Einträge statt ${backupCount}`);
     showToast(`⛔ Speichern gestoppt – Datenverlust verhindert (${entryCount} vs. ${backupCount} Einträge)`,'err');
-    return;
+    return false;
   }
 
   const payload=JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,packItems,packChecked,packTrip,version:4,lastSaved:new Date().toISOString()});
   localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,packItems,packChecked,packTrip,sha:currentSha}));
   try{
-    const body={message:'Pflege-Doku update '+new Date().toISOString(),content:b64encode(payload)};
-    if(currentSha)body.sha=currentSha;
-    const r=await fetch(`${GH_API}/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`,{
-      method:'PUT',
-      headers:{'Authorization':'Bearer '+ghToken,'Accept':'application/vnd.github+json','Content-Type':'application/json'},
-      body:JSON.stringify(body)
-    });
+    const put=async (sha,inhalt)=>{
+      const body={message:'Pflege-Doku update '+new Date().toISOString(),content:b64encode(inhalt)};
+      if(sha)body.sha=sha;
+      return fetch(`${GH_API}/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`,{
+        method:'PUT',
+        headers:{'Authorization':'Bearer '+ghToken,'Accept':'application/vnd.github+json','Content-Type':'application/json'},
+        body:JSON.stringify(body)
+      });
+    };
+    let gesendet=payload;
+    let r=await put(currentSha,gesendet);
+    // SHA-Konflikt: ein anderes Handy hat zwischenzeitlich gespeichert. Frischen Stand holen,
+    // dessen Einträge übernehmen und genau einmal wiederholen. Ohne das Zusammenführen
+    // würden fremde Einträge überschrieben; ohne die Wiederholung bliebe der Dienst
+    // dauerhaft nur lokal gesichert.
+    if(!r.ok && (r.status===409||r.status===422)){
+      const g=await fetch(`${GH_API}/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}?t=${Date.now()}`,{
+        headers:{'Authorization':'Bearer '+ghToken,'Accept':'application/vnd.github+json'},cache:'no-store'
+      });
+      if(g.ok){
+        const gm=await g.json();
+        currentSha=gm.sha;
+        try{
+          const rec=JSON.parse(b64decode(gm.content.replace(/\n/g,'')));
+          Object.entries(rec.entries||{}).forEach(([k,v])=>{if(!db[k])db[k]=v});
+          wechselDone=mergeWechsel(rec.wechselDone||{},wechselDone);
+        }catch{}
+        gesendet=JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,packItems,packChecked,packTrip,version:4,lastSaved:new Date().toISOString()});
+        r=await put(currentSha,gesendet);
+      }
+    }
     if(!r.ok){const e=await r.json();throw new Error(e.message||'HTTP '+r.status)}
     const meta=await r.json();
     currentSha=meta.content.sha;
@@ -1402,18 +1426,20 @@ async function saveToCloud(opts={}){
     const lastBk=+(localStorage.getItem('pflege_backup_ts')||0);
     if(!opts.light || Date.now()-lastBk>18e5){
       localStorage.setItem('pflege_backup_ts',String(Date.now()));
-      writeBackupToGithub(payload).catch(()=>{});
+      writeBackupToGithub(gesendet).catch(()=>{});
     }
 
     setSyncBar('ok','☁️ Gespeichert · '+nowHHMM());
+    return true;
   }catch(e){
     setSyncBar('error','⚠️ Cloud-Fehler (lokal gesichert) · '+e.message);
+    return false;
   }
 }
 async function writeBackupToGithub(payload){
   // Aktuelles Backup-SHA holen
-  const r=await fetch(`${GH_API}/repos/${GH_OWNER}/${GH_REPO}/contents/data_backup.json`,{
-    headers:{'Authorization':'Bearer '+ghToken,'Accept':'application/vnd.github+json'}
+  const r=await fetch(`${GH_API}/repos/${GH_OWNER}/${GH_REPO}/contents/data_backup.json?t=${Date.now()}`,{
+    headers:{'Authorization':'Bearer '+ghToken,'Accept':'application/vnd.github+json'},cache:'no-store'
   });
   const body={message:'Backup '+new Date().toISOString(),content:b64encode(payload)};
   if(r.ok){const m=await r.json();body.sha=m.sha;}
@@ -1427,8 +1453,8 @@ async function restoreFromBackup(){
   if(!confirm('Backup von GitHub laden und als aktuelle Daten verwenden?\nDies überschreibt die aktuellen Daten.'))return;
   setSyncBar('syncing','⏳ Lade Backup…');
   try{
-    const r=await fetch(`${GH_API}/repos/${GH_OWNER}/${GH_REPO}/contents/data_backup.json`,{
-      headers:{'Authorization':'Bearer '+ghToken,'Accept':'application/vnd.github+json'}
+    const r=await fetch(`${GH_API}/repos/${GH_OWNER}/${GH_REPO}/contents/data_backup.json?t=${Date.now()}`,{
+      headers:{'Authorization':'Bearer '+ghToken,'Accept':'application/vnd.github+json'},cache:'no-store'
     });
     if(!r.ok)throw new Error('Kein Backup gefunden');
     const meta=await r.json();
@@ -2400,8 +2426,8 @@ async function saveEntry(){
   const entry=collectEntry();
   // Aktuellen Cloud-Stand holen, bevor wir schreiben – damit andere Handys' Einträge nicht überschrieben werden
   try{
-    const r=await fetch(`${GH_API}/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`,{
-      headers:{'Authorization':'Bearer '+ghToken,'Accept':'application/vnd.github+json'}
+    const r=await fetch(`${GH_API}/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}?t=${Date.now()}`,{
+      headers:{'Authorization':'Bearer '+ghToken,'Accept':'application/vnd.github+json'},cache:'no-store'
     });
     if(r.ok){
       const meta=await r.json();
@@ -2413,8 +2439,11 @@ async function saveEntry(){
     }
   }catch{}
   db[k]=entry;
-  await saveToCloud();isDirty=false;
-  showToast('✓ '+curDienst+' · '+fmtDate(curDate)+' gespeichert');
+  const ok=await saveToCloud();isDirty=false;
+  // Ehrliche Rückmeldung: bei Cloud-Fehler nicht "gespeichert" melden, sonst glaubt
+  // die Pflegerin, der Dienst sei übertragen, obwohl er nur lokal liegt.
+  showToast(ok ? '✓ '+curDienst+' · '+fmtDate(curDate)+' gespeichert'
+               : '⚠️ Nur auf diesem Gerät gesichert – Cloud nicht erreicht', ok?'':'err');
   renderVerlauf();renderStats();
   maybeShowMotivation();
 }
