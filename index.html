@@ -1192,6 +1192,9 @@ let packEdit=false;      // Bearbeitungsmodus der Packliste
 let curDate=todayISO(), curDienst='Frühdienst';
 let isDirty=false;
 let painSel=-1, checks={}, radios={}, durations={};
+// Ungespeicherte Änderungen an Katalog/Team/Medikamenten. Ohne diese Flagge überschrieb
+// der 60-Sekunden-Abgleich die Eingaben, während die Felder sie weiter anzeigten.
+let stammDirty=false;
 let painLog=[];
 let lagers=[], medGiven=[], drinkLog=[], stuhlLog=[], urinLog=[], tracheaLog=[];
 let kappeLog=[], orthosenLog=[], sekretLog=[], verbandLog=[];
@@ -1492,7 +1495,9 @@ function init(){
   window.addEventListener('orientationchange', ()=>setTimeout(fixLayout, 200));
   setInterval(async()=>{
     checkMidnight();
-    if(!isDirty){await loadFromCloud();loadEntry();renderVerlauf();renderStats();renderWechsel();renderPack()}
+    // Nicht abgleichen, solange Stammdaten unsaved sind – sonst gehen sie verloren.
+    if(!isDirty && !stammDirty){await loadFromCloud();loadEntry();renderVerlauf();renderStats();renderWechsel();renderPack();
+      renderOrderCatalog();renderOrderCatalogEdit();renderTeamList();renderMedDefList()}
   },60000);
   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkMidnight();});
 }
@@ -1915,15 +1920,15 @@ function renderTracheaLog(){
 }
 
 /* ── MEDS ── */
-function addMedDef(n='',d=''){medDefs.push({name:n,dose:d});renderMedDefList()}
+function addMedDef(n='',d=''){stammDirty=true;medDefs.push({name:n,dose:d});renderMedDefList()}
 function renderMedDefList(){
   const w=$id('medDefList');
   if(!medDefs.length){w.innerHTML='<div style="color:var(--text3);font-size:13px">Noch keine Medikamente.</div>';renderMedPresets();return}
   w.innerHTML='';
   medDefs.forEach((m,i)=>{
     const d=document.createElement('div');d.className='meddef-row';
-    d.innerHTML=`<input class="mdinput" value="${escH(m.name)}" placeholder="Medikament" style="flex:2" oninput="medDefs[${i}].name=this.value;renderMedPresets()">
-      <input class="mdinput" value="${escH(m.dose)}" placeholder="Dosis" oninput="medDefs[${i}].dose=this.value;renderMedPresets()">
+    d.innerHTML=`<input class="mdinput" value="${escH(m.name)}" placeholder="Medikament" style="flex:2" oninput="stammDirty=true;medDefs[${i}].name=this.value;renderMedPresets()">
+      <input class="mdinput" value="${escH(m.dose)}" placeholder="Dosis" oninput="stammDirty=true;medDefs[${i}].dose=this.value;renderMedPresets()">
       <button class="del-btn" onclick="medDefs.splice(${i},1);renderMedDefList()">✕</button>`;
     w.appendChild(d);
   });
@@ -1962,6 +1967,7 @@ function renderOrderCatalog(){
   `).join('');
 }
 function addOrderItem(){
+  stammDirty=true;
   orderCatalog.push({cat:'Hilfsmittel',name:'',unit:'Packungen'});
   renderOrderCatalogEdit();renderOrderCatalog();
 }
@@ -1970,21 +1976,35 @@ function renderOrderCatalogEdit(){
   if(!orderCatalog.length){w.innerHTML='<div style="color:var(--text3);font-size:13px">Noch keine Produkte.</div>';return}
   w.innerHTML=orderCatalog.map((c,i)=>`
     <div style="display:flex;gap:6px;margin-bottom:6px;align-items:center;flex-wrap:wrap">
-      <select class="mdinput" style="flex:0 0 110px" onchange="orderCatalog[${i}].cat=this.value;renderOrderCatalog()">
+      <select class="mdinput" style="flex:0 0 110px" onchange="stammDirty=true;orderCatalog[${i}].cat=this.value;renderOrderCatalog()">
         <option value="Hilfsmittel" ${c.cat==='Hilfsmittel'?'selected':''}>Hilfsmittel</option>
         <option value="Medikamente" ${c.cat==='Medikamente'?'selected':''}>Medikamente</option>
       </select>
-      <input class="mdinput" value="${escH(c.name)}" placeholder="Produktname" style="flex:2;min-width:140px" oninput="orderCatalog[${i}].name=this.value;renderOrderCatalog()">
-      <select class="mdinput" style="flex:0 0 100px" onchange="orderCatalog[${i}].unit=this.value;renderOrderCatalog()">
+      <input class="mdinput" value="${escH(c.name)}" placeholder="Produktname" style="flex:2;min-width:140px" oninput="stammDirty=true;orderCatalog[${i}].name=this.value;renderOrderCatalog()">
+      <select class="mdinput" style="flex:0 0 100px" onchange="stammDirty=true;orderCatalog[${i}].unit=this.value;renderOrderCatalog()">
         <option value="Packungen" ${c.unit==='Packungen'?'selected':''}>Packungen</option>
         <option value="Stück" ${c.unit==='Stück'?'selected':''}>Stück</option>
       </select>
-      <button class="del-btn" onclick="orderCatalog.splice(${i},1);renderOrderCatalogEdit();renderOrderCatalog()">✕</button>
+      <button class="del-btn" onclick="stammDirty=true;orderCatalog.splice(${i},1);renderOrderCatalogEdit();renderOrderCatalog()">✕</button>
     </div>`).join('');
 }
 async function saveOrderCatalog(){
-  await saveToCloud();
-  showToast('✓ Katalog gespeichert');
+  // Werte aus den Eingabefeldern lesen statt aus dem Arbeitsspeicher – wie saveTeam().
+  // So gewinnt immer das, was die Pflegerin auf dem Bildschirm sieht.
+  const rows=[...$id('orderCatalogEdit').querySelectorAll('.mdinput')];
+  const neu=[];
+  for(let i=0;i+2<rows.length+1;i+=3){
+    const cat=rows[i]?.value, name=(rows[i+1]?.value||'').trim(), unit=rows[i+2]?.value;
+    if(cat&&unit)neu.push({cat,name,unit});
+  }
+  if(neu.length)orderCatalog=neu;
+  const leer=orderCatalog.filter(c=>!c.name).length;
+  orderCatalog=orderCatalog.filter(c=>c.name);          // leere Zeilen nicht mitspeichern
+  renderOrderCatalogEdit();renderOrderCatalog();
+  const ok=await saveToCloud();
+  if(ok)stammDirty=false;
+  showToast(ok ? '✓ Katalog gespeichert ('+orderCatalog.length+' Produkte'+(leer?', '+leer+' leere Zeile'+(leer>1?'n':'')+' entfernt':'')+')'
+               : '⚠️ Nur auf diesem Gerät gesichert – Cloud nicht erreicht', ok?'':'err');
 }
 function sendOrder(){
   const items=orderCatalog.map((c,i)=>({...c,qty:parseInt($id('ord-qty-'+i)?.value)||0})).filter(c=>c.qty>0);
@@ -2365,15 +2385,15 @@ function calcFluidSilent(){
 }
 
 /* ── TEAM ── */
-function addTeamRow(n=''){team.push({name:n});renderTeamList()}
+function addTeamRow(n=''){stammDirty=true;team.push({name:n});renderTeamList()}
 function renderTeamList(){
   const w=$id('teamList');
   if(!team.length){w.innerHTML='<div style="color:var(--text3);font-size:13px">Noch keine Pflegepersonen.</div>';updatePflegerinSel();return}
   w.innerHTML='';
   team.forEach((t,i)=>{
     const d=document.createElement('div');d.className='team-row';
-    d.innerHTML=`<input class="team-name" value="${escH(t.name)}" placeholder="Vollständiger Name" oninput="team[${i}].name=this.value">
-      <button class="del-btn" onclick="team.splice(${i},1);renderTeamList()">✕</button>`;
+    d.innerHTML=`<input class="team-name" value="${escH(t.name)}" placeholder="Vollständiger Name" oninput="stammDirty=true;team[${i}].name=this.value">
+      <button class="del-btn" onclick="stammDirty=true;team.splice(${i},1);renderTeamList()">✕</button>`;
     w.appendChild(d);
   });
   updatePflegerinSel();
@@ -2388,8 +2408,10 @@ async function saveTeam(){
       medDefs[i].name=ins[0].value.trim();medDefs[i].dose=ins[1].value.trim();
     }
   });
-  await saveToCloud();updatePflegerinSel();renderMedPresets();
-  showToast('✓ Team & Medikamente gespeichert');
+  const ok=await saveToCloud();updatePflegerinSel();renderMedPresets();
+  if(ok)stammDirty=false;
+  showToast(ok ? '✓ Team & Medikamente gespeichert'
+               : '⚠️ Nur auf diesem Gerät gesichert – Cloud nicht erreicht', ok?'':'err');
 }
 function updatePflegerinSel(){
   const sel=$id('hdr-pflegerin');if(!sel)return;
