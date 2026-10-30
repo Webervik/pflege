@@ -1009,9 +1009,32 @@ const DEFAULT_ORDER_CATALOG=[
   {cat:'Medikamente',name:'Levetiracetam 1000 mg',unit:'Stück'},
   {cat:'Medikamente',name:'Duloxetin 30 mg',unit:'Stück'},
 ];
+/* Kategorien in Anzeigereihenfolge – nach Lieferant unterteilt (Fahl, Jochum), Rest wie bisher */
+const ORDER_CATS=['Fahl','Jochum (Cough Assist)','Hilfsmittel','Medikamente'];
+/* Nachtrag aus der handschriftlichen Liste (Oktober 2026) – wird einmalig in den
+   bestehenden Katalog eingespielt (siehe applyOrderSeed), fehlende Namen werden ergänzt */
+const ORDER_SEED_V=1;
+const ORDER_SEED=[
+  {cat:'Fahl',name:'Absaugkatheter 12 Ch',unit:'Packungen'},
+  {cat:'Fahl',name:'Trachflow Line Pro (130 cm)',unit:'Stück'},
+  {cat:'Fahl',name:'Non-woven Kompressen, unsteril',unit:'Packungen'},
+  {cat:'Fahl',name:'Optifluid Lubricant Gel',unit:'Stück'},
+  {cat:'Fahl',name:'Bakterienfilter',unit:'Stück'},
+  {cat:'Fahl',name:'Optibrush TK-Bürsten',unit:'Packungen'},
+  {cat:'Fahl',name:'Nebulizer Set (Inhalation)',unit:'Stück'},
+  {cat:'Fahl',name:'Passy Muir Sprechventil',unit:'Stück'},
+  {cat:'Fahl',name:'Verschlusskappe',unit:'Stück'},
+  {cat:'Jochum (Cough Assist)',name:'Gänsegurgel (gerade)',unit:'Stück'},
+  {cat:'Jochum (Cough Assist)',name:'HME-Filter',unit:'Stück'},
+  {cat:'Jochum (Cough Assist)',name:'Schlauchsystem',unit:'Stück'},
+  {cat:'Hilfsmittel',name:'Handschuhe Gr. M',unit:'Packungen'},   // derzeit kein S
+  {cat:'Hilfsmittel',name:'Handschuhe Gr. L',unit:'Packungen'},
+];
+DEFAULT_ORDER_CATALOG.push(...ORDER_SEED);
 const ORDER_EMAIL='v.w@gmx.ch';
 
-/* Wechselplan – Aufgaben laut Papierplan (Stand Juni/Juli 2026, handschriftliche Änderungen übernommen).
+/* Wechselplan – Aufgaben laut Papierplan (Stand Juni/Juli 2026, handschriftliche Änderungen übernommen;
+   Okt. 2026: TK-Band nur noch bei Bedarf, Bakterienfilter Cough Assist monatlich).
    iv = Soll-Intervall in Tagen (0 = kein festes Intervall), pause = ausgesetzt, keine Erinnerung */
 const WECHSEL_TASKS=[
   {g:'Absauge',        id:'abs-filter',      n:'Bakterienfilter',      iv:30, note:'1× monatlich'},
@@ -1021,10 +1044,10 @@ const WECHSEL_TASKS=[
   {g:'Absauge mobil',  id:'absm-schlauch',   n:'Schlauchsystem',       iv:30, note:'1× monatlich'},
   {g:'Inhalierset',    id:'inhalierset',     n:'Inhalierset',          iv:30, note:'1× monatlich', pause:true},
   {g:'Cough Assist',   id:'cough-laden',     n:'Laden',                iv:7,  note:'1× wö · Montag'},
-  {g:'Cough Assist',   id:'cough-filter',    n:'Bakterienfilter',      iv:7,  note:'1× wöchentlich'},
+  {g:'Cough Assist',   id:'cough-filter',    n:'Bakterienfilter',      iv:30, note:'1× monatlich'},
   {g:'Cough Assist',   id:'cough-schlauch',  n:'Schlauchsystem',       iv:30, note:'1× monatlich'},
   {g:'Cough Assist',   id:'cough-maske',     n:'Tubus',                iv:30, note:'1× monatlich'},
-  {g:'Trachealkanüle', id:'kanuelenband',    n:'Kanülenband (TK-Band)',iv:7,  note:'1× wöchentlich'},
+  {g:'Trachealkanüle', id:'kanuelenband',    n:'Kanülenband (TK-Band)',iv:0,  note:'bei Bedarf'},
   {g:'Trachealkanüle', id:'tk-wechsel',      n:'TK-Wechsel',           iv:42, note:'alle 6 Wochen'},
   {g:'GastroTube',     id:'gt-blockung',     n:'Blockung prüfen',      iv:14, note:'alle 14 Tage · 10 ml Aqua'},
   {g:'GastroTube',     id:'gt-wechsel',      n:'GastroTube wechseln',  iv:120,note:'alle 4–6 Monate'},
@@ -1146,6 +1169,7 @@ let db={}, team=[], medDefs=[], orderCatalog=[];   // db[key] = entry
 let wechselDone={};      // wechselDone[taskId][ISO-Datum] = Pflegerin-Name oder 1
 let wechselMonth='';     // 'YYYY-MM' im Monatsraster angezeigt
 let wechselSeedV=0;      // Version des eingespielten Papier-Startstands
+let orderSeedV=0;        // Version des eingespielten Bestellkatalog-Nachtrags
 let packItems=[];        // Packlisten-Katalog (bearbeitbar)
 let packChecked={};      // packChecked[itemId] = Pflegerin-Name oder 1
 let packTrip='';         // Name der aktuellen Reise
@@ -1200,7 +1224,7 @@ async function doSetup(){
     });
     if(r.status===404){
       // File doesn't exist yet – create it with empty data
-      const body=JSON.stringify({entries:{},team:[],medDefs:[],orderCatalog:DEFAULT_ORDER_CATALOG,wechselDone:{},wechselSeedV:0,packItems:DEFAULT_PACK_ITEMS,packChecked:{},packTrip:'',impfungen:DEFAULT_IMPF,impfSeedV:IMPF_SEED_V,version:4});
+      const body=JSON.stringify({entries:{},team:[],medDefs:[],orderCatalog:DEFAULT_ORDER_CATALOG,wechselDone:{},wechselSeedV:0,orderSeedV:ORDER_SEED_V,packItems:DEFAULT_PACK_ITEMS,packChecked:{},packTrip:'',impfungen:DEFAULT_IMPF,impfSeedV:IMPF_SEED_V,version:4});
       const cr=await fetch(`${GH_API}/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_FILE}`,{
         method:'PUT',
         headers:{'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json','Content-Type':'application/json'},
@@ -1282,7 +1306,7 @@ async function loadFromCloud(){
   try{
     const c=JSON.parse(localStorage.getItem(LS_CACHE)||'{}');
     localEntries=c.entries||c.days||{};
-    localTeam=c.team||[];localMedDefs=c.medDefs||[];localOrderCatalog=c.orderCatalog||[];localWechsel=c.wechselDone||{};wechselSeedV=c.wechselSeedV||0;
+    localTeam=c.team||[];localMedDefs=c.medDefs||[];localOrderCatalog=c.orderCatalog||[];localWechsel=c.wechselDone||{};wechselSeedV=c.wechselSeedV||0;orderSeedV=c.orderSeedV||0;
     if(c.packItems)localPackItems=c.packItems;
     if(c.packChecked)localPackChecked=c.packChecked;
     if(typeof c.packTrip==='string')localPackTrip=c.packTrip;
@@ -1322,7 +1346,9 @@ async function loadFromCloud(){
     let seedNeeded=wechselSeedV<WECHSEL_SEED_V;
     if(seedNeeded)applyWechselSeed();
     if(impfSeedV<IMPF_SEED_V){applyImpfSeed();seedNeeded=true;}
-    localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,packItems,packChecked,packTrip,impfungen,impfSeedV,sha:currentSha}));
+    orderSeedV=rec.orderSeedV||orderSeedV||0;
+    if(orderSeedV<ORDER_SEED_V){applyOrderSeed();seedNeeded=true;}
+    localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,orderSeedV,packItems,packChecked,packTrip,impfungen,impfSeedV,sha:currentSha}));
 
     if(newLocal>0||seedNeeded){
       setSyncBar('syncing',`⏳ ${newLocal} lokale Einträge werden hochgeladen…`);
@@ -1336,6 +1362,7 @@ async function loadFromCloud(){
     packItems=localPackItems||DEFAULT_PACK_ITEMS.map(i=>({...i}));packChecked=localPackChecked||{};packTrip=localPackTrip||'';
     impfungen=localImpf||[];if(impfSeedV<IMPF_SEED_V)applyImpfSeed();
     if(wechselSeedV<WECHSEL_SEED_V)applyWechselSeed();
+    if(orderSeedV<ORDER_SEED_V)applyOrderSeed();
     setSyncBar('error','⚠️ Offline – lokaler Cache · '+e.message);
   }
 }
@@ -1353,8 +1380,8 @@ async function saveToCloud(opts={}){
     return false;
   }
 
-  const payload=JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,packItems,packChecked,packTrip,impfungen,impfSeedV,version:4,lastSaved:new Date().toISOString()});
-  localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,packItems,packChecked,packTrip,impfungen,impfSeedV,sha:currentSha}));
+  const payload=JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,orderSeedV,packItems,packChecked,packTrip,impfungen,impfSeedV,version:4,lastSaved:new Date().toISOString()});
+  localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,orderSeedV,packItems,packChecked,packTrip,impfungen,impfSeedV,sha:currentSha}));
   try{
     const put=async (sha,inhalt)=>{
       const body={message:'Pflege-Doku update '+new Date().toISOString(),content:b64encode(inhalt)};
@@ -1383,17 +1410,17 @@ async function saveToCloud(opts={}){
           Object.entries(rec.entries||{}).forEach(([k,v])=>{if(!db[k])db[k]=v});
           wechselDone=mergeWechsel(rec.wechselDone||{},wechselDone);
         }catch{}
-        gesendet=JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,packItems,packChecked,packTrip,impfungen,impfSeedV,version:4,lastSaved:new Date().toISOString()});
+        gesendet=JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,orderSeedV,packItems,packChecked,packTrip,impfungen,impfSeedV,version:4,lastSaved:new Date().toISOString()});
         r=await put(currentSha,gesendet);
       }
     }
     if(!r.ok){const e=await r.json();throw new Error(e.message||'HTTP '+r.status)}
     const meta=await r.json();
     currentSha=meta.content.sha;
-    localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,packItems,packChecked,packTrip,impfungen,impfSeedV,sha:currentSha}));
+    localStorage.setItem(LS_CACHE,JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,orderSeedV,packItems,packChecked,packTrip,impfungen,impfSeedV,sha:currentSha}));
 
     // ── Backup nach jedem erfolgreichen Speichern aktualisieren ──
-    localStorage.setItem('pflege_backup',JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,packItems,packChecked,packTrip,impfungen,impfSeedV,savedAt:new Date().toISOString()}));
+    localStorage.setItem('pflege_backup',JSON.stringify({entries:db,team,medDefs,orderCatalog,wechselDone,wechselSeedV,orderSeedV,packItems,packChecked,packTrip,impfungen,impfSeedV,savedAt:new Date().toISOString()}));
     // Backup-Datei auf GitHub: bei normalen Speicherungen immer,
     // bei Wechselplan-Haken höchstens alle 30 Minuten (data.json hat ohnehin Git-Historie)
     const lastBk=+(localStorage.getItem('pflege_backup_ts')||0);
@@ -1434,7 +1461,7 @@ async function restoreFromBackup(){
     const rec=JSON.parse(b64decode(meta.content.replace(/\n/g,'')));
     const cnt=Object.keys(rec.entries||{}).length;
     if(!confirm(`Backup enthält ${cnt} Einträge. Wiederherstellen?`))return;
-    db=rec.entries||{};team=rec.team||[];medDefs=rec.medDefs||[];orderCatalog=rec.orderCatalog||orderCatalog;wechselDone=rec.wechselDone||{};wechselSeedV=rec.wechselSeedV||0;packItems=rec.packItems||packItems;packChecked=rec.packChecked||{};packTrip=rec.packTrip||'';impfungen=rec.impfungen||impfungen;impfSeedV=rec.impfSeedV||0;
+    db=rec.entries||{};team=rec.team||[];medDefs=rec.medDefs||[];orderCatalog=rec.orderCatalog||orderCatalog;wechselDone=rec.wechselDone||{};wechselSeedV=rec.wechselSeedV||0;orderSeedV=rec.orderSeedV||0;packItems=rec.packItems||packItems;packChecked=rec.packChecked||{};packTrip=rec.packTrip||'';impfungen=rec.impfungen||impfungen;impfSeedV=rec.impfSeedV||0;
     await saveToCloud();
     loadEntry();renderVerlauf();renderStats();renderOrderCatalog();renderOrderCatalogEdit();renderWechsel();renderPack();renderImpf();
     showToast(`✅ Backup mit ${cnt} Einträgen wiederhergestellt`);
@@ -1923,17 +1950,28 @@ function giveMed(name,dose,btn){
 }
 
 /* ── BESTELLUNG ── */
+/* Nachtrag einspielen – nur fehlende Produktnamen ergänzen, vorhandene nie verändern */
+function applyOrderSeed(){
+  const da=new Set(orderCatalog.map(c=>(c.name||'').trim().toLowerCase()));
+  ORDER_SEED.forEach(c=>{if(!da.has(c.name.toLowerCase()))orderCatalog.push({...c})});
+  orderSeedV=ORDER_SEED_V;
+}
+/* Feste Kategorien zuerst, selbst angelegte dahinter */
+function orderCats(){
+  const extra=orderCatalog.map(c=>c.cat).filter(c=>c&&!ORDER_CATS.includes(c));
+  return [...ORDER_CATS,...new Set(extra)];
+}
 function renderOrderCatalog(){
   const w=$id('orderCatalogList');if(!w)return;
   if(!orderCatalog.length){w.innerHTML='<div style="color:var(--text3);font-size:13px">Noch keine Produkte im Katalog.</div>';return}
-  const cats=[...new Set(orderCatalog.map(c=>c.cat))];
+  const cats=orderCats().filter(cat=>orderCatalog.some(c=>c.cat===cat));
   w.innerHTML=cats.map(cat=>`
     <div class="sec-lbl" style="margin-top:10px">${escH(cat)}</div>
     ${orderCatalog.map((c,i)=>c.cat===cat?`
       <div class="frow">
         <div class="flabel">${escH(c.name)}</div>
         <input class="finput" type="number" inputmode="numeric" min="0" id="ord-qty-${i}" placeholder="0">
-        <div class="funit">${escH(c.unit)}</div>
+        <div class="funit" style="width:62px">${escH(c.unit)}</div>
       </div>`:'').join('')}
   `).join('');
 }
@@ -1947,9 +1985,8 @@ function renderOrderCatalogEdit(){
   if(!orderCatalog.length){w.innerHTML='<div style="color:var(--text3);font-size:13px">Noch keine Produkte.</div>';return}
   w.innerHTML=orderCatalog.map((c,i)=>`
     <div style="display:flex;gap:6px;margin-bottom:6px;align-items:center;flex-wrap:wrap">
-      <select class="mdinput" style="flex:0 0 110px" onchange="stammDirty=true;orderCatalog[${i}].cat=this.value;renderOrderCatalog()">
-        <option value="Hilfsmittel" ${c.cat==='Hilfsmittel'?'selected':''}>Hilfsmittel</option>
-        <option value="Medikamente" ${c.cat==='Medikamente'?'selected':''}>Medikamente</option>
+      <select class="mdinput" style="flex:0 0 150px" onchange="stammDirty=true;orderCatalog[${i}].cat=this.value;renderOrderCatalog()">
+        ${orderCats().map(k=>`<option value="${escH(k)}" ${c.cat===k?'selected':''}>${escH(k)}</option>`).join('')}
       </select>
       <input class="mdinput" value="${escH(c.name)}" placeholder="Produktname" style="flex:2;min-width:140px" oninput="stammDirty=true;orderCatalog[${i}].name=this.value;renderOrderCatalog()">
       <select class="mdinput" style="flex:0 0 100px" onchange="stammDirty=true;orderCatalog[${i}].unit=this.value;renderOrderCatalog()">
@@ -1980,7 +2017,13 @@ async function saveOrderCatalog(){
 function sendOrder(){
   const items=orderCatalog.map((c,i)=>({...c,qty:parseInt($id('ord-qty-'+i)?.value)||0})).filter(c=>c.qty>0);
   if(!items.length){showToast('⚠️ Bitte Menge für mind. ein Produkt angeben','err');return}
-  const lines=items.map(c=>'* '+c.name+' – '+c.qty+' '+c.unit);
+  // Nach Kategorie/Lieferant gruppieren – Überschriften nur, wenn mehrere Gruppen dabei sind
+  const cats=orderCats().filter(cat=>items.some(c=>c.cat===cat));
+  const lines=[];
+  cats.forEach((cat,ci)=>{
+    if(cats.length>1)lines.push((ci?'\n':'')+cat+':');
+    items.filter(c=>c.cat===cat).forEach(c=>lines.push('* '+c.name+' – '+c.qty+' '+c.unit));
+  });
   const body='Sehr geehrte Damen und Herren,\n\nich bitte um die Ausstellung eines Rezeptes bzw. eine Verordnung für folgende Produkte:\n\n'
     +lines.join('\n')
     +'\n\nVielen Dank und viele Grüße \n\nViktor Weber \n+49 172 9977 385\nMeraner Str. 18a, 10825 Berlin';
